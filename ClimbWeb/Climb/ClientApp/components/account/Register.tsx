@@ -53,7 +53,7 @@ export class Register extends React.Component<RouteComponentProps<{}>, IRegister
         const password = (document.getElementById("passwordInput") as HTMLInputElement).value;
         const confirm = (document.getElementById("confirmInput") as HTMLInputElement).value;
 
-        const accountClient = new AccountClient();
+        const accountClient = new AccountClient("http://192.168.196.1:45455");
         accountClient.register(email, password, confirm)
             .then(this.onRegisterSuccess)
             .catch(this.onRegisterFail);
