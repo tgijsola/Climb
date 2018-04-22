@@ -13,9 +13,11 @@ subprocess.run("gradle build -p .\\tmp", shell=True, check=True)
 jarsource = ".\\tmp\\build\\outputs\\jar\\tmp-release-1.0.0.jar"
 jartarget = "..\\app\\libs\\"
 os.makedirs(jartarget, exist_ok=True)
-jarname = "climb.jar"
+jarname = "climb-client.jar"
 
-os.remove(jartarget + jarname)
+if os.path.exists(jartarget + jarname):
+    os.remove(jartarget + jarname)
+
 os.rename(jarsource, jartarget + jarname)
 
 shutil.rmtree(newpath)

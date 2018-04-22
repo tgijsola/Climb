@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ClimbAndroid.iml" filepath="$PROJECT_DIR$/ClimbAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ClimbAndroid.iml" filepath="$PROJECT_DIR$/.idea/ClimbAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tmp-debug-1.0.0/tmp-debug-1.0.0.iml" filepath="$PROJECT_DIR$/tmp-debug-1.0.0/tmp-debug-1.0.0.iml" />
     </modules>
   </component>
 </project>
