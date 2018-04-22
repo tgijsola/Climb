@@ -24,13 +24,13 @@ export class Index extends React.Component<RouteComponentProps<{}>, IIndexState>
     }
 
     render() {
-        let games;
+        let games: any;
 
         if (this.state.games != null) {
             if (this.state.games.length === 0) {
                 games = <span>No games created yet!</span>;
             } else {
-                games = this.state.games.map((game) => <li key="{game.id}">{game.name}</li>);
+                games = this.state.games.map((game) => <li key={game.id}>{game.name}</li>);
             }
         } else {
             games = <div></div>;
@@ -43,7 +43,7 @@ export class Index extends React.Component<RouteComponentProps<{}>, IIndexState>
                     color={"#123abc"}
                     loading={this.state.games == null}/>
                 
-                <Link to={ "/games/create" } className={"button"} >Create New Game</Link>
+                <Link to={ "/games/create" } className={"btn btn-danger"} role={"button"} >Create New Game</Link>
 
                 {games}
             </div>
