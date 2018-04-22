@@ -197,6 +197,101 @@ export class AccountClient extends BaseClass {
     }
 }
 
+export class GameClient extends BaseClass {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        super();
+        this.http = http ? http : <any>window;
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
+    }
+
+    create(name: string | null | undefined): Promise<Game> {
+        let url_ = this.baseUrl + "/api/v1/games/create?";
+        if (name !== undefined)
+            url_ += "name=" + encodeURIComponent("" + name) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: Response): Promise<Game> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 201) {
+            return response.text().then((_responseText) => {
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = resultData201 ? Game.fromJS(resultData201) : new Game();
+            return result201;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = resultData400 !== undefined ? resultData400 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Game>(<any>null);
+    }
+
+    listAll(): Promise<Game[]> {
+        let url_ = this.baseUrl + "/api/v1/games";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processListAll(_response);
+        });
+    }
+
+    protected processListAll(response: Response): Promise<Game[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(Game.fromJS(item));
+            }
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Game[]>(<any>null);
+    }
+}
+
 export class UserClient extends BaseClass {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -477,6 +572,150 @@ export class LoginResponse implements ILoginResponse {
 
 export interface ILoginResponse {
     token?: string | undefined;
+}
+
+export class Game implements IGame {
+    id: number;
+    name?: string | undefined;
+    characters?: Character[] | undefined;
+    stages?: Stage[] | undefined;
+
+    constructor(data?: IGame) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.name = data["name"];
+            if (data["characters"] && data["characters"].constructor === Array) {
+                this.characters = [];
+                for (let item of data["characters"])
+                    this.characters.push(Character.fromJS(item));
+            }
+            if (data["stages"] && data["stages"].constructor === Array) {
+                this.stages = [];
+                for (let item of data["stages"])
+                    this.stages.push(Stage.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Game {
+        data = typeof data === 'object' ? data : {};
+        let result = new Game();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (this.characters && this.characters.constructor === Array) {
+            data["characters"] = [];
+            for (let item of this.characters)
+                data["characters"].push(item.toJSON());
+        }
+        if (this.stages && this.stages.constructor === Array) {
+            data["stages"] = [];
+            for (let item of this.stages)
+                data["stages"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IGame {
+    id: number;
+    name?: string | undefined;
+    characters?: Character[] | undefined;
+    stages?: Stage[] | undefined;
+}
+
+export class Character implements ICharacter {
+    id: number;
+    name?: string | undefined;
+
+    constructor(data?: ICharacter) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.name = data["name"];
+        }
+    }
+
+    static fromJS(data: any): Character {
+        data = typeof data === 'object' ? data : {};
+        let result = new Character();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data; 
+    }
+}
+
+export interface ICharacter {
+    id: number;
+    name?: string | undefined;
+}
+
+export class Stage implements IStage {
+    id: number;
+    name?: string | undefined;
+
+    constructor(data?: IStage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.name = data["name"];
+        }
+    }
+
+    static fromJS(data: any): Stage {
+        data = typeof data === 'object' ? data : {};
+        let result = new Stage();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data; 
+    }
+}
+
+export interface IStage {
+    id: number;
+    name?: string | undefined;
 }
 
 export class WeatherForecast implements IWeatherForecast {

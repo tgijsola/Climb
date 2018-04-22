@@ -24,12 +24,19 @@ namespace Climb
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            var connectionString = Configuration.GetConnectionString("defaultConnection");
+            if(string.IsNullOrWhiteSpace(connectionString))
+            {
+                services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("Test"));
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            }
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()

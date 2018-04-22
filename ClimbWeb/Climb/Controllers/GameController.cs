@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Climb.Models;
 using Climb.Requests.Games;
@@ -16,9 +17,18 @@ namespace Climb.Controllers
         {
             this.gameRepository = gameRepository;
         }
+        
+        [HttpGet("/games/{*page}")]
+        [SwaggerIgnore]
+        public IActionResult Index()
+        {
+            ViewData["Title"] = "Game";
+            ViewData["Script"] = "games";
+            return View("~/Views/Page.cshtml");
+        }
 
         [HttpPost("/api/v1/games/create")]
-        [SwaggerResponse(HttpStatusCode.Created, typeof(Game), IsNullable = false)]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Game), IsNullable = false)]
         [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), IsNullable = false)]
         public async Task<IActionResult> Create(CreateRequest request)
         {
@@ -29,7 +39,16 @@ namespace Climb.Controllers
 
             var game = await gameRepository.Create(request.Name);
 
-            return CreatedAtRoute($"games/{game.ID}", game);
+            return Ok(game);
+        }
+
+        [HttpGet("/api/v1/games")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(List<Game>), IsNullable = false)]
+        public async Task<IActionResult> ListAll()
+        {
+            var games = await gameRepository.ListAll();
+
+            return Ok(games);
         }
     }
 }

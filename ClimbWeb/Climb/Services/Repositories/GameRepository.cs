@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Models;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,11 @@ namespace Climb.Services.Repositories
         public GameRepository(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
+        }
+
+        public Task<List<Game>> ListAll()
+        {
+            return dbContext.Game.ToListAsync();
         }
 
         public Task<bool> AnyExist(string name)
