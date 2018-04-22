@@ -67,6 +67,7 @@ namespace Climb
 
             services.AddTransient<IApplicationUserRepository, ApplicationUserRepository>();
             services.AddTransient<IGameRepository, GameRepository>();
+            services.AddTransient<ILeagueRepository, LeagueRepository>();
 
             services.AddSingleton<IEmailSender, EmailSender>();
             services.AddTransient<ITokenHelper, TokenHelper>();

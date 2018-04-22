@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Models;
@@ -17,22 +19,27 @@ namespace Climb.Services.Repositories
 
         public Task<List<Game>> ListAll()
         {
-            return dbContext.Game.ToListAsync();
+            return dbContext.Games.ToListAsync();
         }
 
         public Task<bool> AnyExist(string name)
         {
-            return dbContext.Game.AnyAsync(g => g.Name == name);
+            return dbContext.Games.AnyAsync(g => g.Name == name);
         }
 
         public async Task<Game> Create(string name)
         {
             var game = new Game {Name = name};
 
-            dbContext.Game.Add(game);
+            dbContext.Games.Add(game);
             await dbContext.SaveChangesAsync();
 
             return game;
+        }
+
+        public async Task<bool> Any(Expression<Func<Game, bool>> predicate)
+        {
+            return await dbContext.Games.AnyAsync(predicate);
         }
     }
 }

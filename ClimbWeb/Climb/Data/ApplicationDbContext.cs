@@ -6,7 +6,8 @@ namespace Climb.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public DbSet<Game> Game { get; set; }
+        public DbSet<Game> Games { get; set; }
+        public DbSet<League> Leagues { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

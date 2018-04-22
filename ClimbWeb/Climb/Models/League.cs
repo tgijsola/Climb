@@ -1,0 +1,14 @@
+﻿using Newtonsoft.Json;
+
+namespace Climb.Models
+{
+    public class League
+    {
+        public int ID { get; set; }
+        public int GameID { get; set; }
+        public string Name { get; set; }
+
+        [JsonIgnore]
+        public Game Game { get; set; }
+    }
+}
