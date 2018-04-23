@@ -51,7 +51,7 @@ export class Index extends React.Component<RouteComponentProps<{}>, IIndexState>
     }
 
     private loadGames() {
-        const gameClient = new ClimbClient.GameClient("http://192.168.196.1:45455");
+        const gameClient = new ClimbClient.GameClient(window.location.origin);
         gameClient.listAll()
             .then(games => {
                 console.log(games);

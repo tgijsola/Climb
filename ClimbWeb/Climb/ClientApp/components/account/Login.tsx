@@ -41,7 +41,7 @@ export class Login extends React.Component<RouteComponentProps<{}>, ILoginState>
                    <form onSubmit={(e: any) => {
                        e.preventDefault();
 
-                       const accountClient = new AccountClient("http://192.168.196.1:45455");
+                       const accountClient = new AccountClient(window.location.origin);
                        accountClient.test(accountClient.getAuthorizationToken(), "")
                            .then(value => console.log(value))
                            .catch(reason => alert(reason));
@@ -60,7 +60,7 @@ export class Login extends React.Component<RouteComponentProps<{}>, ILoginState>
         const email = (document.getElementById("emailInput") as HTMLInputElement).value;
         const password = (document.getElementById("passwordInput") as HTMLInputElement).value;
 
-        const accountClient = new AccountClient("http://192.168.196.1:45455");
+        const accountClient = new AccountClient(window.location.origin);
         accountClient.logIn(email, password)
             .then(this.onLogInSuccess)
             .catch(this.onLogInFail);

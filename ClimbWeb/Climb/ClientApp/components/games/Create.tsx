@@ -24,7 +24,7 @@ export class Create extends React.Component<RouteComponentProps<{}>> {
     private onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const gameClient = new ClimbClient.GameClient("http://192.168.196.1:45455");
+        const gameClient = new ClimbClient.GameClient(window.location.origin);
         const gameName = (document.getElementById("gameNameInput") as HTMLInputElement).value;
 
         gameClient.create(gameName)
