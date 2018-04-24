@@ -21,7 +21,7 @@ export class AccountClient extends BaseClass {
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         super();
         this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:53425";
     }
 
     register(email: string | null, password: string | null, confirmPassword: string | null | undefined): Promise<ApplicationUser | null> {
@@ -205,7 +205,7 @@ export class GameClient extends BaseClass {
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         super();
         this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:53425";
     }
 
     create(name: string | null | undefined): Promise<Game> {
@@ -230,12 +230,12 @@ export class GameClient extends BaseClass {
     protected processCreate(response: Response): Promise<Game> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 201) {
+        if (status === 200) {
             return response.text().then((_responseText) => {
-            let result201: any = null;
-            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result201 = resultData201 ? Game.fromJS(resultData201) : new Game();
-            return result201;
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? Game.fromJS(resultData200) : new Game();
+            return result200;
             });
         } else if (status === 400) {
             return response.text().then((_responseText) => {
@@ -300,7 +300,7 @@ export class UserClient extends BaseClass {
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         super();
         this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:53425";
     }
 
     index(): Promise<FileResponse | null> {
@@ -334,57 +334,6 @@ export class UserClient extends BaseClass {
             });
         }
         return Promise.resolve<FileResponse | null>(<any>null);
-    }
-}
-
-export class SampleDataClient extends BaseClass {
-    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
-        super();
-        this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
-    }
-
-    weatherForecasts(): Promise<WeatherForecast[] | null> {
-        let url_ = this.baseUrl + "/api/v1/SampleData/WeatherForecasts";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ = <RequestInit>{
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json", 
-                "Accept": "application/json"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processWeatherForecasts(_response);
-        });
-    }
-
-    protected processWeatherForecasts(response: Response): Promise<WeatherForecast[] | null> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (resultData200 && resultData200.constructor === Array) {
-                result200 = [];
-                for (let item of resultData200)
-                    result200.push(WeatherForecast.fromJS(item));
-            }
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<WeatherForecast[] | null>(<any>null);
     }
 }
 
@@ -716,54 +665,6 @@ export class Stage implements IStage {
 export interface IStage {
     id: number;
     name?: string | undefined;
-}
-
-export class WeatherForecast implements IWeatherForecast {
-    dateFormatted?: string | undefined;
-    temperatureC: number;
-    summary?: string | undefined;
-    temperatureF: number;
-
-    constructor(data?: IWeatherForecast) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.dateFormatted = data["dateFormatted"];
-            this.temperatureC = data["temperatureC"];
-            this.summary = data["summary"];
-            this.temperatureF = data["temperatureF"];
-        }
-    }
-
-    static fromJS(data: any): WeatherForecast {
-        data = typeof data === 'object' ? data : {};
-        let result = new WeatherForecast();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["dateFormatted"] = this.dateFormatted;
-        data["temperatureC"] = this.temperatureC;
-        data["summary"] = this.summary;
-        data["temperatureF"] = this.temperatureF;
-        return data; 
-    }
-}
-
-export interface IWeatherForecast {
-    dateFormatted?: string | undefined;
-    temperatureC: number;
-    summary?: string | undefined;
-    temperatureF: number;
 }
 
 export interface FileResponse {
