@@ -21,7 +21,7 @@ export class AccountClient extends BaseClass {
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         super();
         this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:53425";
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
     }
 
     register(email: string | null, password: string | null, confirmPassword: string | null | undefined): Promise<ApplicationUser | null> {
@@ -205,7 +205,7 @@ export class GameClient extends BaseClass {
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         super();
         this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:53425";
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
     }
 
     create(name: string | null | undefined): Promise<Game> {
@@ -230,12 +230,12 @@ export class GameClient extends BaseClass {
     protected processCreate(response: Response): Promise<Game> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
+        if (status === 201) {
             return response.text().then((_responseText) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 ? Game.fromJS(resultData200) : new Game();
-            return result200;
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = resultData201 ? Game.fromJS(resultData201) : new Game();
+            return result201;
             });
         } else if (status === 400) {
             return response.text().then((_responseText) => {
@@ -406,7 +406,7 @@ export class UserClient extends BaseClass {
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         super();
         this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:53425";
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
     }
 
     index(): Promise<FileResponse | null> {
@@ -770,6 +770,50 @@ export class Stage implements IStage {
 
 export interface IStage {
     id: number;
+    name?: string | undefined;
+}
+
+export class League implements ILeague {
+    id: number;
+    gameID: number;
+    name?: string | undefined;
+
+    constructor(data?: ILeague) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.gameID = data["gameID"];
+            this.name = data["name"];
+        }
+    }
+
+    static fromJS(data: any): League {
+        data = typeof data === 'object' ? data : {};
+        let result = new League();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["gameID"] = this.gameID;
+        data["name"] = this.name;
+        return data; 
+    }
+}
+
+export interface ILeague {
+    id: number;
+    gameID: number;
     name?: string | undefined;
 }
 

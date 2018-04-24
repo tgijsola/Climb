@@ -22,7 +22,15 @@ namespace Climb.Controllers
             this.gameRepository = gameRepository;
         }
 
-        
+        [HttpGet("/leagues/{*page}")]
+        [SwaggerIgnore]
+        public IActionResult Index()
+        {
+            ViewData["Title"] = "League";
+            ViewData["Script"] = "leagues";
+            return View("~/Views/Page.cshtml");
+        }
+
         [HttpGet("/api/v1/leagues")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(List<League>), IsNullable = false)]
         public async Task<IActionResult> ListAll()
@@ -50,7 +58,7 @@ namespace Climb.Controllers
 
             var league = await leagueRepository.Create(request.Name, request.GameID);
 
-            return new ObjectResult(league){StatusCode = StatusCodes.Status201Created};
+            return new ObjectResult(league) {StatusCode = StatusCodes.Status201Created};
         }
     }
 }
