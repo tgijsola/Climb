@@ -21,7 +21,7 @@ export class AccountClient extends BaseClass {
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         super();
         this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:53425";
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
     }
 
     register(email: string | null, password: string | null, confirmPassword: string | null | undefined): Promise<ApplicationUser | null> {
@@ -205,7 +205,7 @@ export class GameClient extends BaseClass {
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         super();
         this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:53425";
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
     }
 
     create(name: string | null | undefined): Promise<Game> {
@@ -230,12 +230,12 @@ export class GameClient extends BaseClass {
     protected processCreate(response: Response): Promise<Game> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
+        if (status === 201) {
             return response.text().then((_responseText) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 ? Game.fromJS(resultData200) : new Game();
-            return result200;
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = resultData201 ? Game.fromJS(resultData201) : new Game();
+            return result201;
             });
         } else if (status === 400) {
             return response.text().then((_responseText) => {
@@ -292,6 +292,112 @@ export class GameClient extends BaseClass {
     }
 }
 
+export class LeagueClient extends BaseClass {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        super();
+        this.http = http ? http : <any>window;
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
+    }
+
+    listAll(): Promise<League[]> {
+        let url_ = this.baseUrl + "/api/v1/leagues";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processListAll(_response);
+        });
+    }
+
+    protected processListAll(response: Response): Promise<League[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(League.fromJS(item));
+            }
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<League[]>(<any>null);
+    }
+
+    create(gameID: number | undefined, name: string | null | undefined): Promise<League> {
+        let url_ = this.baseUrl + "/api/v1/leagues/create?";
+        if (gameID === null)
+            throw new Error("The parameter 'gameID' cannot be null.");
+        else if (gameID !== undefined)
+            url_ += "gameID=" + encodeURIComponent("" + gameID) + "&"; 
+        if (name !== undefined)
+            url_ += "name=" + encodeURIComponent("" + name) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: Response): Promise<League> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 201) {
+            return response.text().then((_responseText) => {
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = resultData201 ? League.fromJS(resultData201) : new League();
+            return result201;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 409) {
+            return response.text().then((_responseText) => {
+            let result409: any = null;
+            let resultData409 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result409 = resultData409 !== undefined ? resultData409 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result409);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<League>(<any>null);
+    }
+}
+
 export class UserClient extends BaseClass {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -300,7 +406,7 @@ export class UserClient extends BaseClass {
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         super();
         this.http = http ? http : <any>window;
-        this.baseUrl = baseUrl ? baseUrl : "http://localhost:53425";
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
     }
 
     index(): Promise<FileResponse | null> {
@@ -664,6 +770,50 @@ export class Stage implements IStage {
 
 export interface IStage {
     id: number;
+    name?: string | undefined;
+}
+
+export class League implements ILeague {
+    id: number;
+    gameID: number;
+    name?: string | undefined;
+
+    constructor(data?: ILeague) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.gameID = data["gameID"];
+            this.name = data["name"];
+        }
+    }
+
+    static fromJS(data: any): League {
+        data = typeof data === 'object' ? data : {};
+        let result = new League();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["gameID"] = this.gameID;
+        data["name"] = this.name;
+        return data; 
+    }
+}
+
+export interface ILeague {
+    id: number;
+    gameID: number;
     name?: string | undefined;
 }
 

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 
@@ -28,7 +29,7 @@ namespace Climb.Controllers
         }
 
         [HttpPost("/api/v1/games/create")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Game), IsNullable = false)]
+        [SwaggerResponse(HttpStatusCode.Created, typeof(Game), IsNullable = false)]
         [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), IsNullable = false)]
         public async Task<IActionResult> Create(CreateRequest request)
         {
@@ -39,7 +40,7 @@ namespace Climb.Controllers
 
             var game = await gameRepository.Create(request.Name);
 
-            return Ok(game);
+            return new ObjectResult(game){StatusCode = StatusCodes.Status201Created};
         }
 
         [HttpGet("/api/v1/games")]
