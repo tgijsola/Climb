@@ -1,8 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Climb.Controllers;
+using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Leagues;
-using Climb.Services.Repositories;
+using Climb.Services.ModelServices;
+using Climb.Test.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -13,29 +15,28 @@ namespace Climb.Test.Controllers
     [TestFixture]
     public class LeagueControllerTest
     {
-        private const string Name = "NewLeague";
-        private const int GameID = 2;
+        private const string LeagueName = "NewLeague";
 
         private LeagueController testObj;
-        private ILeagueRepository leagueRepository;
-        private IGameRepository gameRepository;
+        private ILeagueService leagueService;
+        private ApplicationDbContext dbContext;
 
         [SetUp]
         public void SetUp()
         {
-            leagueRepository = Substitute.For<ILeagueRepository>();
-            gameRepository = Substitute.For<IGameRepository>();
-
-            testObj = new LeagueController(leagueRepository, gameRepository);
+            leagueService = Substitute.For<ILeagueService>();
+            dbContext = DbContextUtility.CreateMockDb();
+            
+            testObj = new LeagueController(leagueService, dbContext);
         }
 
         [Test]
         public async Task Create_Valid_CreatedResult()
         {
-            var request = new CreateRequest {Name = Name, GameID = GameID};
+            var gameID = CreateGame().ID;
+            var request = new CreateRequest {Name = LeagueName, GameID = gameID};
 
-            gameRepository.Any(null).ReturnsForAnyArgs(true);
-            leagueRepository.Create(Name, GameID).Returns(new League {Name = Name, GameID = GameID});
+            leagueService.Create(LeagueName, gameID).Returns(new League {Name = LeagueName, GameID = gameID});
 
             var result = (ObjectResult)await testObj.Create(request);
 
@@ -45,9 +46,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Create_NoGame_NotFound()
         {
-            var request = new CreateRequest {Name = Name, GameID = GameID};
-
-            gameRepository.Any(null).ReturnsForAnyArgs(false);
+            var request = new CreateRequest {Name = LeagueName, GameID = 0};
 
             var result = (ObjectResult)await testObj.Create(request);
 
@@ -57,14 +56,22 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Create_NameTaken_Conflict()
         {
-            var request = new CreateRequest {Name = Name, GameID = GameID};
-
-            gameRepository.Any(null).ReturnsForAnyArgs(true);
-            leagueRepository.Any(null).ReturnsForAnyArgs(true);
+            var gameID = CreateGame().ID;
+            var request = new CreateRequest {Name = LeagueName, GameID = gameID};
+            
+            dbContext.Add(new League {Name = LeagueName, GameID = gameID});
+            dbContext.SaveChanges();
 
             var result = (ObjectResult)await testObj.Create(request);
 
             Assert.AreEqual(StatusCodes.Status409Conflict, result.StatusCode);
+        }
+
+        private Game CreateGame()
+        {
+            var game = dbContext.Games.Add(new Game());
+            dbContext.SaveChanges();
+            return game.Entity;
         }
     }
 }

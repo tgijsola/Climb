@@ -11,9 +11,10 @@ using System;
 namespace Climb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180424035750_Season")]
+    partial class Season
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,7 +113,7 @@ namespace Climb.Migrations
 
                     b.HasIndex("GameID");
 
-                    b.ToTable("Leagues");
+                    b.ToTable("League");
                 });
 
             modelBuilder.Entity("Climb.Models.Season", b =>
@@ -132,7 +133,7 @@ namespace Climb.Migrations
 
                     b.HasIndex("LeagueID");
 
-                    b.ToTable("Seasons");
+                    b.ToTable("Season");
                 });
 
             modelBuilder.Entity("Climb.Models.Stage", b =>
