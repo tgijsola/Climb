@@ -42,7 +42,7 @@ namespace Climb.Controllers
         {
             var league = await dbContext.Leagues
                 .Include(l => l.Seasons).AsNoTracking()
-                .FirstAsync(l => l.ID == leagueID);
+                .FirstOrDefaultAsync(l => l.ID == leagueID);
             if(league == null)
             {
                 return NotFound($"No League with ID '{leagueID}' found.");
@@ -57,7 +57,7 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), IsNullable = false, Description = "Start and end date issues.")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
-            if(!await leagueRepository.Any(l => l.ID == request.LeagueID))
+            if(!await dbContext.Leagues.AnyAsync(l => l.ID == request.LeagueID))
             {
                 return NotFound($"No League with ID '{request.LeagueID}' found.");
             }
