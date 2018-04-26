@@ -1,25 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Climb.Services.Repositories
 {
-    public class LeagueRepository : ILeagueRepository
+    public class LeagueRepository : DbRepository<League>, ILeagueRepository
     {
         private readonly ApplicationDbContext dbContext;
 
         public LeagueRepository(ApplicationDbContext dbContext)
+            : base(dbContext.Leagues)
         {
             this.dbContext = dbContext;
-        }
-
-        public Task<List<League>> ListAll()
-        {
-            return dbContext.Leagues.ToListAsync();
         }
 
         public async Task<League> Create(string name, int gameID)
@@ -30,15 +22,10 @@ namespace Climb.Services.Repositories
                 GameID = gameID,
             };
 
-            dbContext.Leagues.Add(league);
+            dbSet.Add(league);
             await dbContext.SaveChangesAsync();
 
             return league;
-        }
-
-        public async Task<bool> Any(Expression<Func<League, bool>> predicate)
-        {
-            return await dbContext.Leagues.AnyAsync(predicate);
         }
     }
 }

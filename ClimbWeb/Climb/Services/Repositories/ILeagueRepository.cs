@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Climb.Models;
 
 namespace Climb.Services.Repositories
 {
-    public interface ILeagueRepository
+    public interface ILeagueRepository : IDbRepository<League>
     {
         Task<League> Create(string name, int gameID);
-        Task<List<League>> ListAll();
-        Task<bool> Any(Expression<Func<League, bool>> predicate);
     }
 }
