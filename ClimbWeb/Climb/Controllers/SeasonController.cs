@@ -16,12 +16,10 @@ namespace Climb.Controllers
     public class SeasonController : Controller
     {
         private readonly ISeasonRepository seasonRepository;
-        private readonly ILeagueRepository leagueRepository;
         private readonly ApplicationDbContext dbContext;
 
-        public SeasonController(ISeasonRepository seasonRepository, ILeagueRepository leagueRepository, ApplicationDbContext dbContext)
+        public SeasonController(ISeasonRepository seasonRepository, ApplicationDbContext dbContext)
         {
-            this.leagueRepository = leagueRepository;
             this.dbContext = dbContext;
             this.seasonRepository = seasonRepository;
         }

@@ -18,8 +18,8 @@ namespace Climb.Test.Controllers
     {
         private SeasonController testObj;
         private ISeasonRepository seasonRepository;
-        private ILeagueRepository leagueRepository;
         private ApplicationDbContext dbContext;
+
         private int gameID;
 
         [SetUp]
@@ -31,9 +31,8 @@ namespace Climb.Test.Controllers
             gameID = game.Entity.ID;
 
             seasonRepository = Substitute.For<ISeasonRepository>();
-            leagueRepository = Substitute.For<ILeagueRepository>();
 
-            testObj = new SeasonController(seasonRepository, leagueRepository, dbContext);
+            testObj = new SeasonController(seasonRepository, dbContext);
         }
 
         [Test]

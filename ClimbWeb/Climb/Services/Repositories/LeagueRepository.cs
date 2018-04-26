@@ -4,12 +4,11 @@ using Climb.Models;
 
 namespace Climb.Services.Repositories
 {
-    public class LeagueRepository : DbRepository<League>, ILeagueRepository
+    public class LeagueRepository : ILeagueRepository
     {
         private readonly ApplicationDbContext dbContext;
 
         public LeagueRepository(ApplicationDbContext dbContext)
-            : base(dbContext.Leagues)
         {
             this.dbContext = dbContext;
         }
@@ -22,7 +21,7 @@ namespace Climb.Services.Repositories
                 GameID = gameID,
             };
 
-            dbSet.Add(league);
+            dbContext.Add(league);
             await dbContext.SaveChangesAsync();
 
             return league;

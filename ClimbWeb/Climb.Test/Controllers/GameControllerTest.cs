@@ -1,8 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Climb.Controllers;
+using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services.Repositories;
+using Climb.Test.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -15,13 +17,15 @@ namespace Climb.Test.Controllers
     {
         private GameController testObj;
         private IGameRepository gameRepository;
+        private ApplicationDbContext dbContext;
 
         [SetUp]
         public void SetUp()
         {
             gameRepository = Substitute.For<IGameRepository>();
+            dbContext = DbContextUtility.CreateMockDb();
 
-            testObj = new GameController(gameRepository);
+            testObj = new GameController(gameRepository, dbContext);
         }
 
         [Test]
@@ -43,7 +47,8 @@ namespace Climb.Test.Controllers
             const string name = "NewGame";
             var request = new CreateRequest {Name = name};
 
-            gameRepository.AnyExist(name).Returns(true);
+            dbContext.Games.Add(new Game {Name = name});
+            dbContext.SaveChanges();
 
             var result = (ObjectResult)await testObj.Create(request);
 

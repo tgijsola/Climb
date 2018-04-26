@@ -8,12 +8,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Climb.Services.Repositories
 {
     [UsedImplicitly]
-    public class SeasonRepository : DbRepository<Season>, ISeasonRepository
+    public class SeasonRepository : ISeasonRepository
     {
         private readonly ApplicationDbContext dbContext;
 
         public SeasonRepository(ApplicationDbContext dbContext)
-            : base(dbContext.Seasons)
         {
             this.dbContext = dbContext;
         }
@@ -30,7 +29,7 @@ namespace Climb.Services.Repositories
                 Index = seasonCount,
             };
 
-            dbSet.Add(season);
+            dbContext.Add(season);
 
             await dbContext.SaveChangesAsync();
 

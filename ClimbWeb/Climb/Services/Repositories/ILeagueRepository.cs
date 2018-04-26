@@ -3,7 +3,7 @@ using Climb.Models;
 
 namespace Climb.Services.Repositories
 {
-    public interface ILeagueRepository : IDbRepository<League>
+    public interface ILeagueRepository
     {
         Task<League> Create(string name, int gameID);
     }
