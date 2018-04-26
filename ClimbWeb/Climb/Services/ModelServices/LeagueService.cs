@@ -2,13 +2,13 @@
 using Climb.Data;
 using Climb.Models;
 
-namespace Climb.Services.Repositories
+namespace Climb.Services.ModelServices
 {
-    public class LeagueRepository : ILeagueRepository
+    public class LeagueService : ILeagueService
     {
         private readonly ApplicationDbContext dbContext;
 
-        public LeagueRepository(ApplicationDbContext dbContext)
+        public LeagueService(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
         }

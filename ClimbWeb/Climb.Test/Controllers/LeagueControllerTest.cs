@@ -3,7 +3,7 @@ using Climb.Controllers;
 using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Leagues;
-using Climb.Services.Repositories;
+using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,16 +18,16 @@ namespace Climb.Test.Controllers
         private const string LeagueName = "NewLeague";
 
         private LeagueController testObj;
-        private ILeagueRepository leagueRepository;
+        private ILeagueService leagueService;
         private ApplicationDbContext dbContext;
 
         [SetUp]
         public void SetUp()
         {
-            leagueRepository = Substitute.For<ILeagueRepository>();
+            leagueService = Substitute.For<ILeagueService>();
             dbContext = DbContextUtility.CreateMockDb();
             
-            testObj = new LeagueController(leagueRepository, dbContext);
+            testObj = new LeagueController(leagueService, dbContext);
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace Climb.Test.Controllers
             var gameID = CreateGame().ID;
             var request = new CreateRequest {Name = LeagueName, GameID = gameID};
 
-            leagueRepository.Create(LeagueName, gameID).Returns(new League {Name = LeagueName, GameID = gameID});
+            leagueService.Create(LeagueName, gameID).Returns(new League {Name = LeagueName, GameID = gameID});
 
             var result = (ObjectResult)await testObj.Create(request);
 

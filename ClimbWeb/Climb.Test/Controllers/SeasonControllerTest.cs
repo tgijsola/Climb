@@ -4,7 +4,7 @@ using Climb.Controllers;
 using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Seasons;
-using Climb.Services.Repositories;
+using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +17,7 @@ namespace Climb.Test.Controllers
     public class SeasonControllerTest
     {
         private SeasonController testObj;
-        private ISeasonRepository seasonRepository;
+        private ISeasonService seasonService;
         private ApplicationDbContext dbContext;
 
         private int gameID;
@@ -30,9 +30,9 @@ namespace Climb.Test.Controllers
             dbContext.SaveChanges();
             gameID = game.Entity.ID;
 
-            seasonRepository = Substitute.For<ISeasonRepository>();
+            seasonService = Substitute.For<ISeasonService>();
 
-            testObj = new SeasonController(seasonRepository, dbContext);
+            testObj = new SeasonController(seasonService, dbContext);
         }
 
         [Test]

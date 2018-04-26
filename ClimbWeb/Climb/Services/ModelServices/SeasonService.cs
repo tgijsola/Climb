@@ -5,14 +5,14 @@ using Climb.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Climb.Services.Repositories
+namespace Climb.Services.ModelServices
 {
     [UsedImplicitly]
-    public class SeasonRepository : ISeasonRepository
+    public class SeasonService : ISeasonService
     {
         private readonly ApplicationDbContext dbContext;
 
-        public SeasonRepository(ApplicationDbContext dbContext)
+        public SeasonService(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
         }

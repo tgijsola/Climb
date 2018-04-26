@@ -5,7 +5,7 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
-using Climb.Services.Repositories;
+using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +15,12 @@ namespace Climb.Controllers
 {
     public class LeagueController : Controller
     {
-        private readonly ILeagueRepository leagueRepository;
+        private readonly ILeagueService leagueService;
         private readonly ApplicationDbContext dbContext;
 
-        public LeagueController(ILeagueRepository leagueRepository, ApplicationDbContext dbContext)
+        public LeagueController(ILeagueService leagueService, ApplicationDbContext dbContext)
         {
-            this.leagueRepository = leagueRepository;
+            this.leagueService = leagueService;
             this.dbContext = dbContext;
         }
 
@@ -58,7 +58,7 @@ namespace Climb.Controllers
                 return this.CodeResult(StatusCodes.Status409Conflict, $"League with name '{request.Name}' already exists.");
             }
 
-            var league = await leagueRepository.Create(request.Name, request.GameID);
+            var league = await leagueService.Create(request.Name, request.GameID);
 
             return new ObjectResult(league) {StatusCode = StatusCodes.Status201Created};
         }

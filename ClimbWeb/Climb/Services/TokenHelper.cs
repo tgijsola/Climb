@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Climb.Services.Repositories;
+using Climb.Services.ModelServices;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Climb.Services
@@ -13,11 +13,11 @@ namespace Climb.Services
         private const string TokenPrefix = "Bearer ";
 
         private readonly JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-        private readonly IApplicationUserRepository userRepository;
+        private readonly IApplicationUserService userService;
 
-        public TokenHelper(IApplicationUserRepository userRepository)
+        public TokenHelper(IApplicationUserService userService)
         {
-            this.userRepository = userRepository;
+            this.userService = userService;
         }
 
         public string CreateUserToken(SecurityKey securityKey, DateTime expires, string email)
@@ -59,7 +59,7 @@ namespace Climb.Services
                 }
 
                 var email = emailclaim.Value;
-                var user = await userRepository.GetByEmail(email);
+                var user = await userService.GetByEmail(email);
                 return user?.Id;
             }
             catch(ArgumentException)

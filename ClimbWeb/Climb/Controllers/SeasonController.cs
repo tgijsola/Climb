@@ -5,7 +5,7 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
-using Climb.Services.Repositories;
+using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,13 +15,13 @@ namespace Climb.Controllers
 {
     public class SeasonController : Controller
     {
-        private readonly ISeasonRepository seasonRepository;
+        private readonly ISeasonService seasonService;
         private readonly ApplicationDbContext dbContext;
 
-        public SeasonController(ISeasonRepository seasonRepository, ApplicationDbContext dbContext)
+        public SeasonController(ISeasonService seasonService, ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.seasonRepository = seasonRepository;
+            this.seasonService = seasonService;
         }
 
         [HttpGet("/seasons/{*page}")]
@@ -70,7 +70,7 @@ namespace Climb.Controllers
                 return BadRequest("Can't have an end date earlier than the start date.");
             }
 
-            var season = await seasonRepository.Create(request.LeagueID, request.StartDate, request.EndDate);
+            var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);
 
             return this.CodeResult(StatusCodes.Status201Created, season);
         }

@@ -2,7 +2,7 @@ using System.Reflection;
 using Climb.Data;
 using Climb.Extensions;
 using Climb.Services;
-using Climb.Services.Repositories;
+using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -65,10 +65,10 @@ namespace Climb
 
             services.AddMvc();
 
-            services.AddTransient<IApplicationUserRepository, ApplicationUserRepository>();
-            services.AddTransient<IGameRepository, GameRepository>();
-            services.AddTransient<ILeagueRepository, LeagueRepository>();
-            services.AddTransient<ISeasonRepository, SeasonRepository>();
+            services.AddTransient<IApplicationUserService, ApplicationUserService>();
+            services.AddTransient<IGameService, GameService>();
+            services.AddTransient<ILeagueService, LeagueService>();
+            services.AddTransient<ISeasonService, SeasonService>();
 
             services.AddSingleton<IEmailSender, EmailSender>();
             services.AddTransient<ITokenHelper, TokenHelper>();

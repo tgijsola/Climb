@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Climb.Models;
 
-namespace Climb.Services.Repositories
+namespace Climb.Services.ModelServices
 {
-    public interface IGameRepository
+    public interface IGameService
     {
         Task<Game> Create(string name);
     }

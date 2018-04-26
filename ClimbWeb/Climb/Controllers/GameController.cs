@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Games;
-using Climb.Services.Repositories;
+using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +14,12 @@ namespace Climb.Controllers
 {
     public class GameController : Controller
     {
-        private readonly IGameRepository gameRepository;
+        private readonly IGameService gameService;
         private readonly ApplicationDbContext dbContext;
 
-        public GameController(IGameRepository gameRepository, ApplicationDbContext dbContext)
+        public GameController(IGameService gameService, ApplicationDbContext dbContext)
         {
-            this.gameRepository = gameRepository;
+            this.gameService = gameService;
             this.dbContext = dbContext;
         }
 
@@ -42,7 +42,7 @@ namespace Climb.Controllers
                 return BadRequest($"Game with name '{request.Name}' already exists.");
             }
 
-            var game = await gameRepository.Create(request.Name);
+            var game = await gameService.Create(request.Name);
 
             return new ObjectResult(game) {StatusCode = StatusCodes.Status201Created};
         }

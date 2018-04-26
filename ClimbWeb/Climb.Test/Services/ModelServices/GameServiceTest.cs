@@ -1,15 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Climb.Data;
-using Climb.Services.Repositories;
+using Climb.Services.ModelServices;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
-namespace Climb.Test.Repositories
+namespace Climb.Test.Services.ModelServices
 {
     [TestFixture]
-    public class GameRepositoryTest
+    public class GameServiceTest
     {
-        private GameRepository testObj;
+        private GameService testObj;
         private ApplicationDbContext dbContext;
 
         [SetUp]
@@ -21,7 +21,7 @@ namespace Climb.Test.Repositories
 
             dbContext = new ApplicationDbContext(options);
 
-            testObj = new GameRepository(dbContext);
+            testObj = new GameService(dbContext);
         }
 
         [Test]
