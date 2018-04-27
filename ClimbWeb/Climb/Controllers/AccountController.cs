@@ -79,8 +79,8 @@ namespace Climb.Controllers
 
         [HttpPost("/api/v1/account/logIn")]
         [AllowAnonymous]
-        [SwaggerResponse(HttpStatusCode.BadRequest, null)]
         [SwaggerResponse(HttpStatusCode.OK, typeof(LoginResponse), IsNullable = false)]
+        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), IsNullable = false, Description = "Email or password is incorrect.")]
         public async Task<IActionResult> LogIn(LoginRequest request)
         {
             var result = await signInManager.PasswordSignInAsync(request.Email, request.Password, true, false);
@@ -89,12 +89,13 @@ namespace Climb.Controllers
                 logger.LogInformation("User logged in.");
 
                 var token = tokenHelper.CreateUserToken(configuration.GetSecurityKey(), DateTime.Now.AddMinutes(30), request.Email);
+                var response = new LoginResponse(token);
 
-                return Ok(new LoginResponse(token));
+                return Ok(response);
             }
 
             logger.LogInformation("User login failed.");
-            return BadRequest();
+            return BadRequest("Email or password is incorrect.");
         }
 
         [HttpGet("/api/v1/account/test")]

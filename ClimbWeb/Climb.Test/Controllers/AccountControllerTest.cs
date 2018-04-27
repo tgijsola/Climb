@@ -9,18 +9,13 @@ using Climb.Test.Utilities;
 using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
-using NSubstitute.Extensions;
 using NUnit.Framework;
 
 namespace Climb.Test.Controllers
 {
-
     [TestFixture]
     public class AccountControllerTest
     {
@@ -39,10 +34,6 @@ namespace Climb.Test.Controllers
             }
         }
 
-
-        private const string Email = "a@a.com";
-        private const string Password = "Abc_123";
-
         private TestController testObj;
         private FakeUserManager userManager;
         private FakeSignInManager signInManager;
@@ -51,7 +42,6 @@ namespace Climb.Test.Controllers
         private IConfiguration configuration;
         private ITokenHelper tokenHelper;
         private IUrlUtility urlUtility;
-        private IObjectModelValidator objectModelValidator;
 
         [SetUp]
         public void SetUp()
@@ -61,19 +51,18 @@ namespace Climb.Test.Controllers
             logger = Substitute.For<ILogger<AccountController>>();
             emailSender = Substitute.For<IEmailSender>();
             configuration = Substitute.For<IConfiguration>();
+            configuration["SecurityKey"].Returns("key");
             tokenHelper = Substitute.For<ITokenHelper>();
             urlUtility = Substitute.For<IUrlUtility>();
-            objectModelValidator = Substitute.For<IObjectModelValidator>();
 
             testObj = new TestController(signInManager, logger, userManager, emailSender, configuration, tokenHelper, urlUtility)
             {
                 ControllerContext = {HttpContext = new DefaultHttpContext()},
-                ObjectValidator = objectModelValidator,
             };
         }
 
         [Test]
-        public async Task Register_Valid_Ok()
+        public async Task Register_Valid_Created()
         {
             userManager.CreateAsync(null, null).ReturnsForAnyArgs(IdentityResult.Success);
 
@@ -93,6 +82,30 @@ namespace Climb.Test.Controllers
             var request = new RegisterRequest();
 
             var result = await testObj.Register(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
+        }
+
+        [Test]
+        public async Task LogIn_Valid_Ok()
+        {
+            signInManager.PasswordSignInAsync("", "", false, false).ReturnsForAnyArgs(SignInResult.Success);
+
+            var request = new LoginRequest();
+
+            var result = await testObj.LogIn(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+        }
+        
+        [Test]
+        public async Task LogIn_IncorrectCreds_BadRequest()
+        {
+            signInManager.PasswordSignInAsync("", "", false, false).ReturnsForAnyArgs(SignInResult.Failed);
+
+            var request = new LoginRequest();
+
+            var result = await testObj.LogIn(request);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
         }
