@@ -5,6 +5,7 @@ using Climb.Attributes;
 using Climb.Data;
 using Climb.Extensions;
 using Climb.Requests;
+using Climb.Requests.Account;
 using Climb.Responses;
 using Climb.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -78,14 +79,14 @@ namespace Climb.Controllers
         [AllowAnonymous]
         [SwaggerResponse(HttpStatusCode.BadRequest, null)]
         [SwaggerResponse(HttpStatusCode.OK, typeof(LoginResponse), IsNullable = false)]
-        public async Task<IActionResult> LogIn(string email, string password)
+        public async Task<IActionResult> LogIn(LoginRequest request)
         {
-            var result = await signInManager.PasswordSignInAsync(email, password, true, false);
+            var result = await signInManager.PasswordSignInAsync(request.Email, request.Password, true, false);
             if(result.Succeeded)
             {
                 logger.LogInformation("User logged in.");
 
-                var token = tokenHelper.CreateUserToken(configuration.GetSecurityKey(), DateTime.Now.AddMinutes(30), email);
+                var token = tokenHelper.CreateUserToken(configuration.GetSecurityKey(), DateTime.Now.AddMinutes(30), request.Email);
 
                 return Ok(new LoginResponse(token));
             }

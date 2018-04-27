@@ -73,16 +73,16 @@ export class AccountClient extends BaseClass {
         return Promise.resolve<ApplicationUser | null>(<any>null);
     }
 
-    logIn(email: string | null, password: string | null): Promise<LoginResponse> {
+    logIn(email: string | null | undefined, password: string | null | undefined, rememberMe: boolean | undefined): Promise<LoginResponse> {
         let url_ = this.baseUrl + "/api/v1/account/logIn?";
-        if (email === undefined)
-            throw new Error("The parameter 'email' must be defined.");
-        else
+        if (email !== undefined)
             url_ += "email=" + encodeURIComponent("" + email) + "&"; 
-        if (password === undefined)
-            throw new Error("The parameter 'password' must be defined.");
-        else
+        if (password !== undefined)
             url_ += "password=" + encodeURIComponent("" + password) + "&"; 
+        if (rememberMe === null)
+            throw new Error("The parameter 'rememberMe' cannot be null.");
+        else if (rememberMe !== undefined)
+            url_ += "rememberMe=" + encodeURIComponent("" + rememberMe) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
@@ -395,6 +395,129 @@ export class LeagueClient extends BaseClass {
             });
         }
         return Promise.resolve<League>(<any>null);
+    }
+}
+
+export class SeasonClient extends BaseClass {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        super();
+        this.http = http ? http : <any>window;
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
+    }
+
+    listForLeague(leagueID: number): Promise<Season[]> {
+        let url_ = this.baseUrl + "/api/v1/seasons?";
+        if (leagueID === undefined || leagueID === null)
+            throw new Error("The parameter 'leagueID' must be defined and cannot be null.");
+        else
+            url_ += "leagueID=" + encodeURIComponent("" + leagueID) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processListForLeague(_response);
+        });
+    }
+
+    protected processListForLeague(response: Response): Promise<Season[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(Season.fromJS(item));
+            }
+            return result200;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Season[]>(<any>null);
+    }
+
+    create(leagueID: number | undefined, startDate: Date | undefined, endDate: Date | undefined): Promise<Season> {
+        let url_ = this.baseUrl + "/api/v1/seasons/create?";
+        if (leagueID === null)
+            throw new Error("The parameter 'leagueID' cannot be null.");
+        else if (leagueID !== undefined)
+            url_ += "leagueID=" + encodeURIComponent("" + leagueID) + "&"; 
+        if (startDate === null)
+            throw new Error("The parameter 'startDate' cannot be null.");
+        else if (startDate !== undefined)
+            url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toJSON() : "") + "&"; 
+        if (endDate === null)
+            throw new Error("The parameter 'endDate' cannot be null.");
+        else if (endDate !== undefined)
+            url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toJSON() : "") + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: Response): Promise<Season> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 201) {
+            return response.text().then((_responseText) => {
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = resultData201 ? Season.fromJS(resultData201) : new Season();
+            return result201;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = resultData400 !== undefined ? resultData400 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Season>(<any>null);
     }
 }
 
@@ -815,6 +938,58 @@ export interface ILeague {
     id: number;
     gameID: number;
     name?: string | undefined;
+}
+
+export class Season implements ISeason {
+    id: number;
+    leagueID: number;
+    index: number;
+    startDate: Date;
+    endDate: Date;
+
+    constructor(data?: ISeason) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.leagueID = data["leagueID"];
+            this.index = data["index"];
+            this.startDate = data["startDate"] ? new Date(data["startDate"].toString()) : <any>undefined;
+            this.endDate = data["endDate"] ? new Date(data["endDate"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): Season {
+        data = typeof data === 'object' ? data : {};
+        let result = new Season();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["leagueID"] = this.leagueID;
+        data["index"] = this.index;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        return data; 
+    }
+}
+
+export interface ISeason {
+    id: number;
+    leagueID: number;
+    index: number;
+    startDate: Date;
+    endDate: Date;
 }
 
 export interface FileResponse {

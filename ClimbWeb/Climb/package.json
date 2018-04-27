@@ -32,7 +32,8 @@
     "webpack-hot-middleware": "2.18.2",
     "less": "3.0.1",
     "less-loader": "4.1.0",
-    "uglifyjs-webpack-plugin": "1.2.4"
+    "uglifyjs-webpack-plugin": "1.2.4",
+    "popper.js": "1.14.3"
   },
   "dependencies": {
     "react-spinners": "^0.3.2"
