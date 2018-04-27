@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Climb.Requests
+namespace Climb.Requests.Account
 {
     public class RegisterRequest
     {

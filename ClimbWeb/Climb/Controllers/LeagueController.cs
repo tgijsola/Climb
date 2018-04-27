@@ -6,7 +6,6 @@ using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
 using Climb.Services.ModelServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NSwag.Annotations;
@@ -55,12 +54,12 @@ namespace Climb.Controllers
 
             if(await dbContext.Leagues.AnyAsync(l => l.Name == request.Name))
             {
-                return this.CodeResult(StatusCodes.Status409Conflict, $"League with name '{request.Name}' already exists.");
+                return this.CodeResult(HttpStatusCode.Conflict, $"League with name '{request.Name}' already exists.");
             }
 
             var league = await leagueService.Create(request.Name, request.GameID);
 
-            return new ObjectResult(league) {StatusCode = StatusCodes.Status201Created};
+            return this.CodeResult(HttpStatusCode.Created, league);
         }
     }
 }

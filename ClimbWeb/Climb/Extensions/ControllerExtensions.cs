@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Climb.Extensions
 {
     public static class ControllerExtensions
     {
-        public static ObjectResult CodeResult(this Controller controller, int code, object value)
+        public static ObjectResult CodeResult(this Controller controller, HttpStatusCode code, object value)
         {
-            return new ObjectResult(value){StatusCode = code};
+            return new ObjectResult(value){StatusCode = (int)code};
         }
     }
 }
