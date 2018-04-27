@@ -3,21 +3,22 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
 using Climb.Data;
-using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
-    public class SeasonController : Controller
+    public class SeasonController : BaseController<SeasonController>
     {
         private readonly ISeasonService seasonService;
         private readonly ApplicationDbContext dbContext;
 
-        public SeasonController(ISeasonService seasonService, ApplicationDbContext dbContext)
+        public SeasonController(ISeasonService seasonService, ApplicationDbContext dbContext, ILogger<SeasonController> logger)
+            : base(logger)
         {
             this.dbContext = dbContext;
             this.seasonService = seasonService;
@@ -42,10 +43,10 @@ namespace Climb.Controllers
                 .FirstOrDefaultAsync(l => l.ID == leagueID);
             if(league == null)
             {
-                return NotFound($"No League with ID '{leagueID}' found.");
+                return CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.");
             }
 
-            return Ok(league.Seasons);
+            return CodeResult(HttpStatusCode.OK, league.Seasons);
         }
 
         [HttpPost("/api/v1/seasons/create")]
@@ -56,22 +57,22 @@ namespace Climb.Controllers
         {
             if(!await dbContext.Leagues.AnyAsync(l => l.ID == request.LeagueID))
             {
-                return NotFound($"No League with ID '{request.LeagueID}' found.");
+                return CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{request.LeagueID}' found.");
             }
 
             if(request.StartDate < DateTime.Now)
             {
-                return BadRequest("Can't have start date in the past.");
+                return CodeResultAndLog(HttpStatusCode.BadRequest, "Can't have start date in the past.");
             }
 
             if(request.EndDate < request.StartDate)
             {
-                return BadRequest("Can't have an end date earlier than the start date.");
+                return CodeResultAndLog(HttpStatusCode.BadRequest, "Can't have an end date earlier than the start date.");
             }
 
             var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);
 
-            return this.CodeResult(HttpStatusCode.Created, season);
+            return CodeResultAndLog(HttpStatusCode.Created, season, "Season created.");
         }
     }
 }

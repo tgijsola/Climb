@@ -6,18 +6,19 @@ using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services.ModelServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
-    public class GameController : Controller
+    public class GameController : BaseController<GameController>
     {
         private readonly IGameService gameService;
         private readonly ApplicationDbContext dbContext;
 
-        public GameController(IGameService gameService, ApplicationDbContext dbContext)
+        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger)
+            : base(logger)
         {
             this.gameService = gameService;
             this.dbContext = dbContext;
@@ -39,12 +40,12 @@ namespace Climb.Controllers
         {
             if(await dbContext.Games.AnyAsync(g => g.Name == request.Name))
             {
-                return BadRequest($"Game with name '{request.Name}' already exists.");
+                return CodeResult(HttpStatusCode.BadRequest, $"Game with name '{request.Name}' already exists.");
             }
 
             var game = await gameService.Create(request.Name);
 
-            return new ObjectResult(game) {StatusCode = StatusCodes.Status201Created};
+            return CodeResultAndLog(HttpStatusCode.Created, game, "Game created.");
         }
 
         [HttpGet("/api/v1/games")]
@@ -53,7 +54,7 @@ namespace Climb.Controllers
         {
             var games = await dbContext.Games.ToListAsync();
 
-            return Ok(games);
+            return CodeResult(HttpStatusCode.OK, games);
         }
     }
 }

@@ -1,12 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Leagues;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -26,8 +26,8 @@ namespace Climb.Test.Controllers
         {
             leagueService = Substitute.For<ILeagueService>();
             dbContext = DbContextUtility.CreateMockDb();
-            
-            testObj = new LeagueController(leagueService, dbContext);
+
+            testObj = new LeagueController(leagueService, dbContext, Substitute.For<ILogger<LeagueController>>());
         }
 
         [Test]
@@ -38,9 +38,9 @@ namespace Climb.Test.Controllers
 
             leagueService.Create(LeagueName, gameID).Returns(new League {Name = LeagueName, GameID = gameID});
 
-            var result = (ObjectResult)await testObj.Create(request);
+            var result = await testObj.Create(request);
 
-            Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.Created);
         }
 
         [Test]
@@ -48,9 +48,9 @@ namespace Climb.Test.Controllers
         {
             var request = new CreateRequest {Name = LeagueName, GameID = 0};
 
-            var result = (ObjectResult)await testObj.Create(request);
+            var result = await testObj.Create(request);
 
-            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
 
         [Test]
@@ -58,13 +58,13 @@ namespace Climb.Test.Controllers
         {
             var gameID = CreateGame().ID;
             var request = new CreateRequest {Name = LeagueName, GameID = gameID};
-            
+
             dbContext.Add(new League {Name = LeagueName, GameID = gameID});
             dbContext.SaveChanges();
 
-            var result = (ObjectResult)await testObj.Create(request);
+            var result = await testObj.Create(request);
 
-            Assert.AreEqual(StatusCodes.Status409Conflict, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.Conflict);
         }
 
         private Game CreateGame()

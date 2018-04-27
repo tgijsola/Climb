@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
 using Climb.Models;
@@ -7,6 +8,7 @@ using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -25,7 +27,7 @@ namespace Climb.Test.Controllers
             gameService = Substitute.For<IGameService>();
             dbContext = DbContextUtility.CreateMockDb();
 
-            testObj = new GameController(gameService, dbContext);
+            testObj = new GameController(gameService, dbContext, Substitute.For<ILogger<GameController>>());
         }
 
         [Test]
@@ -36,9 +38,9 @@ namespace Climb.Test.Controllers
 
             gameService.Create(name).Returns(new Game {Name = name});
 
-            var result = (ObjectResult)await testObj.Create(request);
+            var result = await testObj.Create(request);
 
-            Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.Created);
         }
 
         [Test]
@@ -50,9 +52,9 @@ namespace Climb.Test.Controllers
             dbContext.Games.Add(new Game {Name = name});
             dbContext.SaveChanges();
 
-            var result = (ObjectResult)await testObj.Create(request);
+            var result = await testObj.Create(request);
 
-            Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
         }
     }
 }

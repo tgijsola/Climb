@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
@@ -6,8 +7,7 @@ using Climb.Models;
 using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -32,15 +32,15 @@ namespace Climb.Test.Controllers
 
             seasonService = Substitute.For<ISeasonService>();
 
-            testObj = new SeasonController(seasonService, dbContext);
+            testObj = new SeasonController(seasonService, dbContext, Substitute.For<ILogger<SeasonController>>());
         }
 
         [Test]
         public async Task ListForLeague_NoLeague_NotFound()
         {
-            var result = (ObjectResult)await testObj.ListForLeague(0);
+            var result = await testObj.ListForLeague(0);
 
-            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
 
         [Test]
@@ -48,9 +48,9 @@ namespace Climb.Test.Controllers
         {
             var league = CreateLeague();
 
-            var result = (ObjectResult)await testObj.ListForLeague(league.ID);
+            var result = await testObj.ListForLeague(league.ID);
 
-            Assert.AreEqual(StatusCodes.Status200OK, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
         }
 
         [Test]
@@ -59,9 +59,9 @@ namespace Climb.Test.Controllers
             var league = CreateLeague();
             var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
 
-            var result = (ObjectResult)await testObj.Create(request);
+            var result = await testObj.Create(request);
 
-            Assert.AreEqual(StatusCodes.Status201Created, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.Created);
         }
 
         [Test]
@@ -69,9 +69,9 @@ namespace Climb.Test.Controllers
         {
             var request = new CreateRequest(0, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
 
-            var result = (ObjectResult)await testObj.Create(request);
+            var result = await testObj.Create(request);
 
-            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
 
         [Test]
@@ -80,9 +80,9 @@ namespace Climb.Test.Controllers
             var league = CreateLeague();
             var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(-1), DateTime.Now.AddMinutes(2));
 
-            var result = (ObjectResult)await testObj.Create(request);
+            var result = await testObj.Create(request);
 
-            Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
         }
 
         [Test]
@@ -91,9 +91,9 @@ namespace Climb.Test.Controllers
             var league = CreateLeague();
             var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(3), DateTime.Now.AddMinutes(2));
 
-            var result = (ObjectResult)await testObj.Create(request);
+            var result = await testObj.Create(request);
 
-            Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
         }
 
         private League CreateLeague()
