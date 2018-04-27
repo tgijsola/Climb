@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using NSwag.Annotations;
 
 namespace Climb.Controllers
 {
@@ -49,7 +48,7 @@ namespace Climb.Controllers
 
         [HttpPost("/api/v1/account/register")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(ApplicationUser))]
-        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), IsNullable = false, Description = "Email or password is not valid.")]
+        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Email or password is not valid.")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
             if(TryValidateModel(request))
@@ -79,8 +78,8 @@ namespace Climb.Controllers
 
         [HttpPost("/api/v1/account/logIn")]
         [AllowAnonymous]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(LoginResponse), IsNullable = false)]
-        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), IsNullable = false, Description = "Email or password is incorrect.")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(LoginResponse))]
+        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Email or password is incorrect.")]
         public async Task<IActionResult> LogIn(LoginRequest request)
         {
             var result = await signInManager.PasswordSignInAsync(request.Email, request.Password, true, false);

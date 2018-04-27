@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Climb.Attributes;
 using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
@@ -8,7 +9,6 @@ using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NSwag.Annotations;
 
 namespace Climb.Controllers
 {
@@ -33,8 +33,8 @@ namespace Climb.Controllers
         }
 
         [HttpGet("/api/v1/seasons")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Season[]), IsNullable = false)]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), IsNullable = false, Description = "Can't find league.")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Season[]))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
         public async Task<IActionResult> ListForLeague(int leagueID)
         {
             var league = await dbContext.Leagues
@@ -49,9 +49,9 @@ namespace Climb.Controllers
         }
 
         [HttpPost("/api/v1/seasons/create")]
-        [SwaggerResponse(HttpStatusCode.Created, typeof(Season), IsNullable = false)]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), IsNullable = false, Description = "Can't find league.")]
-        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), IsNullable = false, Description = "Start and end date issues.")]
+        [SwaggerResponse(HttpStatusCode.Created, typeof(Season))]
+        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Start and end date issues.")]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
             if(!await dbContext.Leagues.AnyAsync(l => l.ID == request.LeagueID))

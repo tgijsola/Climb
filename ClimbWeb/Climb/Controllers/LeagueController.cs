@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Climb.Attributes;
 using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
@@ -8,7 +9,6 @@ using Climb.Requests.Leagues;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NSwag.Annotations;
 
 namespace Climb.Controllers
 {
@@ -33,7 +33,7 @@ namespace Climb.Controllers
         }
 
         [HttpGet("/api/v1/leagues")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(List<League>), IsNullable = false)]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(List<League>))]
         public async Task<IActionResult> ListAll()
         {
             var leagues = await dbContext.Leagues.ToListAsync();
@@ -42,9 +42,9 @@ namespace Climb.Controllers
         }
 
         [HttpPost("/api/v1/leagues/create")]
-        [SwaggerResponse(HttpStatusCode.Created, typeof(League), IsNullable = false)]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), IsNullable = false)]
-        [SwaggerResponse(HttpStatusCode.Conflict, typeof(string), IsNullable = false)]
+        [SwaggerResponse(HttpStatusCode.Created, typeof(League))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find game.")]
+        [SwaggerResponse(HttpStatusCode.Conflict, typeof(string), "League name taken.")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
             if(!await dbContext.Games.AnyAsync(g => g.ID == request.GameID))

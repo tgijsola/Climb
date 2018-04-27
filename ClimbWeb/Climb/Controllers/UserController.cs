@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Climb.Attributes;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Climb.Controllers
 {
     public class UserController : Controller
     {
-        [Route("/user/{*page}")]
+        [HttpGet("/user/{*page}")]
+        [SwaggerIgnore]
         public IActionResult Index()
         {
             ViewData["Title"] = "User";
