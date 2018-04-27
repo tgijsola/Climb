@@ -54,16 +54,19 @@ export class AccountClient extends BaseClass {
     protected processRegister(response: Response): Promise<ApplicationUser | null> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 400) {
+        if (status === 201) {
             return response.text().then((_responseText) => {
-            return throwException("A server error occurred.", status, _responseText, _headers);
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = resultData201 ? ApplicationUser.fromJS(resultData201) : <any>null;
+            return result201;
             });
-        } else if (status === 200) {
+        } else if (status === 400) {
             return response.text().then((_responseText) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 ? ApplicationUser.fromJS(resultData200) : <any>null;
-            return result200;
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = resultData400 !== undefined ? resultData400 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result400);
             });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {

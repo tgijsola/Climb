@@ -6,7 +6,6 @@ using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NSwag.Annotations;
@@ -72,7 +71,7 @@ namespace Climb.Controllers
 
             var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);
 
-            return this.CodeResult(StatusCodes.Status201Created, season);
+            return this.CodeResult(HttpStatusCode.Created, season);
         }
     }
 }
