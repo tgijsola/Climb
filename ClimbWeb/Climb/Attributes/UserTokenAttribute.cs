@@ -2,9 +2,9 @@
 
 namespace Climb.Attributes
 {
-    public class UserToken : FromHeaderAttribute
+    public class UserTokenAttribute : FromHeaderAttribute
     {
-        public UserToken()
+        public UserTokenAttribute()
         {
             Name = "Authorization";
         }
