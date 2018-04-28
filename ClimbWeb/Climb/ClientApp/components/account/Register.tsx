@@ -21,37 +21,33 @@ export class Register extends React.Component<RouteComponentProps<{}>, IRegister
 
     public render() {
         if (this.state.user != null) {
-            return <h1>Hello </h1>;
+            return <h1>Hello {this.state.user.userName}</h1>;
         }
 
-        return <div>
-                   <h2 id="subtitle">Register</h2>
-                   <form onSubmit={this.onRegisterClick}>
-                       <div>
-                           <label>Email</label>
-                           <input id="emailInput" type="email"/>
-                       </div>
-                       <div>
-                           <label>Password</label>
-                           <input id="passwordInput" type="password"/>
-                       </div>
-                       <div>
-                           <label>Confirm Password</label>
-                           <input id="confirmInput" type="password"/>
-                       </div>
-                       <button>Register</button>
-                   </form>
-
-                   <Link to={ '/account' }>Login</Link>
-               </div>;
+        return (
+            <form id="signin-form" onSubmit={this.onRegisterClick}>
+                <img className="mb-4" src="/images/logo-128x128.png" alt="" width="128" height="128"/>
+                <h1 className="h3 mb-3 font-weight-normal">Register</h1>
+                <input type="email" id="inputEmail" className="form-control" placeholder="Email address" required/>
+                <input type="password" id="inputPassword" className="form-control" placeholder="Password" required/>
+                <input type="password" id="inputConfirm" className="form-control" placeholder="Confirm Password" required/>
+                <div className="mb-3">
+                    <label>
+                        <input type="checkbox" id="inputRememberMe" value="remember-me"/> Remember me
+                    </label>
+                </div>
+                <button id="signin-button" className="btn btn-lg btn-block" type="submit">Register</button>
+                <Link to={ "/account" }>Log In</Link>
+            </form>
+        );
     }
 
     private onRegisterClick(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const email = (document.getElementById("emailInput") as HTMLInputElement).value;
-        const password = (document.getElementById("passwordInput") as HTMLInputElement).value;
-        const confirm = (document.getElementById("confirmInput") as HTMLInputElement).value;
+        const email = (document.getElementById("inputEmail") as HTMLInputElement).value;
+        const password = (document.getElementById("inputPassword") as HTMLInputElement).value;
+        const confirm = (document.getElementById("inputConfirm") as HTMLInputElement).value;
 
         const accountClient = new AccountClient(window.location.origin);
         accountClient.register(email, password, confirm)
