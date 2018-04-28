@@ -12,6 +12,8 @@ namespace Climb.Models
         [JsonIgnore]
         public Game Game { get; set; }
         [JsonIgnore]
+        public HashSet<LeagueUser> Members { get; set; }
+        [JsonIgnore]
         public HashSet<Season> Seasons { get; set; }
 
         public League()

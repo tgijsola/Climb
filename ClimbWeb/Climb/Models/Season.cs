@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Climb.Models
@@ -13,5 +14,19 @@ namespace Climb.Models
 
         [JsonIgnore]
         public League League { get; set; }
+        [JsonIgnore]
+        public HashSet<SeasonLeagueUser> Participants { get; set; }
+
+        public Season()
+        {
+        }
+
+        public Season(int leagueID, int index, DateTime start, DateTime end)
+        {
+            LeagueID = leagueID;
+            Index = index;
+            StartDate = start;
+            EndDate = end;
+        }
     }
 }

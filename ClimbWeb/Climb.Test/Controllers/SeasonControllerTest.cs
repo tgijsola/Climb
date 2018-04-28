@@ -26,9 +26,8 @@ namespace Climb.Test.Controllers
         public void SetUp()
         {
             dbContext = DbContextUtility.CreateMockDb();
-            var game = dbContext.Games.Add(new Game());
-            dbContext.SaveChanges();
-            gameID = game.Entity.ID;
+            var game = DbContextUtility.AddNew<Game>(dbContext);
+            gameID = game.ID;
 
             seasonService = Substitute.For<ISeasonService>();
 
@@ -46,7 +45,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task ListForLeague_Valid_ReturnOk()
         {
-            var league = CreateLeague();
+            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = gameID);
 
             var result = await testObj.ListForLeague(league.ID);
 
@@ -56,7 +55,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Create_Valid_ReturnOk()
         {
-            var league = CreateLeague();
+            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = gameID);
             var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
 
             var result = await testObj.Create(request);
@@ -77,7 +76,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Create_StartInPast_ReturnBadRequest()
         {
-            var league = CreateLeague();
+            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = gameID);
             var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(-1), DateTime.Now.AddMinutes(2));
 
             var result = await testObj.Create(request);
@@ -88,20 +87,12 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Create_EndBeforeStart_ReturnBadRequest()
         {
-            var league = CreateLeague();
+            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = gameID);
             var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(3), DateTime.Now.AddMinutes(2));
 
             var result = await testObj.Create(request);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
-        }
-
-        private League CreateLeague()
-        {
-            var league = new League {GameID = gameID};
-            dbContext.Leagues.Add(league);
-            dbContext.SaveChanges();
-            return league;
         }
     }
 }

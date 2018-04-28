@@ -1,4 +1,6 @@
-﻿using Climb.Data;
+﻿using System.Collections.Generic;
+using Climb.Data;
+using Newtonsoft.Json;
 
 namespace Climb.Models
 {
@@ -9,8 +11,12 @@ namespace Climb.Models
         public string UserID { get; set; }
         public bool HasLeft { get; set; }
 
+        [JsonIgnore]
         public League League { get; set; }
+        [JsonIgnore]
         public ApplicationUser User { get; set; }
+        [JsonIgnore]
+        public HashSet<SeasonLeagueUser> Seasons { get; set; }
 
         public LeagueUser()
         {
