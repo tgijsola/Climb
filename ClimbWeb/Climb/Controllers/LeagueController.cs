@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
 using Climb.Data;
+using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
 using Climb.Services.ModelServices;
@@ -12,16 +13,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
-    public class LeagueController : BaseController<LeagueController>
+    public class LeagueController : Controller
     {
         private readonly ILeagueService leagueService;
         private readonly ApplicationDbContext dbContext;
+        private readonly ILogger<LeagueController> logger;
 
         public LeagueController(ILeagueService leagueService, ApplicationDbContext dbContext, ILogger<LeagueController> logger)
-            : base(logger)
         {
             this.leagueService = leagueService;
             this.dbContext = dbContext;
+            this.logger = logger;
         }
 
         [HttpGet("/leagues/{*page}")]
@@ -39,7 +41,7 @@ namespace Climb.Controllers
         {
             var leagues = await dbContext.Leagues.ToListAsync();
 
-            return CodeResult(HttpStatusCode.OK, leagues);
+            return this.CodeResult(HttpStatusCode.OK, leagues);
         }
 
         [HttpPost("/api/v1/leagues/create")]
@@ -50,17 +52,17 @@ namespace Climb.Controllers
         {
             if(!await dbContext.Games.AnyAsync(g => g.ID == request.GameID))
             {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"No Game with ID '{request.GameID}' found.");
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Game with ID '{request.GameID}' found.", logger);
             }
 
             if(await dbContext.Leagues.AnyAsync(l => l.Name == request.Name))
             {
-                return CodeResultAndLog(HttpStatusCode.Conflict, $"League with name '{request.Name}' already exists.");
+                return this.CodeResultAndLog(HttpStatusCode.Conflict, $"League with name '{request.Name}' already exists.", logger);
             }
 
             var league = await leagueService.Create(request.Name, request.GameID);
 
-            return CodeResult(HttpStatusCode.Created, league);
+            return this.CodeResult(HttpStatusCode.Created, league);
         }
     }
 }

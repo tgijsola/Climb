@@ -5,7 +5,6 @@ using Climb.Data;
 using Climb.Requests.Account;
 using Climb.Services;
 using Climb.Test.Fakes;
-using Climb.Test.Utilities;
 using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
+using ControllerUtility = Climb.Test.Utilities.ControllerUtility;
 
 namespace Climb.Test.Controllers
 {
@@ -23,8 +23,8 @@ namespace Climb.Test.Controllers
         {
             public bool willValidateTrue = true;
 
-            public TestController(SignInManager<ApplicationUser> signInManager, ILogger<AccountController> logger, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility)
-                : base(signInManager, logger, userManager, emailSender, configuration, tokenHelper, urlUtility)
+            public TestController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, ILogger<AccountController> logger)
+                : base(signInManager, userManager, emailSender, configuration, tokenHelper, urlUtility, logger)
             {
             }
 
@@ -37,25 +37,20 @@ namespace Climb.Test.Controllers
         private TestController testObj;
         private FakeUserManager userManager;
         private FakeSignInManager signInManager;
-        private ILogger<AccountController> logger;
-        private IEmailSender emailSender;
-        private IConfiguration configuration;
-        private ITokenHelper tokenHelper;
-        private IUrlUtility urlUtility;
 
         [SetUp]
         public void SetUp()
         {
             userManager = Substitute.For<FakeUserManager>();
             signInManager = Substitute.For<FakeSignInManager>();
-            logger = Substitute.For<ILogger<AccountController>>();
-            emailSender = Substitute.For<IEmailSender>();
-            configuration = Substitute.For<IConfiguration>();
+            var logger = Substitute.For<ILogger<AccountController>>();
+            var emailSender = Substitute.For<IEmailSender>();
+            var configuration = Substitute.For<IConfiguration>();
             configuration["SecurityKey"].Returns("key");
-            tokenHelper = Substitute.For<ITokenHelper>();
-            urlUtility = Substitute.For<IUrlUtility>();
+            var tokenHelper = Substitute.For<ITokenHelper>();
+            var urlUtility = Substitute.For<IUrlUtility>();
 
-            testObj = new TestController(signInManager, logger, userManager, emailSender, configuration, tokenHelper, urlUtility)
+            testObj = new TestController(signInManager, userManager, emailSender, configuration, tokenHelper, urlUtility, logger)
             {
                 ControllerContext = {HttpContext = new DefaultHttpContext()},
             };
@@ -97,7 +92,7 @@ namespace Climb.Test.Controllers
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
         }
-        
+
         [Test]
         public async Task LogIn_IncorrectCreds_BadRequest()
         {
