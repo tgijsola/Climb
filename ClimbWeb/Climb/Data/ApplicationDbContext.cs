@@ -9,6 +9,7 @@ namespace Climb.Data
         public DbSet<Game> Games { get; set; }
         public DbSet<League> Leagues { get; set; }
         public DbSet<Season> Seasons { get; set; }
+        public DbSet<LeagueUser> LeagueUsers { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

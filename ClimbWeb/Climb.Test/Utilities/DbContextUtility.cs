@@ -1,4 +1,5 @@
-﻿using Climb.Data;
+﻿using System;
+using Climb.Data;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,15 @@ namespace Climb.Test.Utilities
             var context = new ApplicationDbContext(options);
             context.Database.EnsureCreated();
             return context;
+        }
+
+        public static T AddNew<T>(ApplicationDbContext dbContext, Action<T> preprocess = null) where T : class, new()
+        {
+            var entry = new T();
+            preprocess?.Invoke(entry);
+            var model = dbContext.Add(entry);
+            dbContext.SaveChanges();
+            return model.Entity;
         }
     }
 }
