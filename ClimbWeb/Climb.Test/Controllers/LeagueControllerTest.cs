@@ -33,7 +33,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Create_Valid_CreatedResult()
         {
-            var gameID = CreateGame().ID;
+            var gameID = DbContextUtility.AddNew<Game>(dbContext).ID;
             var request = new CreateRequest {Name = LeagueName, GameID = gameID};
 
             leagueService.Create(LeagueName, gameID).Returns(new League {Name = LeagueName, GameID = gameID});
@@ -56,7 +56,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Create_NameTaken_Conflict()
         {
-            var gameID = CreateGame().ID;
+            var gameID = DbContextUtility.AddNew<Game>(dbContext).ID;
             var request = new CreateRequest {Name = LeagueName, GameID = gameID};
 
             dbContext.Add(new League {Name = LeagueName, GameID = gameID});
@@ -67,11 +67,41 @@ namespace Climb.Test.Controllers
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.Conflict);
         }
 
-        private Game CreateGame()
+        [Test]
+        public async Task Join_Valid_Created()
         {
-            var game = dbContext.Games.Add(new Game());
-            dbContext.SaveChanges();
-            return game.Entity;
+            var game = DbContextUtility.AddNew<Game>(dbContext);
+            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
+
+            var request = new JoinRequest(league.ID, user.Id);
+
+            var result = await testObj.Join(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.Created);
+        }
+
+        [Test]
+        public async Task Join_NoLeague_NotFound()
+        {
+            var request = new JoinRequest();
+
+            var result = await testObj.Join(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
+        }
+        
+        [Test]
+        public async Task Join_NoUser_NotFound()
+        {
+            var game = DbContextUtility.AddNew<Game>(dbContext);
+            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
+
+            var request = new JoinRequest(league.ID, "");
+
+            var result = await testObj.Join(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
         }
     }
 }

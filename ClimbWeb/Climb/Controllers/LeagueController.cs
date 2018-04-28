@@ -64,5 +64,26 @@ namespace Climb.Controllers
 
             return this.CodeResult(HttpStatusCode.Created, league);
         }
+
+        [HttpPost("/api/v1/leagues/join")]
+        [SwaggerResponse(HttpStatusCode.Created, typeof(LeagueUser))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find user.")]
+        public async Task<IActionResult> Join(JoinRequest request)
+        {
+            if(!await dbContext.Leagues.AnyAsync(l => l.ID == request.LeagueID))
+            {
+                return this.CodeResultAndLog(HttpStatusCode.BadRequest, $"No League with ID '{request.LeagueID}' found.", logger);
+            }
+
+            if(!await dbContext.Users.AnyAsync(u => u.Id == request.UserID))
+            {
+                return this.CodeResultAndLog(HttpStatusCode.BadRequest, $"No User with ID '{request.UserID}' found.", logger);
+            }
+
+            var leagueUser = await leagueService.Join(request.LeagueID, request.UserID);
+
+            return this.CodeResultAndLog(HttpStatusCode.Created, leagueUser, "User joined league.", logger);
+        }
     }
 }
