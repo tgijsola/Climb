@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Models;
@@ -9,7 +10,6 @@ using NUnit.Framework;
 namespace Climb.Test.Services
 {
     // TODO: Sets are spaced out.
-    // TODO: Everyone fights everyone.
     public class RoundRobinSchedulerTest
     {
         private RoundRobinScheduler testObj;
@@ -34,6 +34,26 @@ namespace Climb.Test.Services
             await testObj.GenerateScheduleAsync(season, dbContext);
 
             Assert.AreEqual(setCount, season.Sets.Count);
+        }
+
+        [TestCase(10)]
+        [TestCase(15)]
+        public async Task GenerateSchedule_Valid_EveryoneFightsEveryone(int userCount)
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, userCount);
+            season.Sets = new HashSet<Set>();
+
+            await testObj.GenerateScheduleAsync(season, dbContext);
+
+            Assert.IsTrue(season.Participants.All(slu =>
+            {
+                var fightCount = season.Sets.Where(s => s
+                        .IsPlaying(slu.LeagueUserID))
+                    .Select(s => s.GetOpponentID(slu.LeagueUserID))
+                    .Distinct()
+                    .Count();
+                return fightCount == userCount - 1;
+            }));
         }
     }
 }

@@ -41,5 +41,25 @@ namespace Climb.Models
             Player2ID = player2ID;
             DueDate = dueDate;
         }
+
+        public bool IsPlaying(int leagueUserID)
+        {
+            return Player1ID == leagueUserID || Player2ID == leagueUserID;
+        }
+
+        public int GetOpponentID(int leagueUserID)
+        {
+            if(Player1ID == leagueUserID)
+            {
+                return Player2ID;
+            }
+
+            if(Player2ID == leagueUserID)
+            {
+                return Player1ID;
+            }
+
+            throw new ArgumentException($"LeagueUser with ID '{leagueUserID}' is not playing this set.");
+        }
     }
 }
