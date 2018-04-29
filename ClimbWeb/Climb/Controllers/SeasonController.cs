@@ -76,5 +76,27 @@ namespace Climb.Controllers
 
             return this.CodeResultAndLog(HttpStatusCode.Created, season, "Season created.", logger);
         }
+
+        [HttpPost("/api/v1/seasons/start")]
+        [SwaggerResponse(HttpStatusCode.Created, typeof(Set[]))]
+        [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(string), "Error trying to create sets for the season schedule.")]
+        public async Task<IActionResult> Start(int seasonID)
+        {
+            if(!await dbContext.Seasons.AnyAsync(s => s.ID == seasonID))
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
+            }
+
+            try
+            {
+                var sets = await seasonService.GenerateSchedule(seasonID);
+                return this.CodeResultAndLog(HttpStatusCode.Created, sets, "Schedule created.", logger);
+            }
+            catch(Exception exception)
+            {
+                logger.LogError(exception, $"Could not create schedule for Season {seasonID}.");
+                return this.CodeResult(HttpStatusCode.InternalServerError, $"Could not create schedule for Season '{seasonID}'");
+            }
+        }
     }
 }
