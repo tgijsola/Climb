@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Climb.Data;
@@ -35,6 +34,32 @@ namespace Climb.Services.ModelServices
             await dbContext.SaveChangesAsync();
 
             return season;
+        }
+
+        public async Task GenerateSchedule(int seasonID)
+        {
+            var season = await dbContext.Seasons
+                .Include(s => s.Sets).AsNoTracking()
+                .Include(s => s.Participants).AsNoTracking()
+                .FirstAsync(s => s.ID == seasonID);
+
+            // TODO: Throw exception if not cleared first???
+
+            var participants = season.Participants.ToArray();
+            for(int i = 0; i < participants.Length - 1; i++)
+            {
+                var player1 = participants[i];
+                for(int j = i + 1; j < participants.Length; j++)
+                {
+                    var player2 = participants[j];
+                    var dueDate = DateTime.Now;
+                    var set = new Set(season.LeagueID, season.ID, player1.LeagueUserID, player2.LeagueUserID, dueDate);
+                    season.Sets.Add(set);
+                }
+            }
+
+            dbContext.Sets.AddRange(season.Sets);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

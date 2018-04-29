@@ -1,4 +1,5 @@
-﻿using Climb.Models;
+﻿using System.Linq;
+using Climb.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,6 +13,7 @@ namespace Climb.Data
         public DbSet<Season> Seasons { get; set; }
         public DbSet<LeagueUser> LeagueUsers { get; set; }
         public DbSet<SeasonLeagueUser> SeasonLeagueUsers { get; set; }
+        public DbSet<Set> Sets { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -22,8 +24,14 @@ namespace Climb.Data
         {
             base.OnModelCreating(builder);
 
+            foreach(var relationship in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+            {
+                relationship.DeleteBehavior = DeleteBehavior.Restrict;
+            }
+
             CreateLeagueUser(builder.Entity<LeagueUser>());
             CreateSeasonLeagueUser(builder.Entity<SeasonLeagueUser>());
+            CreateSet(builder.Entity<Set>());
         }
 
         private static void CreateLeagueUser(EntityTypeBuilder<LeagueUser> entity)
@@ -34,11 +42,10 @@ namespace Climb.Data
         private static void CreateSeasonLeagueUser(EntityTypeBuilder<SeasonLeagueUser> entity)
         {
             entity.HasKey(lus => new {lus.LeagueUserID, lus.SeasonID});
+        }
 
-            entity
-                .HasOne(lus => lus.Season)
-                .WithMany(l => l.Participants)
-                .OnDelete(DeleteBehavior.Restrict);
+        private static void CreateSet(EntityTypeBuilder<Set> entity)
+        {
         }
     }
 }

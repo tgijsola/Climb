@@ -25,8 +25,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Create_Valid_NotNull()
         {
-            var game = DbContextUtility.AddNew<Game>(dbContext);
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
+            League league = CreateLeague();
 
             var season = await testObj.Create(league.ID, DateTime.MaxValue, DateTime.MaxValue);
 
@@ -42,13 +41,51 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Create_Valid_AddsMembers()
         {
-            var game = DbContextUtility.AddNew<Game>(dbContext);
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
-            DbContextUtility.AddNew<LeagueUser>(dbContext, lu => lu.LeagueID = league.ID);
+            League league = CreateLeague();
+            JoinUser(league);
 
             var season = await testObj.Create(league.ID, DateTime.MaxValue, DateTime.MaxValue);
 
             Assert.IsTrue(season.Participants.Count > 0);
+        }
+
+        [TestCase(2, 1)]
+        [TestCase(4, 6)]
+        [TestCase(11, 55)]
+        public async Task GenerateSchedule_Valid_CreateSets(int userCount, int setCount)
+        {
+            var league = CreateLeague();
+            AddUserToLeague(league, userCount);
+            var season = await testObj.Create(league.ID, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
+
+            await testObj.GenerateSchedule(season.ID);
+
+            Assert.AreEqual(setCount, season.Sets.Count);
+        }
+
+        // TODO: Already started.
+        // TODO: Already ended.
+        // TODO: Already has sets.
+        // TODO: Not enough participants.
+
+        private League CreateLeague()
+        {
+            var game = DbContextUtility.AddNew<Game>(dbContext);
+            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
+            return league;
+        }
+
+        private void AddUserToLeague(League league, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                JoinUser(league);
+            }
+        }
+
+        private void JoinUser(League league)
+        {
+            DbContextUtility.AddNew<LeagueUser>(dbContext, lu => lu.LeagueID = league.ID);
         }
     }
 }
