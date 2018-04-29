@@ -11,9 +11,10 @@ using System;
 namespace Climb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180429013531_Set")]
+    partial class Set
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -403,7 +404,7 @@ namespace Climb.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Climb.Models.Season", "Season")
-                        .WithMany("Sets")
+                        .WithMany()
                         .HasForeignKey("SeasonID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });

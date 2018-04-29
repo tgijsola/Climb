@@ -13,10 +13,12 @@ namespace Climb.Services.ModelServices
     public class SeasonService : ISeasonService
     {
         private readonly ApplicationDbContext dbContext;
+        private readonly ScheduleFactory scheduleFactory;
 
-        public SeasonService(ApplicationDbContext dbContext)
+        public SeasonService(ApplicationDbContext dbContext, ScheduleFactory scheduleFactory)
         {
             this.dbContext = dbContext;
+            this.scheduleFactory = scheduleFactory;
         }
 
         public async Task<Season> Create(int leagueID, DateTime start, DateTime end)
@@ -35,6 +37,18 @@ namespace Climb.Services.ModelServices
             await dbContext.SaveChangesAsync();
 
             return season;
+        }
+
+        public async Task<HashSet<Set>> GenerateSchedule(int seasonID)
+        {
+            var season = await dbContext.Seasons
+                .Include(s => s.Sets)
+                .Include(s => s.Participants).AsNoTracking()
+                .FirstAsync(s => s.ID == seasonID);
+
+            var sets = await scheduleFactory.GenerateScheduleAsync(season, dbContext);
+
+            return sets;
         }
     }
 }

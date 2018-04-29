@@ -18,6 +18,13 @@ namespace Climb.Models
         [JsonIgnore]
         public HashSet<SeasonLeagueUser> Seasons { get; set; }
 
+        #region For DB
+        [JsonIgnore]
+        public HashSet<Set> P1Sets { get; set; }
+        [JsonIgnore]
+        public HashSet<Set> P2Sets { get; set; }
+        #endregion
+
         public LeagueUser()
         {
         }

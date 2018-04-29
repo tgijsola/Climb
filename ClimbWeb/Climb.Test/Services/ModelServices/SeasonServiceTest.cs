@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Climb.Data;
-using Climb.Models;
+using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
@@ -13,20 +14,21 @@ namespace Climb.Test.Services.ModelServices
     {
         private SeasonService testObj;
         private ApplicationDbContext dbContext;
+        private ScheduleFactory scheduler;
 
         [SetUp]
         public void SetUp()
         {
             dbContext = DbContextUtility.CreateMockDb();
+            scheduler = Substitute.For<ScheduleFactory>();
 
-            testObj = new SeasonService(dbContext);
+            testObj = new SeasonService(dbContext, scheduler);
         }
 
         [Test]
         public async Task Create_Valid_NotNull()
         {
-            var game = DbContextUtility.AddNew<Game>(dbContext);
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
+            var league = LeagueUtility.CreateLeague(dbContext);
 
             var season = await testObj.Create(league.ID, DateTime.MaxValue, DateTime.MaxValue);
 
@@ -42,9 +44,8 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Create_Valid_AddsMembers()
         {
-            var game = DbContextUtility.AddNew<Game>(dbContext);
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
-            DbContextUtility.AddNew<LeagueUser>(dbContext, lu => lu.LeagueID = league.ID);
+            var league = LeagueUtility.CreateLeague(dbContext);
+            LeagueUtility.AddUsersToLeague(league, 1, dbContext);
 
             var season = await testObj.Create(league.ID, DateTime.MaxValue, DateTime.MaxValue);
 
