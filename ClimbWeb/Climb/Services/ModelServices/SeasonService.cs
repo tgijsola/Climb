@@ -43,7 +43,10 @@ namespace Climb.Services.ModelServices
                 .Include(s => s.Participants).AsNoTracking()
                 .FirstAsync(s => s.ID == seasonID);
 
-            // TODO: Throw exception if not cleared first???
+            if(season.Participants.Count < 2)
+            {
+                throw new InvalidOperationException("Season needs more than 2 participants.");
+            }
 
             var participants = season.Participants.ToArray();
             for(int i = 0; i < participants.Length - 1; i++)

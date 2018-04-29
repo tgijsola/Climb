@@ -63,10 +63,20 @@ namespace Climb.Test.Services.ModelServices
             Assert.AreEqual(setCount, season.Sets.Count);
         }
 
+        [TestCase(0)]
+        [TestCase(1)]
+        public async Task GenerateSchedule_NotEnoughParticipants_Exception(int userCount)
+        {
+            var league = CreateLeague();
+            AddUserToLeague(league, userCount);
+            var season = await testObj.Create(league.ID, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
+
+            Assert.ThrowsAsync<InvalidOperationException>(() => testObj.GenerateSchedule(season.ID));
+        }
+
         // TODO: Already started.
         // TODO: Already ended.
         // TODO: Already has sets.
-        // TODO: Not enough participants.
 
         private League CreateLeague()
         {
