@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Climb.Data;
-using Climb.Models;
+using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
@@ -13,19 +14,21 @@ namespace Climb.Test.Services.ModelServices
     {
         private SeasonService testObj;
         private ApplicationDbContext dbContext;
+        private ScheduleFactory scheduler;
 
         [SetUp]
         public void SetUp()
         {
             dbContext = DbContextUtility.CreateMockDb();
+            scheduler = Substitute.For<ScheduleFactory>();
 
-            testObj = new SeasonService(dbContext);
+            testObj = new SeasonService(dbContext, scheduler);
         }
 
         [Test]
         public async Task Create_Valid_NotNull()
         {
-            League league = CreateLeague();
+            var league = LeagueUtility.CreateLeague(dbContext);
 
             var season = await testObj.Create(league.ID, DateTime.MaxValue, DateTime.MaxValue);
 
@@ -41,61 +44,12 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Create_Valid_AddsMembers()
         {
-            League league = CreateLeague();
-            JoinUser(league);
+            var league = LeagueUtility.CreateLeague(dbContext);
+            LeagueUtility.AddUsersToLeague(league, 1, dbContext);
 
             var season = await testObj.Create(league.ID, DateTime.MaxValue, DateTime.MaxValue);
 
             Assert.IsTrue(season.Participants.Count > 0);
-        }
-
-        [TestCase(2, 1)]
-        [TestCase(4, 6)]
-        [TestCase(11, 55)]
-        public async Task GenerateSchedule_Valid_CreateSets(int userCount, int setCount)
-        {
-            var league = CreateLeague();
-            AddUserToLeague(league, userCount);
-            var season = await testObj.Create(league.ID, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
-
-            await testObj.GenerateSchedule(season.ID);
-
-            Assert.AreEqual(setCount, season.Sets.Count);
-        }
-
-        [TestCase(0)]
-        [TestCase(1)]
-        public async Task GenerateSchedule_NotEnoughParticipants_Exception(int userCount)
-        {
-            var league = CreateLeague();
-            AddUserToLeague(league, userCount);
-            var season = await testObj.Create(league.ID, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
-
-            Assert.ThrowsAsync<InvalidOperationException>(() => testObj.GenerateSchedule(season.ID));
-        }
-
-        // TODO: Already started.
-        // TODO: Already ended.
-        // TODO: Already has sets.
-
-        private League CreateLeague()
-        {
-            var game = DbContextUtility.AddNew<Game>(dbContext);
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
-            return league;
-        }
-
-        private void AddUserToLeague(League league, int count)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                JoinUser(league);
-            }
-        }
-
-        private void JoinUser(League league)
-        {
-            DbContextUtility.AddNew<LeagueUser>(dbContext, lu => lu.LeagueID = league.ID);
         }
     }
 }

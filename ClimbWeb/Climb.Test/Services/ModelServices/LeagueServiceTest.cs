@@ -11,6 +11,9 @@ namespace Climb.Test.Services.ModelServices
     [TestFixture]
     public class LeagueServiceTest
     {
+        private LeagueService testObj;
+        private ApplicationDbContext dbContext;
+
         [SetUp]
         public void SetUp()
         {
@@ -18,9 +21,6 @@ namespace Climb.Test.Services.ModelServices
 
             testObj = new LeagueService(dbContext);
         }
-
-        private LeagueService testObj;
-        private ApplicationDbContext dbContext;
 
         [Test]
         public async Task Create_Valid_ReturnLeague()
@@ -41,7 +41,6 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Join_NewUser_CreateLeagueUser()
         {
-
             var game = DbContextUtility.AddNew<Game>(dbContext);
             var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
@@ -54,12 +53,11 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Join_OldUser_HasLeftFalse()
         {
-            var game = DbContextUtility.AddNew<Game>(dbContext);
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
+            var league = LeagueUtility.CreateLeague(dbContext);
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
 
             var oldLeagueUser = new LeagueUser(league.ID, user.Id) {HasLeft = true};
-            dbContext.Add(oldLeagueUser);
+            dbContext.LeagueUsers.Add(oldLeagueUser);
             dbContext.SaveChanges();
 
             var leagueUser = await testObj.Join(league.ID, user.Id);

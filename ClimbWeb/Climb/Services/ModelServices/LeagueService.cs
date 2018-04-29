@@ -26,7 +26,9 @@ namespace Climb.Services.ModelServices
 
         public async Task<LeagueUser> Join(int leagueID, string userID)
         {
-            var leagueUser = await dbContext.LeagueUsers.FirstOrDefaultAsync(lu => lu.UserID == userID);
+            var leagueUser = await dbContext.LeagueUsers
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(lu => lu.UserID == userID);
             if(leagueUser != null)
             {
                 leagueUser.HasLeft = false;
@@ -36,7 +38,6 @@ namespace Climb.Services.ModelServices
                 leagueUser = new LeagueUser(leagueID, userID);
                 dbContext.Add(leagueUser);
             }
-
 
             await dbContext.SaveChangesAsync();
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Climb.Data;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ namespace Climb.Test.Utilities
             connection.Open();
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseSqlite(connection)
+                .EnableSensitiveDataLogging()
                 .Options;
             var context = new ApplicationDbContext(options);
             context.Database.EnsureCreated();
@@ -26,6 +28,23 @@ namespace Climb.Test.Utilities
             var model = dbContext.Add(entry);
             dbContext.SaveChanges();
             return model.Entity;
+        }
+
+        public static List<T> AddNewRange<T>(ApplicationDbContext dbContext, int count, Action<T, int> preprocess = null) where T : class, new()
+        {
+            var entries = new List<T>();
+
+            for(var i = 0; i < count; i++)
+            {
+                var entry = new T();
+                preprocess?.Invoke(entry, i);
+                entries.Add(entry);
+            }
+
+            dbContext.AddRange(entries);
+            dbContext.SaveChanges();
+
+            return entries;
         }
     }
 }
