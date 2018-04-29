@@ -16,9 +16,9 @@ namespace Climb.Models
         public DateTime DueDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
-        [ JsonIgnore]
+        [JsonIgnore]
         public League League { get; set; }
-        [ JsonIgnore]
+        [JsonIgnore]
         public Season Season { get; set; }
         [JsonIgnore]
         [InverseProperty("P1Sets")]
