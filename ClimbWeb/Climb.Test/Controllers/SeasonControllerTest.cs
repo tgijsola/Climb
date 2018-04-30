@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
+using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
@@ -123,7 +124,7 @@ namespace Climb.Test.Controllers
             seasonService.GenerateSchedule(season.ID).ReturnsForAnyArgs(info => sets);
 
             var result = await testObj.Start(season.ID);
-            var setResults = (ICollection<Set>)((ObjectResult)result).Value;
+            var setResults = result.GetObject<ICollection<Set>>();
 
             Assert.IsTrue(setResults.Count == sets.Count);
         }
