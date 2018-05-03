@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
@@ -7,7 +8,6 @@ using Climb.Models;
 using Climb.Requests.Leagues;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
@@ -91,7 +91,7 @@ namespace Climb.Test.Controllers
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
         }
-        
+
         [Test]
         public async Task Join_NoUser_NotFound()
         {
@@ -120,7 +120,38 @@ namespace Climb.Test.Controllers
         public async Task Get_NoLeague_NotFound()
         {
             var result = await testObj.Get(0);
-            
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task GetSeasons_Valid_Ok()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+
+            var result = await testObj.GetSeasons(league.ID);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+        }
+
+        [Test]
+        public async Task GetSeasons_Valid_ReturnsSeasons()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            DbContextUtility.AddNew<Season>(dbContext, s => s.LeagueID = league.ID);
+            DbContextUtility.AddNew<Season>(dbContext, s => s.LeagueID = league.ID);
+
+            var result = await testObj.GetSeasons(league.ID);
+            var seasons = result.GetObject<ICollection<Season>>();
+
+            Assert.AreEqual(2, seasons.Count);
+        }
+
+        [Test]
+        public async Task GetSeasons_NoLeague_NotFound()
+        {
+            var result = await testObj.GetSeasons(0);
+
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
     }
