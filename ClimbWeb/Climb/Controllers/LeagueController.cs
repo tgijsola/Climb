@@ -44,6 +44,19 @@ namespace Climb.Controllers
             return this.CodeResult(HttpStatusCode.OK, leagues);
         }
 
+        [HttpGet("/api/v1/leagues/{leagueID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(League))]
+        public async Task<IActionResult> Get(int leagueID)
+        {
+            var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ID == leagueID);
+            if(league == null)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.", logger);
+            }
+
+            return this.CodeResult(HttpStatusCode.OK, league);
+        }
+
         [HttpPost("/api/v1/leagues/create")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(League))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find game.")]
