@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
@@ -44,6 +45,19 @@ namespace Climb.Controllers
             return this.CodeResult(HttpStatusCode.OK, leagues);
         }
 
+        [HttpGet("/api/v1/leagues/{leagueID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(League))]
+        public async Task<IActionResult> Get(int leagueID)
+        {
+            var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ID == leagueID);
+            if(league == null)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.", logger);
+            }
+
+            return this.CodeResult(HttpStatusCode.OK, league);
+        }
+
         [HttpPost("/api/v1/leagues/create")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(League))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find game.")]
@@ -84,6 +98,22 @@ namespace Climb.Controllers
             var leagueUser = await leagueService.Join(request.LeagueID, request.UserID);
 
             return this.CodeResultAndLog(HttpStatusCode.Created, leagueUser, "User joined league.", logger);
+        }
+
+        [HttpGet("/api/v1/leagues/seasons/{leagueID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Season[]))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
+        public async Task<IActionResult> GetSeasons(int leagueID)
+        {
+            var league = await dbContext.Leagues
+                .Include(l => l.Seasons).AsNoTracking()
+                .FirstOrDefaultAsync(l => l.ID == leagueID);
+            if(league == null)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.", logger);
+            }
+
+            return this.CodeResult(HttpStatusCode.OK, league.Seasons);
         }
     }
 }

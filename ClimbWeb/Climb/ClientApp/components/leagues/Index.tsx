@@ -30,7 +30,10 @@ export class Index extends React.Component<RouteComponentProps<{}>, IIndexState>
             if (this.state.leagues.length === 0) {
                 leagues = <span>No leagues created yet!</span>;
             } else {
-                leagues = this.state.leagues.map((game) => <li key={game.id}>{game.name}</li>);
+                leagues = this.state.leagues.map(
+                    (league) => <li key={league.id}>
+                                    <Link to={"/leagues/" +league.id}>{league.name}</Link>
+                                </li>);
             }
         } else {
             leagues = <div></div>;
@@ -42,8 +45,8 @@ export class Index extends React.Component<RouteComponentProps<{}>, IIndexState>
                 <RingLoader
                     color={"#123abc"}
                     loading={this.state.leagues == null}/>
-                
-                <Link to={ "/leagues/create" } className={"btn btn-danger"} role={"button"} >Create New League</Link>
+
+                <Link to={ "/leagues/create" } className={"btn btn-danger"} role={"button"}>Create New League</Link>
 
                 {leagues}
             </div>
