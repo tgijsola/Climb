@@ -7,6 +7,7 @@ import { ClimbClient } from "../../gen/climbClient";
 interface IState {
     season: ClimbClient.Season | null;
     league: ClimbClient.League | null;
+    sets: ClimbClient.Set[] | null;
 }
 
 export class Home extends React.Component<RouteComponentProps<any>, IState> {
@@ -20,7 +21,9 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
         this.state = {
             season: null,
             league: null,
+            sets: null,
         };
+        this.startSeason = this.startSeason.bind(this);
     }
 
     componentDidMount() {
@@ -32,9 +35,18 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
             return <RingLoader color={"#123abc"}/>;
         }
 
+        let body: any;
+        if (this.state.sets != null) {
+            const sets = this.state.sets.map((s, i) => <li key={i}>{`set ${i}`}</li>);
+            body = <ul>{sets}</ul>;
+        } else {
+            body = <button onClick={this.startSeason}>Start</button>;
+        }
+
         return (
             <div>
                 <h1>Welcome to {this.state.league.name + " Season " + (this.state.season.index + 1)}</h1>
+                {body}
             </div>
         );
     }
@@ -45,10 +57,25 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
             .then(response => {
                 console.log(response);
                 if (response.season != null && response.league != null) {
-                    this.setState({ season: response.season });
-                    this.setState({ league: response.league });
+                    this.setState({
+                        season: response.season,
+                        league: response.league,
+                    });
                 }
             })
             .catch(reason => alert(`Could not load season\n${reason}`));
+    }
+
+    private startSeason() {
+        if (this.state.season == null) return;
+
+        const seasonId = this.state.season.id;
+
+        this.seasonClient.start(seasonId)
+            .then(sets => {
+                console.log(sets);
+                this.setState({ sets: sets });
+            })
+            .catch(reason => alert(`Could not start season\n${reason}`));
     }
 }
