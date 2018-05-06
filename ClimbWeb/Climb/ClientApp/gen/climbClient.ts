@@ -602,6 +602,55 @@ export class SeasonClient extends BaseClass {
         return Promise.resolve<SeasonDto>(<any>null);
     }
 
+    sets(seasonID: number): Promise<Set[]> {
+        let url_ = this.baseUrl + "/api/v1/seasons/sets/{seasonID}";
+        if (seasonID === undefined || seasonID === null)
+            throw new Error("The parameter 'seasonID' must be defined.");
+        url_ = url_.replace("{seasonID}", encodeURIComponent("" + seasonID)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processSets(_response);
+        });
+    }
+
+    protected processSets(response: Response): Promise<Set[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (resultData200 && resultData200.constructor === Array) {
+                result200 = [];
+                for (let item of resultData200)
+                    result200.push(Set.fromJS(item));
+            }
+            return result200;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Set[]>(<any>null);
+    }
+
     listForLeague(leagueID: number): Promise<Season[]> {
         let url_ = this.baseUrl + "/api/v1/seasons?";
         if (leagueID === undefined || leagueID === null)

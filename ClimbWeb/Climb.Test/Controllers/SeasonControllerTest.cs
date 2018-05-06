@@ -8,7 +8,7 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
-using Climb.Responses.Seasons;
+using Climb.Responses;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
@@ -55,6 +55,39 @@ namespace Climb.Test.Controllers
         public async Task Get_NoSeason_NotFound()
         {
             var result = await testObj.Get(0);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task Sets_HasSets_Ok()
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, 2);
+            SeasonUtility.CreateSets(dbContext, season);
+
+            var result = await testObj.Sets(season.ID);
+            var resultObj = result.GetObject<IEnumerable<Set>>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.IsNotEmpty(resultObj);
+        }
+
+        [Test]
+        public async Task Sets_NoSets_Ok()
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, 2);
+
+            var result = await testObj.Sets(season.ID);
+            var resultObj = result.GetObject<IEnumerable<Set>>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.IsNotNull(resultObj);
+        }
+
+        [Test]
+        public async Task Sets_NoSeason_NotFound()
+        {
+            var result = await testObj.Sets(0);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }

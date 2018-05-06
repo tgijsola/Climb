@@ -4,7 +4,7 @@ using System.Linq;
 using Climb.Models;
 using JetBrains.Annotations;
 
-namespace Climb.Responses.Seasons
+namespace Climb.Responses
 {
     public class SeasonDto
     {

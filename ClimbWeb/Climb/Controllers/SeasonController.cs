@@ -6,7 +6,7 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
-using Climb.Responses.Seasons;
+using Climb.Responses;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +53,22 @@ namespace Climb.Controllers
 
             var response = new SeasonDto(season);
             return this.CodeResult(HttpStatusCode.OK, response);
+        }
+
+        [HttpGet("/api/v1/seasons/sets/{seasonID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Set[]))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
+        public async Task<IActionResult> Sets(int seasonID)
+        {
+            var season = await dbContext.Seasons
+                .Include(s => s.Sets).AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ID == seasonID);
+            if(season == null)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
+            }
+
+            return this.CodeResult(HttpStatusCode.OK, season.Sets);
         }
 
         [HttpGet("/api/v1/seasons")]
