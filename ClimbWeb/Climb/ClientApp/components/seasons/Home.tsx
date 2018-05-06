@@ -5,7 +5,7 @@ import { RingLoader } from "react-spinners";
 import { ClimbClient } from "../../gen/climbClient";
 
 interface IState {
-    season: ClimbClient.GetResponse | null;
+    season: ClimbClient.SeasonDto | null;
 }
 
 export class Home extends React.Component<RouteComponentProps<any>, IState> {

@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Climb.Responses.Seasons
 {
-    public class GetResponse
+    public class SeasonDto
     {
         [UsedImplicitly]
         public int ID { get; }
@@ -25,7 +25,7 @@ namespace Climb.Responses.Seasons
         [UsedImplicitly]
         public HashSet<Set> Sets { get; }
 
-        public GetResponse(Season season)
+        public SeasonDto(Season season)
         {
             ID = season.ID;
             LeagueID = season.LeagueID;

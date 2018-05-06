@@ -37,7 +37,7 @@ namespace Climb.Controllers
         }
 
         [HttpGet("/api/v1/seasons/{seasonID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(GetResponse))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(SeasonDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
         public async Task<IActionResult> Get(int seasonID)
         {
@@ -51,7 +51,7 @@ namespace Climb.Controllers
                 return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
             }
 
-            var response = new GetResponse(season);
+            var response = new SeasonDto(season);
             return this.CodeResult(HttpStatusCode.OK, response);
         }
 

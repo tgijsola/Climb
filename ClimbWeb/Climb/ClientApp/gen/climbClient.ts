@@ -557,7 +557,7 @@ export class SeasonClient extends BaseClass {
         this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
     }
 
-    get(seasonID: number): Promise<GetResponse> {
+    get(seasonID: number): Promise<SeasonDto> {
         let url_ = this.baseUrl + "/api/v1/seasons/{seasonID}";
         if (seasonID === undefined || seasonID === null)
             throw new Error("The parameter 'seasonID' must be defined.");
@@ -577,14 +577,14 @@ export class SeasonClient extends BaseClass {
         });
     }
 
-    protected processGet(response: Response): Promise<GetResponse> {
+    protected processGet(response: Response): Promise<SeasonDto> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 ? GetResponse.fromJS(resultData200) : new GetResponse();
+            result200 = resultData200 ? SeasonDto.fromJS(resultData200) : new SeasonDto();
             return result200;
             });
         } else if (status === 404) {
@@ -599,7 +599,7 @@ export class SeasonClient extends BaseClass {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<GetResponse>(<any>null);
+        return Promise.resolve<SeasonDto>(<any>null);
     }
 
     listForLeague(leagueID: number): Promise<Season[]> {
@@ -1238,7 +1238,7 @@ export interface ISeason {
     endDate: Date;
 }
 
-export class GetResponse implements IGetResponse {
+export class SeasonDto implements ISeasonDto {
     id: number;
     leagueID: number;
     leagueName?: string | undefined;
@@ -1248,7 +1248,7 @@ export class GetResponse implements IGetResponse {
     participants?: LeagueUser[] | undefined;
     sets?: Set[] | undefined;
 
-    constructor(data?: IGetResponse) {
+    constructor(data?: ISeasonDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1278,9 +1278,9 @@ export class GetResponse implements IGetResponse {
         }
     }
 
-    static fromJS(data: any): GetResponse {
+    static fromJS(data: any): SeasonDto {
         data = typeof data === 'object' ? data : {};
-        let result = new GetResponse();
+        let result = new SeasonDto();
         result.init(data);
         return result;
     }
@@ -1307,7 +1307,7 @@ export class GetResponse implements IGetResponse {
     }
 }
 
-export interface IGetResponse {
+export interface ISeasonDto {
     id: number;
     leagueID: number;
     leagueName?: string | undefined;

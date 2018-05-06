@@ -45,7 +45,7 @@ namespace Climb.Test.Controllers
             var season = SeasonUtility.CreateSeason(dbContext, 2);
 
             var result = await testObj.Get(season.ID);
-            var resultSeason = result.GetObject<GetResponse>();
+            var resultSeason = result.GetObject<SeasonDto>();
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
             Assert.IsNotNull(resultSeason.Participants);
