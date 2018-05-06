@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
@@ -47,6 +46,7 @@ namespace Climb.Controllers
 
         [HttpGet("/api/v1/leagues/{leagueID:int}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(League))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
         public async Task<IActionResult> Get(int leagueID)
         {
             var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ID == leagueID);

@@ -10,7 +10,7 @@ namespace Climb.Models
         [JsonIgnore]
         public Season Season { get; set; }
         [JsonIgnore]
-        public League League { get; set; }
+        public LeagueUser LeagueUser { get; set; }
 
         public SeasonLeagueUser()
         {

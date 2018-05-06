@@ -9,5 +9,14 @@ namespace Climb.Models
 
         public HashSet<Character> Characters { get; set; }
         public HashSet<Stage> Stages { get; set; }
+
+        public Game()
+        {
+        }
+
+        public Game(string name)
+        {
+            Name = name;
+        }
     }
 }

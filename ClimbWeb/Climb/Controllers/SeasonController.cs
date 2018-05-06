@@ -6,6 +6,7 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
+using Climb.Responses.Seasons;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,23 @@ namespace Climb.Controllers
             ViewData["Title"] = "Season";
             ViewData["Script"] = "seasons";
             return View("~/Views/Page.cshtml");
+        }
+
+        [HttpGet("/api/v1/seasons/{seasonID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(GetResponse))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
+        public async Task<IActionResult> Get(int seasonID)
+        {
+            var season = await dbContext.Seasons
+                .Include(s => s.League).AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ID == seasonID);
+            if(season == null)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
+            }
+
+            var response = new GetResponse(season);
+            return this.CodeResult(HttpStatusCode.OK, response);
         }
 
         [HttpGet("/api/v1/seasons")]
