@@ -15,7 +15,8 @@ module.exports = (env) => {
                 "pages/account": "./ClientApp/pages/account.tsx",
                 "pages/user": "./ClientApp/pages/user.tsx",
                 "pages/games": "./ClientApp/pages/games.tsx",
-                "pages/leagues": "./ClientApp/pages/leagues.tsx"
+                "pages/leagues": "./ClientApp/pages/leagues.tsx",
+                "pages/seasons": "./ClientApp/pages/seasons.tsx"
             },
             resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
             output: {

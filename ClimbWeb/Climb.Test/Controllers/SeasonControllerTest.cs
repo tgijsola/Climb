@@ -8,9 +8,9 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
+using Climb.Responses.Seasons;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -37,6 +37,27 @@ namespace Climb.Test.Controllers
             seasonService = Substitute.For<ISeasonService>();
 
             testObj = new SeasonController(seasonService, dbContext, Substitute.For<ILogger<SeasonController>>());
+        }
+
+        [Test]
+        public async Task Get_Valid_Ok()
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, 2);
+
+            var result = await testObj.Get(season.ID);
+            var resultSeason = result.GetObject<GetResponse>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.IsNotNull(resultSeason.season);
+            Assert.IsNotNull(resultSeason.league);
+        }
+
+        [Test]
+        public async Task Get_NoSeason_NotFound()
+        {
+            var result = await testObj.Get(0);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
 
         [Test]
@@ -116,7 +137,7 @@ namespace Climb.Test.Controllers
             var season = SeasonUtility.CreateSeason(dbContext, 2);
             var participants = season.Participants.ToArray();
             var sets = new HashSet<Set>();
-            for (int i = 0; i < 3; i++)
+            for(var i = 0; i < 3; i++)
             {
                 sets.Add(SetUtility.Create(dbContext, participants[0].LeagueUserID, participants[1].LeagueUserID, season));
             }
