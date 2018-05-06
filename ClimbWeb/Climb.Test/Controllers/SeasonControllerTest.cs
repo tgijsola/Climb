@@ -48,8 +48,7 @@ namespace Climb.Test.Controllers
             var resultSeason = result.GetObject<GetResponse>();
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
-            Assert.IsNotNull(resultSeason.season);
-            Assert.IsNotNull(resultSeason.league);
+            Assert.IsNotNull(resultSeason.Participants);
         }
 
         [Test]

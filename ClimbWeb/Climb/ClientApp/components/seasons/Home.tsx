@@ -5,9 +5,7 @@ import { RingLoader } from "react-spinners";
 import { ClimbClient } from "../../gen/climbClient";
 
 interface IState {
-    season: ClimbClient.Season | null;
-    league: ClimbClient.League | null;
-    sets: ClimbClient.Set[] | null;
+    season: ClimbClient.GetResponse | null;
 }
 
 export class Home extends React.Component<RouteComponentProps<any>, IState> {
@@ -19,9 +17,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
         this.seasonClient = new ClimbClient.SeasonClient(window.location.origin);
 
         this.state = {
-            season: null,
-            league: null,
-            sets: null,
+            season: null
         };
         this.startSeason = this.startSeason.bind(this);
     }
@@ -31,13 +27,13 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
     }
 
     render() {
-        if (this.state.season == null || this.state.league == null) {
+        if (this.state.season == null) {
             return <RingLoader color={"#123abc"}/>;
         }
 
         let body: any;
-        if (this.state.sets != null) {
-            const sets = this.state.sets.map((s, i) => <li key={i}>{`set ${i}`}</li>);
+        if (this.state.season.sets != null) {
+            const sets = this.state.season.sets.map((s, i) => <li key={i}>{`set ${i}`}</li>);
             body = <ul>{sets}</ul>;
         } else {
             body = <button onClick={this.startSeason}>Start</button>;
@@ -45,7 +41,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
 
         return (
             <div>
-                <h1>Welcome to {this.state.league.name + " Season " + (this.state.season.index + 1)}</h1>
+                <h1>Welcome to {this.state.season.leagueName + " Season " + (this.state.season.index + 1)}</h1>
                 {body}
             </div>
         );
@@ -56,12 +52,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
         this.seasonClient.get(seasonId)
             .then(response => {
                 console.log(response);
-                if (response.season != null && response.league != null) {
-                    this.setState({
-                        season: response.season,
-                        league: response.league,
-                    });
-                }
+                this.setState({ season: response });
             })
             .catch(reason => alert(`Could not load season\n${reason}`));
     }
@@ -74,7 +65,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
         this.seasonClient.start(seasonId)
             .then(sets => {
                 console.log(sets);
-                this.setState({ sets: sets });
+                //this.setState({ sets: sets });
             })
             .catch(reason => alert(`Could not start season\n${reason}`));
     }

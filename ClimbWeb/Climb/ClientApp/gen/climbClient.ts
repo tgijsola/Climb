@@ -1239,8 +1239,14 @@ export interface ISeason {
 }
 
 export class GetResponse implements IGetResponse {
-    season?: Season | undefined;
-    league?: League | undefined;
+    id: number;
+    leagueID: number;
+    leagueName?: string | undefined;
+    index: number;
+    startDate: Date;
+    endDate: Date;
+    participants?: LeagueUser[] | undefined;
+    sets?: Set[] | undefined;
 
     constructor(data?: IGetResponse) {
         if (data) {
@@ -1253,8 +1259,22 @@ export class GetResponse implements IGetResponse {
 
     init(data?: any) {
         if (data) {
-            this.season = data["season"] ? Season.fromJS(data["season"]) : <any>undefined;
-            this.league = data["league"] ? League.fromJS(data["league"]) : <any>undefined;
+            this.id = data["id"];
+            this.leagueID = data["leagueID"];
+            this.leagueName = data["leagueName"];
+            this.index = data["index"];
+            this.startDate = data["startDate"] ? new Date(data["startDate"].toString()) : <any>undefined;
+            this.endDate = data["endDate"] ? new Date(data["endDate"].toString()) : <any>undefined;
+            if (data["participants"] && data["participants"].constructor === Array) {
+                this.participants = [];
+                for (let item of data["participants"])
+                    this.participants.push(LeagueUser.fromJS(item));
+            }
+            if (data["sets"] && data["sets"].constructor === Array) {
+                this.sets = [];
+                for (let item of data["sets"])
+                    this.sets.push(Set.fromJS(item));
+            }
         }
     }
 
@@ -1267,15 +1287,35 @@ export class GetResponse implements IGetResponse {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["season"] = this.season ? this.season.toJSON() : <any>undefined;
-        data["league"] = this.league ? this.league.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["leagueID"] = this.leagueID;
+        data["leagueName"] = this.leagueName;
+        data["index"] = this.index;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        if (this.participants && this.participants.constructor === Array) {
+            data["participants"] = [];
+            for (let item of this.participants)
+                data["participants"].push(item.toJSON());
+        }
+        if (this.sets && this.sets.constructor === Array) {
+            data["sets"] = [];
+            for (let item of this.sets)
+                data["sets"].push(item.toJSON());
+        }
         return data; 
     }
 }
 
 export interface IGetResponse {
-    season?: Season | undefined;
-    league?: League | undefined;
+    id: number;
+    leagueID: number;
+    leagueName?: string | undefined;
+    index: number;
+    startDate: Date;
+    endDate: Date;
+    participants?: LeagueUser[] | undefined;
+    sets?: Set[] | undefined;
 }
 
 export class Set implements ISet {

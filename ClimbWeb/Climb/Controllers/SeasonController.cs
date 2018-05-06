@@ -42,6 +42,8 @@ namespace Climb.Controllers
         public async Task<IActionResult> Get(int seasonID)
         {
             var season = await dbContext.Seasons
+                .Include(s => s.Participants).ThenInclude(slu => slu.LeagueUser).AsNoTracking()
+                .Include(s => s.Sets).AsNoTracking()
                 .Include(s => s.League).AsNoTracking()
                 .FirstOrDefaultAsync(s => s.ID == seasonID);
             if(season == null)
