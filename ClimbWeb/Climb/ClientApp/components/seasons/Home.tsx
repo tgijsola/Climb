@@ -5,25 +5,30 @@ import { RingLoader } from "react-spinners";
 import { ClimbClient } from "../../gen/climbClient";
 
 interface IState {
-    season: ClimbClient.Season | null;
-    league: ClimbClient.League | null;
-    sets: ClimbClient.Set[] | null;
+    season: ClimbClient.Season | undefined;
+    league: ClimbClient.League | undefined;
+    participants: ClimbClient.LeagueUser[] | undefined;
+    sets: ClimbClient.Set[] | undefined;
 }
 
 export class Home extends React.Component<RouteComponentProps<any>, IState> {
     seasonClient: ClimbClient.SeasonClient;
+    leagueClient: ClimbClient.LeagueClient;
 
     constructor(props: RouteComponentProps<{}>) {
         super(props);
 
         this.seasonClient = new ClimbClient.SeasonClient(window.location.origin);
+        this.leagueClient = new ClimbClient.LeagueClient(window.location.origin);
+
+        this.startSeason = this.startSeason.bind(this);
 
         this.state = {
-            season: null,
-            league: null,
-            sets: null,
-        };
-        this.startSeason = this.startSeason.bind(this);
+            season: undefined,
+            league: undefined,
+            participants: undefined,
+            sets: undefined,
+        }
     }
 
     componentDidMount() {
@@ -31,12 +36,15 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
     }
 
     render() {
-        if (this.state.season == null || this.state.league == null) {
+        if (this.state.season == null ||
+            this.state.league == null ||
+            this.state.participants == null ||
+            this.state.sets == null) {
             return <RingLoader color={"#123abc"}/>;
         }
 
         let body: any;
-        if (this.state.sets != null) {
+        if (this.state.sets.length !== 0) {
             const sets = this.state.sets.map((s, i) => <li key={i}>{`set ${i}`}</li>);
             body = <ul>{sets}</ul>;
         } else {
@@ -54,14 +62,21 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
     private loadSeason() {
         const seasonId = this.props.match.params.seasonId;
         this.seasonClient.get(seasonId)
-            .then(response => {
-                console.log(response);
-                if (response.season != null && response.league != null) {
-                    this.setState({
-                        season: response.season,
-                        league: response.league,
-                    });
-                }
+            .then(season => {
+                console.log(season);
+                this.setState({ season: season });
+
+                this.leagueClient.get(season.leagueID)
+                    .then(league => this.setState({ league: league }))
+                    .catch(reason => alert(`Could not load league\n${reason}`));
+
+                this.seasonClient.sets(seasonId)
+                    .then(sets => this.setState({ sets: sets }))
+                    .catch(reason => alert(`Could not load sets\n${reason}`));
+
+                this.seasonClient.participants(seasonId)
+                    .then(participants => this.setState({ participants: participants }))
+                    .catch(reason => alert(`Could not load participants\n${reason}`));
             })
             .catch(reason => alert(`Could not load season\n${reason}`));
     }
@@ -72,10 +87,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
         const seasonId = this.state.season.id;
 
         this.seasonClient.start(seasonId)
-            .then(sets => {
-                console.log(sets);
-                this.setState({ sets: sets });
-            })
+            .then(sets => this.setState({ sets: sets }))
             .catch(reason => alert(`Could not start season\n${reason}`));
     }
 }

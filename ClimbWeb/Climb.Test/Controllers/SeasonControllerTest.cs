@@ -8,7 +8,6 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
-using Climb.Responses.Seasons;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
@@ -45,17 +44,70 @@ namespace Climb.Test.Controllers
             var season = SeasonUtility.CreateSeason(dbContext, 2);
 
             var result = await testObj.Get(season.ID);
-            var resultSeason = result.GetObject<GetResponse>();
+            var resultObj = result.GetObject<Season>();
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
-            Assert.IsNotNull(resultSeason.season);
-            Assert.IsNotNull(resultSeason.league);
+            Assert.IsNotNull(resultObj.Participants);
         }
 
         [Test]
         public async Task Get_NoSeason_NotFound()
         {
             var result = await testObj.Get(0);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task Sets_HasSets_Ok()
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, 2);
+            SeasonUtility.CreateSets(dbContext, season);
+
+            var result = await testObj.Sets(season.ID);
+            var resultObj = result.GetObject<IEnumerable<Set>>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.IsNotEmpty(resultObj);
+        }
+
+        [Test]
+        public async Task Sets_NoSets_Ok()
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, 2);
+
+            var result = await testObj.Sets(season.ID);
+            var resultObj = result.GetObject<IEnumerable<Set>>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.IsNotNull(resultObj);
+        }
+
+        [Test]
+        public async Task Sets_NoSeason_NotFound()
+        {
+            var result = await testObj.Sets(0);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+        
+        [TestCase(0)]
+        [TestCase(2)]
+        public async Task Participants_Valid_Ok(int participantsCount)
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, participantsCount);
+
+            var result = await testObj.Participants(season.ID);
+            var resultObj = result.GetObject<IEnumerable<LeagueUser>>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.AreEqual(participantsCount, resultObj.Count());
+        }
+
+        [Test]
+        public async Task Participants_NoSeason_NotFound()
+        {
+            var result = await testObj.Participants(0);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
