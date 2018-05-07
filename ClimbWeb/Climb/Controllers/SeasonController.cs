@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
@@ -6,7 +7,6 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
-using Climb.Responses;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +37,7 @@ namespace Climb.Controllers
         }
 
         [HttpGet("/api/v1/seasons/{seasonID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(SeasonDto))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Season))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
         public async Task<IActionResult> Get(int seasonID)
         {
@@ -51,8 +51,7 @@ namespace Climb.Controllers
                 return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
             }
 
-            var response = new SeasonDto(season);
-            return this.CodeResult(HttpStatusCode.OK, response);
+            return this.CodeResult(HttpStatusCode.OK, season);
         }
 
         [HttpGet("/api/v1/seasons/sets/{seasonID:int}")]
@@ -69,6 +68,23 @@ namespace Climb.Controllers
             }
 
             return this.CodeResult(HttpStatusCode.OK, season.Sets);
+        }
+
+        [HttpGet("/api/v1/seasons/participants/{seasonID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(LeagueUser[]))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
+        public async Task<IActionResult> Participants(int seasonID)
+        {
+            var season = await dbContext.Seasons
+                .Include(s => s.Participants).ThenInclude(slu => slu.LeagueUser).AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ID == seasonID);
+            if(season == null)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
+            }
+
+            var participants = season.Participants.Select(slu => slu.LeagueUser);
+            return this.CodeResult(HttpStatusCode.OK, participants);
         }
 
         [HttpGet("/api/v1/seasons")]

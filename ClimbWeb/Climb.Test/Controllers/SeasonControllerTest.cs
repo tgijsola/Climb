@@ -8,7 +8,6 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
-using Climb.Responses;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
@@ -45,10 +44,10 @@ namespace Climb.Test.Controllers
             var season = SeasonUtility.CreateSeason(dbContext, 2);
 
             var result = await testObj.Get(season.ID);
-            var resultSeason = result.GetObject<SeasonDto>();
+            var resultObj = result.GetObject<Season>();
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
-            Assert.IsNotNull(resultSeason.Participants);
+            Assert.IsNotNull(resultObj.Participants);
         }
 
         [Test]
@@ -88,6 +87,27 @@ namespace Climb.Test.Controllers
         public async Task Sets_NoSeason_NotFound()
         {
             var result = await testObj.Sets(0);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+        
+        [TestCase(0)]
+        [TestCase(2)]
+        public async Task Participants_Valid_Ok(int participantsCount)
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, participantsCount);
+
+            var result = await testObj.Participants(season.ID);
+            var resultObj = result.GetObject<IEnumerable<LeagueUser>>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.AreEqual(participantsCount, resultObj.Count());
+        }
+
+        [Test]
+        public async Task Participants_NoSeason_NotFound()
+        {
+            var result = await testObj.Participants(0);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
