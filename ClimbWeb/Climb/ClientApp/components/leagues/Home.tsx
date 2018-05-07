@@ -37,7 +37,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
 
         const seasons = this.state.seasons == null
             ? <div></div>
-            : this.state.seasons.map(s => <li>Season {s.index + 1}</li>);
+            : this.state.seasons.map(s => <li key={s.index}>Season {s.index + 1}</li>);
 
         return (
             <div>
