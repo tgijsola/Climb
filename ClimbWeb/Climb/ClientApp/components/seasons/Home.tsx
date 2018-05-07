@@ -36,7 +36,10 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
     }
 
     render() {
-        if (this.state.season == null || this.state.league == null || this.state.participants == null || this.state.sets == null) {
+        if (this.state.season == null ||
+            this.state.league == null ||
+            this.state.participants == null ||
+            this.state.sets == null) {
             return <RingLoader color={"#123abc"}/>;
         }
 
@@ -84,10 +87,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
         const seasonId = this.state.season.id;
 
         this.seasonClient.start(seasonId)
-            .then(sets => {
-                console.log(sets);
-                //this.setState({ sets: sets });
-            })
+            .then(sets => this.setState({ sets: sets }))
             .catch(reason => alert(`Could not start season\n${reason}`));
     }
 }
