@@ -11,9 +11,9 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 
-import Climb.API.AccountApi;
-import Climb.Models.ApplicationUser;
-import Climb.Models.LoginResponse;
+import io.swagger.client.api.AccountApi;
+import io.swagger.client.model.ApplicationUser;
+import io.swagger.client.model.LoginResponse;
 
 public class MainActivity extends AppCompatActivity {
     private AccountApi accountApi;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText passwordInput = findViewById(R.id.passwordInput);
         final String password = passwordInput.getText().toString();
 
-        accountApi.accountLogIn(email, password, true, new Listener<LoginResponse>() {
+        accountApi.accountLogIn(email, password, new Listener<LoginResponse>() {
                     @Override
                     public void onResponse(LoginResponse response) {
                         response.getToken();

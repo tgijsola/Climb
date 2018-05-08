@@ -17,7 +17,7 @@ namespace Climb.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
+                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Climb.Data.ApplicationUser", b =>
@@ -71,19 +71,7 @@ namespace Climb.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Climb.Models.Game", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Games");
-                });
-
-            modelBuilder.Entity("Climb.Models.GameCharacter", b =>
+            modelBuilder.Entity("Climb.Models.Character", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
@@ -96,7 +84,19 @@ namespace Climb.Migrations
 
                     b.HasIndex("GameID");
 
-                    b.ToTable("GameCharacter");
+                    b.ToTable("Character");
+                });
+
+            modelBuilder.Entity("Climb.Models.Game", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Games");
                 });
 
             modelBuilder.Entity("Climb.Models.League", b =>
@@ -326,7 +326,7 @@ namespace Climb.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Climb.Models.GameCharacter", b =>
+            modelBuilder.Entity("Climb.Models.Character", b =>
                 {
                     b.HasOne("Climb.Models.Game")
                         .WithMany("Characters")

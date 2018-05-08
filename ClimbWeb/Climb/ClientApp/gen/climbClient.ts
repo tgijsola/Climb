@@ -1051,7 +1051,7 @@ export interface ILoginResponse {
 export class Game implements IGame {
     id: number;
     name?: string | undefined;
-    characters?: GameCharacter[] | undefined;
+    characters?: Character[] | undefined;
     stages?: Stage[] | undefined;
 
     constructor(data?: IGame) {
@@ -1070,7 +1070,7 @@ export class Game implements IGame {
             if (data["characters"] && data["characters"].constructor === Array) {
                 this.characters = [];
                 for (let item of data["characters"])
-                    this.characters.push(GameCharacter.fromJS(item));
+                    this.characters.push(Character.fromJS(item));
             }
             if (data["stages"] && data["stages"].constructor === Array) {
                 this.stages = [];
@@ -1108,15 +1108,15 @@ export class Game implements IGame {
 export interface IGame {
     id: number;
     name?: string | undefined;
-    characters?: GameCharacter[] | undefined;
+    characters?: Character[] | undefined;
     stages?: Stage[] | undefined;
 }
 
-export class GameCharacter implements IGameCharacter {
+export class Character implements ICharacter {
     id: number;
     name?: string | undefined;
 
-    constructor(data?: IGameCharacter) {
+    constructor(data?: ICharacter) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1132,9 +1132,9 @@ export class GameCharacter implements IGameCharacter {
         }
     }
 
-    static fromJS(data: any): GameCharacter {
+    static fromJS(data: any): Character {
         data = typeof data === 'object' ? data : {};
-        let result = new GameCharacter();
+        let result = new Character();
         result.init(data);
         return result;
     }
@@ -1147,7 +1147,7 @@ export class GameCharacter implements IGameCharacter {
     }
 }
 
-export interface IGameCharacter {
+export interface ICharacter {
     id: number;
     name?: string | undefined;
 }
