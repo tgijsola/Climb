@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Climb.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +14,8 @@ namespace Climb.Data
         public DbSet<LeagueUser> LeagueUsers { get; set; }
         public DbSet<SeasonLeagueUser> SeasonLeagueUsers { get; set; }
         public DbSet<Set> Sets { get; set; }
+        public DbSet<Match> Matches { get; set; }
+        public DbSet<MatchCharacter> MatchCharacters { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -32,7 +33,8 @@ namespace Climb.Data
 
             CreateLeagueUser(builder.Entity<LeagueUser>());
             CreateSeasonLeagueUser(builder.Entity<SeasonLeagueUser>());
-            CreateSet(builder.Entity<Set>());
+            CreateMatch(builder.Entity<Match>());
+            CreateMatchCharacter(builder.Entity<MatchCharacter>());
         }
 
         private static void CreateLeagueUser(EntityTypeBuilder<LeagueUser> entity)
@@ -45,8 +47,14 @@ namespace Climb.Data
             entity.HasKey(lus => new {lus.LeagueUserID, lus.SeasonID});
         }
 
-        private static void CreateSet(EntityTypeBuilder<Set> entity)
+        private static void CreateMatch(EntityTypeBuilder<Match> entity)
         {
+            entity.HasKey(m => new {m.SetID, m.Index});
+        }
+
+        private static void CreateMatchCharacter(EntityTypeBuilder<MatchCharacter> entity)
+        {
+            entity.HasKey(m => new {m.MatchID, m.CharacterID, m.LeagueUserID});
         }
     }
 }
