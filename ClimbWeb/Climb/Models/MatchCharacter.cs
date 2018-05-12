@@ -14,5 +14,16 @@ namespace Climb.Models
         public Character Character { get; set; }
         [JsonIgnore]
         public LeagueUser LeagueUser { get; set; }
+
+        public MatchCharacter()
+        {
+        }
+
+        public MatchCharacter(int matchID, int characterID, int leagueUserID)
+        {
+            MatchID = matchID;
+            CharacterID = characterID;
+            LeagueUserID = leagueUserID;
+        }
     }
 }

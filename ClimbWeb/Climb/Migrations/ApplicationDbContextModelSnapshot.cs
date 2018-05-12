@@ -137,7 +137,8 @@ namespace Climb.Migrations
 
             modelBuilder.Entity("Climb.Models.Match", b =>
                 {
-                    b.Property<int>("SetID");
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("Index");
 
@@ -145,9 +146,13 @@ namespace Climb.Migrations
 
                     b.Property<int>("Player2Score");
 
+                    b.Property<int>("SetID");
+
                     b.Property<int?>("StageID");
 
-                    b.HasKey("SetID", "Index");
+                    b.HasKey("ID");
+
+                    b.HasIndex("SetID");
 
                     b.HasIndex("StageID");
 
@@ -162,17 +167,11 @@ namespace Climb.Migrations
 
                     b.Property<int>("LeagueUserID");
 
-                    b.Property<int?>("MatchIndex");
-
-                    b.Property<int?>("MatchSetID");
-
                     b.HasKey("MatchID", "CharacterID", "LeagueUserID");
 
                     b.HasIndex("CharacterID");
 
                     b.HasIndex("LeagueUserID");
-
-                    b.HasIndex("MatchSetID", "MatchIndex");
 
                     b.ToTable("MatchCharacters");
                 });
@@ -424,7 +423,7 @@ namespace Climb.Migrations
 
                     b.HasOne("Climb.Models.Match", "Match")
                         .WithMany("MatchCharacters")
-                        .HasForeignKey("MatchSetID", "MatchIndex")
+                        .HasForeignKey("MatchID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

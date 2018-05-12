@@ -33,7 +33,6 @@ namespace Climb.Data
 
             CreateLeagueUser(builder.Entity<LeagueUser>());
             CreateSeasonLeagueUser(builder.Entity<SeasonLeagueUser>());
-            CreateMatch(builder.Entity<Match>());
             CreateMatchCharacter(builder.Entity<MatchCharacter>());
         }
 
@@ -45,11 +44,6 @@ namespace Climb.Data
         private static void CreateSeasonLeagueUser(EntityTypeBuilder<SeasonLeagueUser> entity)
         {
             entity.HasKey(lus => new {lus.LeagueUserID, lus.SeasonID});
-        }
-
-        private static void CreateMatch(EntityTypeBuilder<Match> entity)
-        {
-            entity.HasKey(m => new {m.SetID, m.Index});
         }
 
         private static void CreateMatchCharacter(EntityTypeBuilder<MatchCharacter> entity)
