@@ -41,7 +41,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Get_Valid_Ok()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2);
+            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
 
             var result = await testObj.Get(season.ID);
             var resultObj = result.GetObject<Season>();
@@ -61,7 +61,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Sets_HasSets_Ok()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2);
+            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
             SeasonUtility.CreateSets(dbContext, season);
 
             var result = await testObj.Sets(season.ID);
@@ -74,7 +74,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Sets_NoSets_Ok()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2);
+            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
 
             var result = await testObj.Sets(season.ID);
             var resultObj = result.GetObject<IEnumerable<Set>>();
@@ -95,7 +95,7 @@ namespace Climb.Test.Controllers
         [TestCase(2)]
         public async Task Participants_Valid_Ok(int participantsCount)
         {
-            var season = SeasonUtility.CreateSeason(dbContext, participantsCount);
+            var season = SeasonUtility.CreateSeason(dbContext, participantsCount).season;
 
             var result = await testObj.Participants(season.ID);
             var resultObj = result.GetObject<IEnumerable<LeagueUser>>();
@@ -176,7 +176,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Start_Valid_Created()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2);
+            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
 
             var result = await testObj.Start(season.ID);
 
@@ -186,7 +186,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Start_Valid_ReturnsSets()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2);
+            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
             var participants = season.Participants.ToArray();
             var sets = new HashSet<Set>();
             for(var i = 0; i < 3; i++)
@@ -213,7 +213,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Start_ServiceError_ServerError()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2);
+            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
             seasonService.GenerateSchedule(season.ID).Throws<Exception>();
 
             var result = await testObj.Start(season.ID);
