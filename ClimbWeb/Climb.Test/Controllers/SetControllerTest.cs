@@ -28,7 +28,7 @@ namespace Climb.Test.Controllers
             dbContext = DbContextUtility.CreateMockDb();
             var logger = Substitute.For<ILogger<SetController>>();
 
-            testObj = new SetController(setService, dbContext, logger);
+            testObj = new SetController(setService, logger);
         }
 
         [Test]
