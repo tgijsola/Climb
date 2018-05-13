@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Climb.Data;
-using Climb.Models;
 using Climb.Requests.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
@@ -25,7 +24,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Update_FirstMatches_CreatesMatchesAndMatchCharacters()
         {
-            var set = CreateSet();
+            var set = SetUtility.Create(dbContext);
 
             var matchForms = CreateMatchForms(3);
             await testObj.Update(set.ID, matchForms);
@@ -36,7 +35,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Update_NewMatches_ReplacesOldMatchesAndMatchCharacters()
         {
-            var set = CreateSet();
+            var set = SetUtility.Create(dbContext);
             var matchForms = CreateMatchForms(3);
             await testObj.Update(set.ID, matchForms);
 
@@ -48,7 +47,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Update_RemoveMatches_DeletesOldMatchesAndMatchCharacters()
         {
-            var set = CreateSet();
+            var set = SetUtility.Create(dbContext);
             var matchForms = CreateMatchForms(3);
             await testObj.Update(set.ID, matchForms);
 
@@ -82,15 +81,6 @@ namespace Climb.Test.Services.ModelServices
             }
 
             return matchForms;
-        }
-
-        private Set CreateSet()
-        {
-            GameUtility.Create(dbContext, 3, 3);
-
-            var (season, members) = SeasonUtility.CreateSeason(dbContext, 2);
-            var set = SetUtility.Create(dbContext, members[0].ID, members[1].ID, season);
-            return set;
         }
     }
 }

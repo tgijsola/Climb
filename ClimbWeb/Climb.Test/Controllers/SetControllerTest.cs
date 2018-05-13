@@ -34,11 +34,22 @@ namespace Climb.Test.Controllers
         public async Task Submit_ServiceException_ServerError()
         {
             setService.Update(0, null).ThrowsForAnyArgs<Exception>();
-            var request = new SubmitRequest {SetID = 0, Matches = new MatchForm[0]};
+            var set = SetUtility.Create(dbContext);
+            var request = new SubmitRequest {SetID = set.ID, Matches = new MatchForm[0]};
 
             var result = await testObj.Submit(request);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.InternalServerError);
+        }
+
+        [Test]
+        public async Task Submit_NoSet_NotFound()
+        {
+            var request = new SubmitRequest {SetID = 0, Matches = new MatchForm[0]};
+
+            var result = await testObj.Submit(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
     }
 }
