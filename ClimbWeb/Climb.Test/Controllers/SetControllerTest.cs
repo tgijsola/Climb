@@ -53,5 +53,16 @@ namespace Climb.Test.Controllers
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
+
+        [Test]
+        public async Task Submit_BadRequest_BadRequest()
+        {
+            setService.Update(0, null).ThrowsForAnyArgs<BadRequestException>();
+            var request = new SubmitRequest {SetID = 0, Matches = new MatchForm[0]};
+
+            var result = await testObj.Submit(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
+        }
     }
 }
