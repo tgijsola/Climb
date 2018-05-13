@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Requests.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
@@ -45,6 +46,7 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Submit_NoSet_NotFound()
         {
+            setService.Update(0, null).ThrowsForAnyArgs<NotFoundException>();
             var request = new SubmitRequest {SetID = 0, Matches = new MatchForm[0]};
 
             var result = await testObj.Submit(request);

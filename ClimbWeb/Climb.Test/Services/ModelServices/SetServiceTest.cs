@@ -1,6 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Requests.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
@@ -57,10 +57,10 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public void Update_NoSet_NullRefException()
+        public void Update_NoSet_NotFoundException()
         {
             var matchForms = CreateMatchForms(3);
-            Assert.ThrowsAsync<NullReferenceException>(() => testObj.Update(0, matchForms));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Update(0, matchForms));
         }
 
         // TODO: Not matching character counts.
@@ -68,7 +68,7 @@ namespace Climb.Test.Services.ModelServices
         private static MatchForm[] CreateMatchForms(int count)
         {
             var matchForms = new MatchForm[count];
-            for(int i = 0; i < count; i++)
+            for(var i = 0; i < count; i++)
             {
                 matchForms[i] = new MatchForm
                 {

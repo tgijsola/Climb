@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Models;
 using Climb.Requests.Sets;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,10 @@ namespace Climb.Services.ModelServices
             var set = await dbContext.Sets
                 .Include(s => s.Matches).ThenInclude(m => m.MatchCharacters)
                 .FirstOrDefaultAsync(s => s.ID == setID);
+            if(set == null)
+            {
+                throw new NotFoundException(typeof(Set), setID);
+            }
 
             if(set.Matches.Count > 0)
             {

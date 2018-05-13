@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Extensions;
 using Climb.Requests.Sets;
 using Climb.Services.ModelServices;
@@ -27,14 +28,13 @@ namespace Climb.Controllers
         [HttpPost("/api/v1/sets/submit")]
         public async Task<IActionResult> Submit([FromBody] SubmitRequest request)
         {
-            if(!await dbContext.Sets.AnyAsync(s => s.ID == request.SetID))
-            {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Set with ID '{request.SetID}' found.", logger);
-            }
-
             try
             {
                 await setService.Update(request.SetID, request.Matches);
+            }
+            catch(NotFoundException exception)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, exception.Message, logger);
             }
             catch(Exception exception)
             {
