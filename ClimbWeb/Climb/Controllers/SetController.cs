@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Extensions;
 using Climb.Requests.Sets;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
@@ -21,10 +23,18 @@ namespace Climb.Controllers
             this.logger = logger;
         }
 
-        [HttpPost("/api/v1/sets/submit/{setID:int}")]
-        public async Task<IActionResult> Submit(int setID, List<MatchForm> matches)
+        [HttpPost("/api/v1/sets/submit")]
+        public async Task<IActionResult> Submit([FromBody] SubmitRequest request)
         {
-            await Task.CompletedTask;
+            try
+            {
+                await setService.Update(request.SetID, request.Matches);
+            }
+            catch(Exception exception)
+            {
+                logger.LogError(exception, "Service error updating set.");
+                return this.CodeResult(HttpStatusCode.InternalServerError, "Could not submit set.");
+            }
 
             return Ok();
         }

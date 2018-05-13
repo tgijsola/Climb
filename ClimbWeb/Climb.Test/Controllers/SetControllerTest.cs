@@ -1,9 +1,14 @@
-﻿using Climb.Controllers;
+﻿using System;
+using System.Net;
+using System.Threading.Tasks;
+using Climb.Controllers;
 using Climb.Data;
+using Climb.Requests.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Climb.Test.Controllers
@@ -23,6 +28,17 @@ namespace Climb.Test.Controllers
             var logger = Substitute.For<ILogger<SetController>>();
 
             testObj = new SetController(setService, dbContext, logger);
+        }
+
+        [Test]
+        public async Task Submit_ServiceException_ServerError()
+        {
+            setService.Update(0, null).ThrowsForAnyArgs<Exception>();
+            var request = new SubmitRequest {SetID = 0, Matches = new MatchForm[0]};
+
+            var result = await testObj.Submit(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.InternalServerError);
         }
     }
 }
