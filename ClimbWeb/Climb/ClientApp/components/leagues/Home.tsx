@@ -9,10 +9,10 @@ interface IState {
     seasons: ClimbClient.Season[] | null;
 }
 
-export class Home extends React.Component<RouteComponentProps<any>, IState> {
+export class Home extends React.Component<RouteComponentProps<any> | undefined, IState> {
     leagueClient: ClimbClient.LeagueClient;
 
-    constructor(props: RouteComponentProps<{}>) {
+    constructor(props: RouteComponentProps<any> | undefined) {
         super(props);
 
         this.leagueClient = new ClimbClient.LeagueClient(window.location.origin);
@@ -85,7 +85,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
                 this.setState({ league: league });
                 this.loadSeasons();
             })
-            .catch(reason => alert(`Could not load games\n${reason}`));
+            .catch(reason => alert(`Could not load league\n${reason}`));
     }
 
     private loadSeasons() {

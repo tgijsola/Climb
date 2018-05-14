@@ -11,8 +11,8 @@ interface ILoginState {
     isLoggingIn: boolean;
 }
 
-export class Login extends React.Component<RouteComponentProps<{}>, ILoginState> {
-    constructor(props: RouteComponentProps<{}>) {
+export class Login extends React.Component<RouteComponentProps<any> | undefined, ILoginState> {
+    constructor(props: RouteComponentProps<any> | undefined) {
         super(props);
 
         this.onLogInClick = this.onLogInClick.bind(this);
