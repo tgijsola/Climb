@@ -11,11 +11,11 @@ interface IState {
     sets: ClimbClient.Set[] | undefined;
 }
 
-export class Home extends React.Component<RouteComponentProps<any>, IState> {
+export class Home extends React.Component<RouteComponentProps<any> | undefined, IState> {
     seasonClient: ClimbClient.SeasonClient;
     leagueClient: ClimbClient.LeagueClient;
 
-    constructor(props: RouteComponentProps<{}>) {
+    constructor(props: RouteComponentProps<any> | undefined) {
         super(props);
 
         this.seasonClient = new ClimbClient.SeasonClient(window.location.origin);

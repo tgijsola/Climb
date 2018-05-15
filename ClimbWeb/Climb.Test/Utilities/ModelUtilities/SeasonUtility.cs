@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Climb.Data;
 using Climb.Models;
@@ -7,7 +8,7 @@ namespace Climb.Test.Utilities
 {
     public static class SeasonUtility
     {
-        public static Season CreateSeason(ApplicationDbContext dbContext, int participants)
+        public static (Season season, List<LeagueUser> members) CreateSeason(ApplicationDbContext dbContext, int participants)
         {
             var league = LeagueUtility.CreateLeague(dbContext);
             var members = LeagueUtility.AddUsersToLeague(league, participants, dbContext);
@@ -19,7 +20,7 @@ namespace Climb.Test.Utilities
                 slu.SeasonID = season.ID;
             });
 
-            return season;
+            return (season, members);
         }
 
         public static List<Set> CreateSets(ApplicationDbContext dbContext, Season season)

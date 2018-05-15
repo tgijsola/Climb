@@ -3,8 +3,8 @@ import { RouteComponentProps } from "react-router";
 
 import { ClimbClient } from "../../gen/climbClient";
 
-export class Create extends React.Component<RouteComponentProps<{}>> {
-    constructor(props: RouteComponentProps<{}>) {
+export class Create extends React.Component<RouteComponentProps<any> | undefined> {
+    constructor(props: RouteComponentProps<any> | undefined) {
         super(props);
 
         this.onSubmit = this.onSubmit.bind(this);

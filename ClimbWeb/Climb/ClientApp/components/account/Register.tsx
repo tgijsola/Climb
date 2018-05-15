@@ -8,8 +8,8 @@ interface IRegisterState {
     user: ClimbClient.ApplicationUser | null;
 }
 
-export class Register extends React.Component<RouteComponentProps<{}>, IRegisterState> {
-    constructor(props: RouteComponentProps<{}>) {
+export class Register extends React.Component<RouteComponentProps<any> | undefined, IRegisterState> {
+    constructor(props: RouteComponentProps<any> | undefined) {
         super(props);
 
         this.onRegisterClick = this.onRegisterClick.bind(this);

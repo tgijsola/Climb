@@ -8,8 +8,8 @@ interface IState {
     games: ClimbClient.Game[] | null;
 }
 
-export class Create extends React.Component<RouteComponentProps<{}>, IState> {
-    constructor(props: RouteComponentProps<{}>) {
+export class Create extends React.Component<RouteComponentProps<any> | undefined, IState> {
+    constructor(props: RouteComponentProps<any> | undefined) {
         super(props);
 
         this.onSubmit = this.onSubmit.bind(this);

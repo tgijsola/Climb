@@ -28,7 +28,7 @@ namespace Climb.Test.Services
         [TestCase(11, 55)]
         public async Task GenerateSchedule_Valid_CreateSets(int userCount, int setCount)
         {
-            var season = SeasonUtility.CreateSeason(dbContext, userCount);
+            var season = SeasonUtility.CreateSeason(dbContext, userCount).season;
             season.Sets = new HashSet<Set>();
 
             await testObj.GenerateScheduleAsync(season, dbContext);
@@ -40,7 +40,7 @@ namespace Climb.Test.Services
         [TestCase(15)]
         public async Task GenerateSchedule_Valid_EveryoneFightsEveryone(int userCount)
         {
-            var season = SeasonUtility.CreateSeason(dbContext, userCount);
+            var season = SeasonUtility.CreateSeason(dbContext, userCount).season;
             season.Sets = new HashSet<Set>();
 
             await testObj.GenerateScheduleAsync(season, dbContext);

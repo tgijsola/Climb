@@ -17,5 +17,14 @@ namespace Climb.Test.Utilities
 
             return set;
         }
+
+        public static Set Create(ApplicationDbContext dbContext)
+        {
+            GameUtility.Create(dbContext, 3, 3);
+
+            var (season, members) = SeasonUtility.CreateSeason(dbContext, 2);
+            var set = Create(dbContext, members[0].ID, members[1].ID, season);
+            return set;
+        }
     }
 }

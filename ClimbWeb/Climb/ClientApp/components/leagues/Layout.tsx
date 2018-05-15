@@ -1,5 +1,5 @@
 ﻿import * as React from "react";
-import { Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 
 import { ClimbClient } from "../../gen/climbClient";
 import ApplicationUser = ClimbClient.ApplicationUser;
@@ -10,7 +10,7 @@ import { Create } from "./Create";
 import { Home } from "./Home";
 
 interface ILayoutProps {
-    user : ApplicationUser | null;
+    user: ApplicationUser | null;
 }
 
 export class Layout extends React.Component<ILayoutProps> {
@@ -19,9 +19,11 @@ export class Layout extends React.Component<ILayoutProps> {
             <div id="container">
                 <Navbar user={this.props.user}/>
                 <h1 id="title">Climb</h1>
-                <Route exact path="/leagues" component={ Index }/>
-                <Route exact path="/leagues/create" component={ Create }/>
-                <Route exact path="/leagues/:leagueId" component={ Home } />
+                <Switch>
+                    <Route exact path="/leagues" component={ Index }/>
+                    <Route exact path="/leagues/create" component={ Create }/>
+                    <Route exact path="/leagues/:leagueId" component={ Home }/>
+                </Switch>
             </div>
         );
     }

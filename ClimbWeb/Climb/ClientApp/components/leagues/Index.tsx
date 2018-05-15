@@ -12,8 +12,8 @@ interface IIndexState {
     leagues: ClimbClient.Game[] | null
 }
 
-export class Index extends React.Component<RouteComponentProps<{}>, IIndexState> {
-    constructor(props: RouteComponentProps<{}>) {
+export class Index extends React.Component<RouteComponentProps<any> | undefined, IIndexState> {
+    constructor(props: RouteComponentProps<any> | undefined) {
         super(props);
 
         this.state = { leagues: null };
