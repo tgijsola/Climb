@@ -4,20 +4,23 @@ import { RingLoader } from "react-spinners";
 
 import { ClimbClient } from "../../gen/climbClient";
 
+interface ILeaguesHomeProps {
+    leagueId: number;
+}
+
 interface IState {
     league: ClimbClient.League | null;
     seasons: ClimbClient.Season[] | null;
 }
 
-export class Home extends React.Component<RouteComponentProps<any> | undefined, IState> {
+export class Home extends React.Component<RouteComponentProps<ILeaguesHomeProps> | undefined, IState> {
     leagueClient: ClimbClient.LeagueClient;
 
-    constructor(props: RouteComponentProps<any> | undefined) {
+    constructor(props: RouteComponentProps<ILeaguesHomeProps> | undefined) {
         super(props);
 
         this.leagueClient = new ClimbClient.LeagueClient(window.location.origin);
 
-        this.onSubmit = this.onSubmit.bind(this);
         this.createSeason = this.createSeason.bind(this);
 
         this.state = {
@@ -61,22 +64,6 @@ export class Home extends React.Component<RouteComponentProps<any> | undefined, 
         );
     }
 
-    private onSubmit(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-
-        const leaguesClient = new ClimbClient.LeagueClient(window.location.origin);
-        const gameInput = (document.getElementById("gameInput") as HTMLSelectElement);
-        const gameId = +gameInput.options[gameInput.selectedIndex].value;
-        const leagueName = (document.getElementById("leagueNameInput") as HTMLInputElement).value;
-
-        leaguesClient.create(gameId, leagueName)
-            .then(game => {
-                console.log(game);
-                window.location.assign("/leagues");
-            })
-            .catch(reason => alert(`Could not create league!\n${reason}`));
-    }
-
     private loadLeague() {
         const leagueId = this.props.match.params.leagueId;
         this.leagueClient.get(leagueId)
@@ -85,7 +72,7 @@ export class Home extends React.Component<RouteComponentProps<any> | undefined, 
                 this.setState({ league: league });
                 this.loadSeasons();
             })
-            .catch(reason => alert(`Could not load league\n${reason}`));
+            .catch(reason => alert(`Could not load league Hi mom\n${reason}`));
     }
 
     private loadSeasons() {
@@ -96,7 +83,6 @@ export class Home extends React.Component<RouteComponentProps<any> | undefined, 
 
         this.leagueClient.getSeasons(this.state.league.id)
             .then(seasons => {
-                console.log(seasons);
                 this.setState({ seasons: seasons });
             })
             .catch(reason => alert(`Could not load seasons\n${reason}`));
@@ -117,7 +103,6 @@ export class Home extends React.Component<RouteComponentProps<any> | undefined, 
 
         seasonClient.create(leagueId, startInput, endInput)
             .then(season => {
-                console.log(season);
                 this.loadSeasons();
             })
             .catch(reason => {
