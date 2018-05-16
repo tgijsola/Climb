@@ -19,6 +19,15 @@ namespace Climb.Controllers
             this.setService = setService;
         }
 
+        [HttpGet("/sets/{*page}")]
+        [SwaggerIgnore]
+        public IActionResult Index()
+        {
+            ViewData["Title"] = "Set";
+            ViewData["Script"] = "sets";
+            return View("~/Views/Page.cshtml");
+        }
+
         [HttpPost("/api/v1/sets/submit")]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
         [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string))]
