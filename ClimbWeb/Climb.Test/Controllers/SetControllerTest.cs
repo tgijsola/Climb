@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
 using Climb.Exceptions;
+using Climb.Extensions;
+using Climb.Models;
 using Climb.Requests.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
@@ -28,7 +30,7 @@ namespace Climb.Test.Controllers
             dbContext = DbContextUtility.CreateMockDb();
             var logger = Substitute.For<ILogger<SetController>>();
 
-            testObj = new SetController(setService, logger);
+            testObj = new SetController(dbContext, setService, logger);
         }
 
         [Test]
@@ -63,6 +65,26 @@ namespace Climb.Test.Controllers
             var result = await testObj.Submit(request);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
+        }
+
+        [Test]
+        public async Task Get_HasSet_Ok()
+        {
+            var set = SetUtility.Create(dbContext);
+
+            var result = await testObj.Get(set.ID);
+            var resultObj = result.GetObject<Set>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.AreEqual(set.ID, resultObj.ID);
+        }
+
+        [Test]
+        public async Task Get_NoSet_NotFound()
+        {
+            var result = await testObj.Get(0);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
     }
 }
