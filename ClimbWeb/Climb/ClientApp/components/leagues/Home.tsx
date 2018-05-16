@@ -13,7 +13,7 @@ interface IState {
     seasons: ClimbClient.Season[] | null;
 }
 
-export class Home extends React.Component<RouteComponentProps<ILeaguesHomeProps> | undefined, IState> {
+export class Home extends React.Component<RouteComponentProps<ILeaguesHomeProps>, IState> {
     leagueClient: ClimbClient.LeagueClient;
 
     constructor(props: RouteComponentProps<ILeaguesHomeProps> | undefined) {

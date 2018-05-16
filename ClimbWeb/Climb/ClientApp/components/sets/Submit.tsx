@@ -4,7 +4,7 @@ import { RingLoader } from "react-spinners";
 
 import { ClimbClient } from "../../gen/climbClient";
 
-export class Submit extends React.Component<RouteComponentProps<any> | undefined> {
+export class Submit extends React.Component<RouteComponentProps<any>> {
 
     constructor(props: RouteComponentProps<any> | undefined) {
         super(props);

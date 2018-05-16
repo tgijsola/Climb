@@ -924,16 +924,16 @@ export class IdentityUserOfString implements IIdentityUserOfString {
     normalizedUserName?: string | undefined;
     email?: string | undefined;
     normalizedEmail?: string | undefined;
-    emailConfirmed!: boolean;
+    emailConfirmed: boolean;
     passwordHash?: string | undefined;
     securityStamp?: string | undefined;
     concurrencyStamp?: string | undefined;
     phoneNumber?: string | undefined;
-    phoneNumberConfirmed!: boolean;
-    twoFactorEnabled!: boolean;
+    phoneNumberConfirmed: boolean;
+    twoFactorEnabled: boolean;
     lockoutEnd?: Date | undefined;
-    lockoutEnabled!: boolean;
-    accessFailedCount!: number;
+    lockoutEnabled: boolean;
+    accessFailedCount: number;
 
     constructor(data?: IIdentityUserOfString) {
         if (data) {
@@ -1105,7 +1105,7 @@ export interface ILoginResponse {
 }
 
 export class Game implements IGame {
-    id!: number;
+    id: number;
     name?: string | undefined;
     characters?: Character[] | undefined;
     stages?: Stage[] | undefined;
@@ -1169,7 +1169,7 @@ export interface IGame {
 }
 
 export class Character implements ICharacter {
-    id!: number;
+    id: number;
     name?: string | undefined;
 
     constructor(data?: ICharacter) {
@@ -1209,7 +1209,7 @@ export interface ICharacter {
 }
 
 export class Stage implements IStage {
-    id!: number;
+    id: number;
     name?: string | undefined;
 
     constructor(data?: IStage) {
@@ -1249,8 +1249,8 @@ export interface IStage {
 }
 
 export class League implements ILeague {
-    id!: number;
-    gameID!: number;
+    id: number;
+    gameID: number;
     name?: string | undefined;
 
     constructor(data?: ILeague) {
@@ -1293,10 +1293,10 @@ export interface ILeague {
 }
 
 export class LeagueUser implements ILeagueUser {
-    id!: number;
-    leagueID!: number;
+    id: number;
+    leagueID: number;
     userID?: string | undefined;
-    hasLeft!: boolean;
+    hasLeft: boolean;
 
     constructor(data?: ILeagueUser) {
         if (data) {
@@ -1341,11 +1341,11 @@ export interface ILeagueUser {
 }
 
 export class Season implements ISeason {
-    id!: number;
-    leagueID!: number;
-    index!: number;
-    startDate!: Date;
-    endDate!: Date;
+    id: number;
+    leagueID: number;
+    index: number;
+    startDate: Date;
+    endDate: Date;
 
     constructor(data?: ISeason) {
         if (data) {
@@ -1393,14 +1393,14 @@ export interface ISeason {
 }
 
 export class Set implements ISet {
-    id!: number;
-    leagueID!: number;
+    id: number;
+    leagueID: number;
     seasonID?: number | undefined;
-    player1ID!: number;
-    player2ID!: number;
+    player1ID: number;
+    player2ID: number;
     player1Score?: number | undefined;
     player2Score?: number | undefined;
-    dueDate!: Date;
+    dueDate: Date;
     updatedDate?: Date | undefined;
 
     constructor(data?: ISet) {
@@ -1461,7 +1461,7 @@ export interface ISet {
 }
 
 export class SubmitRequest implements ISubmitRequest {
-    setID!: number;
+    setID: number;
     matches?: MatchForm[] | undefined;
 
     constructor(data?: ISubmitRequest) {
@@ -1509,8 +1509,8 @@ export interface ISubmitRequest {
 }
 
 export class MatchForm implements IMatchForm {
-    player1Score!: number;
-    player2Score!: number;
+    player1Score: number;
+    player2Score: number;
     player1Characters?: number[] | undefined;
     player2Characters?: number[] | undefined;
     stageID?: number | undefined;
