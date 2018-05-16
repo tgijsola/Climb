@@ -11,8 +11,8 @@ using System;
 namespace Climb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180504052752_SeasonLeagueUser.LeagueUser")]
-    partial class SeasonLeagueUserLeagueUser
+    [Migration("20180512174526_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -134,6 +134,47 @@ namespace Climb.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("LeagueUsers");
+                });
+
+            modelBuilder.Entity("Climb.Models.Match", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Index");
+
+                    b.Property<int>("Player1Score");
+
+                    b.Property<int>("Player2Score");
+
+                    b.Property<int>("SetID");
+
+                    b.Property<int?>("StageID");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("SetID");
+
+                    b.HasIndex("StageID");
+
+                    b.ToTable("Matches");
+                });
+
+            modelBuilder.Entity("Climb.Models.MatchCharacter", b =>
+                {
+                    b.Property<int>("MatchID");
+
+                    b.Property<int>("CharacterID");
+
+                    b.Property<int>("LeagueUserID");
+
+                    b.HasKey("MatchID", "CharacterID", "LeagueUserID");
+
+                    b.HasIndex("CharacterID");
+
+                    b.HasIndex("LeagueUserID");
+
+                    b.ToTable("MatchCharacters");
                 });
 
             modelBuilder.Entity("Climb.Models.Season", b =>
@@ -353,6 +394,37 @@ namespace Climb.Migrations
                     b.HasOne("Climb.Data.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Climb.Models.Match", b =>
+                {
+                    b.HasOne("Climb.Models.Set", "Set")
+                        .WithMany("Matches")
+                        .HasForeignKey("SetID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.Stage", "Stage")
+                        .WithMany()
+                        .HasForeignKey("StageID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Climb.Models.MatchCharacter", b =>
+                {
+                    b.HasOne("Climb.Models.Character", "Character")
+                        .WithMany()
+                        .HasForeignKey("CharacterID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.LeagueUser", "LeagueUser")
+                        .WithMany()
+                        .HasForeignKey("LeagueUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.Match", "Match")
+                        .WithMany("MatchCharacters")
+                        .HasForeignKey("MatchID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

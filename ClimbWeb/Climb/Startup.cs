@@ -70,6 +70,7 @@ namespace Climb
             services.AddTransient<IGameService, GameService>();
             services.AddTransient<ILeagueService, LeagueService>();
             services.AddTransient<ISeasonService, SeasonService>();
+            services.AddTransient<ISetService, SetService>();
 
             services.AddSingleton<IEmailSender, EmailSender>();
             services.AddTransient<ITokenHelper, TokenHelper>();

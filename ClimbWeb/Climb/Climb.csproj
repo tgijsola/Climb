@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.7</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable>
     <RootNamespace>Climb</RootNamespace>
   </PropertyGroup>
@@ -12,7 +12,7 @@
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.2" />
-    <PackageReference Include="NSwag.AspNetCore" Version="11.17.3" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.17.4" />
   </ItemGroup>
 
   <ItemGroup>

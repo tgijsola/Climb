@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Models;
@@ -42,7 +41,7 @@ namespace Climb.Test.Services
         {
             var league = LeagueUtility.CreateLeague(dbContext);
             LeagueUtility.AddUsersToLeague(league, userCount, dbContext);
-            var season = SeasonUtility.CreateSeason(dbContext, userCount);
+            var season = SeasonUtility.CreateSeason(dbContext, userCount).season;
 
             Assert.ThrowsAsync<InvalidOperationException>(() => testObj.GenerateScheduleAsync(season, dbContext));
         }
@@ -50,13 +49,12 @@ namespace Climb.Test.Services
         [Test]
         public async Task GenerateSchedule_AlreadyHasSets_ClearsOldSets()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2);
-            var participants = season.Participants.ToArray();
+            var (season, participants) = SeasonUtility.CreateSeason(dbContext, 2);
 
-            var set1 = SetUtility.Create(dbContext, participants[0].LeagueUserID, participants[1].LeagueUserID, season);
+            var set1 = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season);
             season.Sets = new HashSet<Set> {set1};
 
-            var set2 = SetUtility.Create(dbContext, participants[0].LeagueUserID, participants[1].LeagueUserID, season);
+            var set2 = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season);
             testObj.sets = new HashSet<Set> {set2};
 
             await testObj.GenerateScheduleAsync(season, dbContext);
