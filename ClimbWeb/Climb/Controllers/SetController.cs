@@ -52,17 +52,21 @@ namespace Climb.Controllers
         }
 
         [HttpGet("/api/v1/sets/{setID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(SetGetResponse))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(SetDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
         public async Task<IActionResult> Get(int setID)
         {
-            var set = await dbContext.Sets.FirstOrDefaultAsync(s => s.ID == setID);
+            var set = await dbContext.Sets
+                .Include(s => s.Matches).ThenInclude(m => m.MatchCharacters).AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ID == setID);
             if(set == null)
             {
                 return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find Set with ID '{setID}'.", logger);
             }
 
-            return this.CodeResult(HttpStatusCode.OK, set);
+            var dto = SetDto.Create(set);
+
+            return this.CodeResult(HttpStatusCode.OK, dto);
         }
     }
 }

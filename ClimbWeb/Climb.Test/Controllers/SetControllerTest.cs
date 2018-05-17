@@ -5,8 +5,8 @@ using Climb.Controllers;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Extensions;
-using Climb.Models;
 using Climb.Requests.Sets;
+using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
@@ -73,10 +73,10 @@ namespace Climb.Test.Controllers
             var set = SetUtility.Create(dbContext);
 
             var result = await testObj.Get(set.ID);
-            var resultObj = result.GetObject<Set>();
+            var resultObj = result.GetObject<SetDto>();
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
-            Assert.AreEqual(set.ID, resultObj.ID);
+            Assert.AreEqual(set.ID, resultObj.id);
         }
 
         [Test]
