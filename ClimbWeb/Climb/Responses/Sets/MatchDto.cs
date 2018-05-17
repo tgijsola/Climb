@@ -6,6 +6,7 @@ namespace Climb.Responses.Sets
     public class MatchDto
     {
         public readonly int id;
+        public readonly int index;
         public readonly int player1Score;
         public readonly int player2Score;
         public readonly IReadOnlyCollection<int> player1Characters;
@@ -15,6 +16,7 @@ namespace Climb.Responses.Sets
         public MatchDto(Match match, int player1ID)
         {
             id = match.ID;
+            index = match.Index;
             player1Score = match.Player1Score;
             player2Score = match.Player2Score;
             stageID = match.StageID;

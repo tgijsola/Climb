@@ -916,6 +916,51 @@ export class SetClient extends BaseClass {
         }
         return Promise.resolve<void>(<any>null);
     }
+
+    get(setID: number): Promise<SetDto> {
+        let url_ = this.baseUrl + "/api/v1/sets/{setID}";
+        if (setID === undefined || setID === null)
+            throw new Error("The parameter 'setID' must be defined.");
+        url_ = url_.replace("{setID}", encodeURIComponent("" + setID)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGet(_response);
+        });
+    }
+
+    protected processGet(response: Response): Promise<SetDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? SetDto.fromJS(resultData200) : new SetDto();
+            return result200;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<SetDto>(<any>null);
+    }
 }
 
 export class IdentityUserOfString implements IIdentityUserOfString {
@@ -1402,6 +1447,7 @@ export class Set implements ISet {
     player2Score?: number | undefined;
     dueDate: Date;
     updatedDate?: Date | undefined;
+    matches?: Match[] | undefined;
 
     constructor(data?: ISet) {
         if (data) {
@@ -1423,6 +1469,11 @@ export class Set implements ISet {
             this.player2Score = data["player2Score"];
             this.dueDate = data["dueDate"] ? new Date(data["dueDate"].toString()) : <any>undefined;
             this.updatedDate = data["updatedDate"] ? new Date(data["updatedDate"].toString()) : <any>undefined;
+            if (data["matches"] && data["matches"].constructor === Array) {
+                this.matches = [];
+                for (let item of data["matches"])
+                    this.matches.push(Match.fromJS(item));
+            }
         }
     }
 
@@ -1444,6 +1495,11 @@ export class Set implements ISet {
         data["player2Score"] = this.player2Score;
         data["dueDate"] = this.dueDate ? this.dueDate.toISOString() : <any>undefined;
         data["updatedDate"] = this.updatedDate ? this.updatedDate.toISOString() : <any>undefined;
+        if (this.matches && this.matches.constructor === Array) {
+            data["matches"] = [];
+            for (let item of this.matches)
+                data["matches"].push(item.toJSON());
+        }
         return data; 
     }
 }
@@ -1458,6 +1514,119 @@ export interface ISet {
     player2Score?: number | undefined;
     dueDate: Date;
     updatedDate?: Date | undefined;
+    matches?: Match[] | undefined;
+}
+
+export class Match implements IMatch {
+    id: number;
+    setID: number;
+    index: number;
+    player1Score: number;
+    player2Score: number;
+    stageID?: number | undefined;
+    matchCharacters?: MatchCharacter[] | undefined;
+
+    constructor(data?: IMatch) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.setID = data["setID"];
+            this.index = data["index"];
+            this.player1Score = data["player1Score"];
+            this.player2Score = data["player2Score"];
+            this.stageID = data["stageID"];
+            if (data["matchCharacters"] && data["matchCharacters"].constructor === Array) {
+                this.matchCharacters = [];
+                for (let item of data["matchCharacters"])
+                    this.matchCharacters.push(MatchCharacter.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Match {
+        data = typeof data === 'object' ? data : {};
+        let result = new Match();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["setID"] = this.setID;
+        data["index"] = this.index;
+        data["player1Score"] = this.player1Score;
+        data["player2Score"] = this.player2Score;
+        data["stageID"] = this.stageID;
+        if (this.matchCharacters && this.matchCharacters.constructor === Array) {
+            data["matchCharacters"] = [];
+            for (let item of this.matchCharacters)
+                data["matchCharacters"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IMatch {
+    id: number;
+    setID: number;
+    index: number;
+    player1Score: number;
+    player2Score: number;
+    stageID?: number | undefined;
+    matchCharacters?: MatchCharacter[] | undefined;
+}
+
+export class MatchCharacter implements IMatchCharacter {
+    matchID: number;
+    characterID: number;
+    leagueUserID: number;
+
+    constructor(data?: IMatchCharacter) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.matchID = data["matchID"];
+            this.characterID = data["characterID"];
+            this.leagueUserID = data["leagueUserID"];
+        }
+    }
+
+    static fromJS(data: any): MatchCharacter {
+        data = typeof data === 'object' ? data : {};
+        let result = new MatchCharacter();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["matchID"] = this.matchID;
+        data["characterID"] = this.characterID;
+        data["leagueUserID"] = this.leagueUserID;
+        return data; 
+    }
+}
+
+export interface IMatchCharacter {
+    matchID: number;
+    characterID: number;
+    leagueUserID: number;
 }
 
 export class SubmitRequest implements ISubmitRequest {
@@ -1569,6 +1738,162 @@ export class MatchForm implements IMatchForm {
 }
 
 export interface IMatchForm {
+    player1Score: number;
+    player2Score: number;
+    player1Characters?: number[] | undefined;
+    player2Characters?: number[] | undefined;
+    stageID?: number | undefined;
+}
+
+export class SetDto implements ISetDto {
+    id: number;
+    leagueID: number;
+    seasonID?: number | undefined;
+    player1ID: number;
+    player2ID: number;
+    player1Score?: number | undefined;
+    player2Score?: number | undefined;
+    dueDate: Date;
+    updatedDate?: Date | undefined;
+    matches?: MatchDto[] | undefined;
+
+    constructor(data?: ISetDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.leagueID = data["leagueID"];
+            this.seasonID = data["seasonID"];
+            this.player1ID = data["player1ID"];
+            this.player2ID = data["player2ID"];
+            this.player1Score = data["player1Score"];
+            this.player2Score = data["player2Score"];
+            this.dueDate = data["dueDate"] ? new Date(data["dueDate"].toString()) : <any>undefined;
+            this.updatedDate = data["updatedDate"] ? new Date(data["updatedDate"].toString()) : <any>undefined;
+            if (data["matches"] && data["matches"].constructor === Array) {
+                this.matches = [];
+                for (let item of data["matches"])
+                    this.matches.push(MatchDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): SetDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SetDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["leagueID"] = this.leagueID;
+        data["seasonID"] = this.seasonID;
+        data["player1ID"] = this.player1ID;
+        data["player2ID"] = this.player2ID;
+        data["player1Score"] = this.player1Score;
+        data["player2Score"] = this.player2Score;
+        data["dueDate"] = this.dueDate ? this.dueDate.toISOString() : <any>undefined;
+        data["updatedDate"] = this.updatedDate ? this.updatedDate.toISOString() : <any>undefined;
+        if (this.matches && this.matches.constructor === Array) {
+            data["matches"] = [];
+            for (let item of this.matches)
+                data["matches"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface ISetDto {
+    id: number;
+    leagueID: number;
+    seasonID?: number | undefined;
+    player1ID: number;
+    player2ID: number;
+    player1Score?: number | undefined;
+    player2Score?: number | undefined;
+    dueDate: Date;
+    updatedDate?: Date | undefined;
+    matches?: MatchDto[] | undefined;
+}
+
+export class MatchDto implements IMatchDto {
+    id: number;
+    index: number;
+    player1Score: number;
+    player2Score: number;
+    player1Characters?: number[] | undefined;
+    player2Characters?: number[] | undefined;
+    stageID?: number | undefined;
+
+    constructor(data?: IMatchDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.index = data["index"];
+            this.player1Score = data["player1Score"];
+            this.player2Score = data["player2Score"];
+            if (data["player1Characters"] && data["player1Characters"].constructor === Array) {
+                this.player1Characters = [];
+                for (let item of data["player1Characters"])
+                    this.player1Characters.push(item);
+            }
+            if (data["player2Characters"] && data["player2Characters"].constructor === Array) {
+                this.player2Characters = [];
+                for (let item of data["player2Characters"])
+                    this.player2Characters.push(item);
+            }
+            this.stageID = data["stageID"];
+        }
+    }
+
+    static fromJS(data: any): MatchDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MatchDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["index"] = this.index;
+        data["player1Score"] = this.player1Score;
+        data["player2Score"] = this.player2Score;
+        if (this.player1Characters && this.player1Characters.constructor === Array) {
+            data["player1Characters"] = [];
+            for (let item of this.player1Characters)
+                data["player1Characters"].push(item);
+        }
+        if (this.player2Characters && this.player2Characters.constructor === Array) {
+            data["player2Characters"] = [];
+            for (let item of this.player2Characters)
+                data["player2Characters"].push(item);
+        }
+        data["stageID"] = this.stageID;
+        return data; 
+    }
+}
+
+export interface IMatchDto {
+    id: number;
+    index: number;
     player1Score: number;
     player2Score: number;
     player1Characters?: number[] | undefined;
