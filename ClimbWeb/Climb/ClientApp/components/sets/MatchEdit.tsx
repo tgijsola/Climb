@@ -98,10 +98,8 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
         let match = this.state.match;
 
         let characters = playerNumber === 1 ? match.player1Characters : match.player2Characters;
-        console.log(characters);
         if (characters == null) throw new Error();
         characters[characterIndex] = characterID;
-        console.log(characters);
 
         this.setState({match: match});
     }
