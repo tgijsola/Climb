@@ -39,21 +39,22 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
     }
 
     render() {
-        if (!this.state.set || !this.state.set.matches || !this.state.game) {
-            return <RingLoader color={"#123abc"}/>;
-        }
+        const game = this.state.game;
+        const set = this.state.set;
+        if (!set || !set.matches || !game) return <RingLoader color={"#123abc"}/>;
 
         if (this.state.selectedMatch != null) {
-            return <MatchEdit
-                       match={this.state.selectedMatch}
-                       game={this.state.game}
-                       onEdit={this.onMatchEdited}
-                       onCancel={this.onMatchCancelled}/>;
+            return <MatchEdit match={this.state.selectedMatch}
+                              game={game}
+                              onEdit={this.onMatchEdited}
+                              onCancel={this.onMatchCancelled}/>;
         }
 
-        const matches =
-            this.state.set.matches.map(
-                (m, i) => <MatchSummary key={i} match={m} onSelect={m => this.setState({ selectedMatch: m })}/>);
+        const matches = set.matches.map(
+            (m, i) => <MatchSummary key={i}
+                                    game={game}
+                                    match={m}
+                                    onSelect={m => this.setState({ selectedMatch: m })}/>);
 
         return (
             <div>
