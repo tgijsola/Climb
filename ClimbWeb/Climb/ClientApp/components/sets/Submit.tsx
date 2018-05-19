@@ -101,8 +101,9 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         setRequest.matches = new Array<ClimbClient.MatchForm>(set.matches.length);
 
         for (var i = 0; i < set.matches.length; i++) {
-            let matchForm = new ClimbClient.MatchForm();
-            matchForm.init(set.matches[i]);
+            const match = set.matches[i];
+            const matchForm = new ClimbClient.MatchForm();
+            matchForm.init(match);
             setRequest.matches[i] = matchForm;
         }
 

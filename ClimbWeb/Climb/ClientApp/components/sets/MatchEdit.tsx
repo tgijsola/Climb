@@ -67,9 +67,9 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                 <div className="match-edit-input-group">
                     <div className="match-edit-input-label">Characters</div>
                     <div className="match-edit-characters">
-                        <select className="match-edit-input" value={characterValues[0]}>{characters}</select>
-                        <select className="match-edit-input" value={characterValues[1]}>{characters}</select>
-                        <select className="match-edit-input" value={characterValues[2]}>{characters}</select>
+                        <select className="match-edit-input" value={characterValues[0]} onChange={e => this.updateCharacter(playerNumber, 0, parseInt(e.currentTarget.value))}>{characters}</select>
+                        <select className="match-edit-input" value={characterValues[1]} onChange={e => this.updateCharacter(playerNumber, 1, parseInt(e.currentTarget.value))}>{characters}</select>
+                        <select className="match-edit-input" value={characterValues[2]} onChange={e => this.updateCharacter(playerNumber, 2, parseInt(e.currentTarget.value))}>{characters}</select>
                     </div>
                 </div>
             </div>
@@ -83,6 +83,18 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
         } else {
             match.player2Score = score;
         }
+
+        this.setState({match: match});
+    }
+
+    private updateCharacter(playerNumber: number, characterIndex: number, characterID: number) {
+        let match = this.state.match;
+
+        let characters = playerNumber === 1 ? match.player1Characters : match.player2Characters;
+        console.log(characters);
+        if (characters == null) throw new Error();
+        characters[characterIndex] = characterID;
+        console.log(characters);
 
         this.setState({match: match});
     }
