@@ -35,6 +35,23 @@ namespace Climb.Controllers
             return View("~/Views/Page.cshtml");
         }
 
+        [HttpGet("/api/v1/games/{gameID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Game))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
+        public async Task<IActionResult> Get(int gameID)
+        {
+            var game = await dbContext.Games
+                .Include(g => g.Characters).AsNoTracking()
+                .Include(g => g.Stages).AsNoTracking()
+                .FirstOrDefaultAsync(g => g.ID == gameID);
+            if(game == null)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find Game with ID '{gameID}'.", logger);
+            }
+
+            return this.CodeResult(HttpStatusCode.OK, game);
+        }
+
         [HttpPost("/api/v1/games/create")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(Game))]
         [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Game name is taken.")]

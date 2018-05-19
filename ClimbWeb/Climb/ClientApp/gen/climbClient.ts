@@ -214,6 +214,51 @@ export class GameClient extends BaseClass {
         this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
     }
 
+    get(gameID: number): Promise<Game> {
+        let url_ = this.baseUrl + "/api/v1/games/{gameID}";
+        if (gameID === undefined || gameID === null)
+            throw new Error("The parameter 'gameID' must be defined.");
+        url_ = url_.replace("{gameID}", encodeURIComponent("" + gameID)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGet(_response);
+        });
+    }
+
+    protected processGet(response: Response): Promise<Game> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? Game.fromJS(resultData200) : new Game();
+            return result200;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Game>(<any>null);
+    }
+
     create(name: string | null | undefined): Promise<Game> {
         let url_ = this.baseUrl + "/api/v1/games/create?";
         if (name !== undefined)
@@ -1749,6 +1794,7 @@ export class SetDto implements ISetDto {
     id: number;
     leagueID: number;
     seasonID?: number | undefined;
+    gameID: number;
     player1ID: number;
     player2ID: number;
     player1Score?: number | undefined;
@@ -1771,6 +1817,7 @@ export class SetDto implements ISetDto {
             this.id = data["id"];
             this.leagueID = data["leagueID"];
             this.seasonID = data["seasonID"];
+            this.gameID = data["gameID"];
             this.player1ID = data["player1ID"];
             this.player2ID = data["player2ID"];
             this.player1Score = data["player1Score"];
@@ -1797,6 +1844,7 @@ export class SetDto implements ISetDto {
         data["id"] = this.id;
         data["leagueID"] = this.leagueID;
         data["seasonID"] = this.seasonID;
+        data["gameID"] = this.gameID;
         data["player1ID"] = this.player1ID;
         data["player2ID"] = this.player2ID;
         data["player1Score"] = this.player1Score;
@@ -1816,6 +1864,7 @@ export interface ISetDto {
     id: number;
     leagueID: number;
     seasonID?: number | undefined;
+    gameID: number;
     player1ID: number;
     player2ID: number;
     player1Score?: number | undefined;
