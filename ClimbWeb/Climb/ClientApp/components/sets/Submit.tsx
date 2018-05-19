@@ -15,15 +15,12 @@ interface ISetSubmitState {
 export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmitState> {
     client: ClimbClient.SetClient;
     setId: number;
-    setRequest: ClimbClient.SubmitRequest;
 
     constructor(props: RouteComponentProps<any>) {
         super(props);
 
         this.client = new ClimbClient.SetClient(window.location.origin);
         this.setId = this.props.match.params.setId;
-        this.setRequest = new ClimbClient.SubmitRequest();
-        this.setRequest.setID = this.setId;
 
         this.state = {
             set: null,
@@ -40,7 +37,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
     }
 
     render() {
-        if (this.state.set == null || this.state.set.matches == null || this.state.game == null) {
+        if (!this.state.set || !this.state.set.matches || !this.state.game) {
             return <RingLoader color={"#123abc"}/>;
         }
 
@@ -85,7 +82,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
 
     private onMatchEdited(match: ClimbClient.MatchDto) {
         const set = this.state.set;
-        if (set == null || set.matches == null) throw new Error();
+        if (!set || !set.matches) throw new Error();
 
         set.matches[match.index] = match;
 
@@ -96,29 +93,20 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
     }
 
     private onSubmit() {
-        this.setRequest.matches = new Array<ClimbClient.MatchForm>();
-        this.setRequest.matches[0] = new ClimbClient.MatchForm();
-        this.setRequest.matches[0].player1Score = 1;
-        this.setRequest.matches[0].player2Score = 2;
-        this.setRequest.matches[0].player1Characters = [1, 2, 3];
-        this.setRequest.matches[0].player2Characters = [2, 3, 1];
-        this.setRequest.matches[0].stageID = 2;
+        const set = this.state.set;
+        if (!set || !set.matches) throw new Error();
 
-        this.setRequest.matches[1] = new ClimbClient.MatchForm();
-        this.setRequest.matches[1].player1Score = 0;
-        this.setRequest.matches[1].player2Score = 2;
-        this.setRequest.matches[1].player1Characters = [1, 2, 3];
-        this.setRequest.matches[1].player2Characters = [2, 3, 1];
-        this.setRequest.matches[1].stageID = 1;
+        let setRequest = new ClimbClient.SubmitRequest();
+        setRequest.setID = set.id;
+        setRequest.matches = new Array<ClimbClient.MatchForm>(set.matches.length);
 
-        this.setRequest.matches[2] = new ClimbClient.MatchForm();
-        this.setRequest.matches[2].player1Score = 0;
-        this.setRequest.matches[2].player2Score = 2;
-        this.setRequest.matches[2].player1Characters = [1, 2, 3];
-        this.setRequest.matches[2].player2Characters = [2, 3, 1];
-        this.setRequest.matches[2].stageID = 3;
+        for (var i = 0; i < set.matches.length; i++) {
+            let matchForm = new ClimbClient.MatchForm();
+            matchForm.init(set.matches[i]);
+            setRequest.matches[i] = matchForm;
+        }
 
-        this.client.submit(this.setRequest)
+        this.client.submit(setRequest)
             .then(() => {
                 console.log("Set submitted!");
                 window.location.reload();
