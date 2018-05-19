@@ -16,8 +16,15 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
     constructor(props: IMatchEditProps) {
         super(props);
 
+        const match = this.props.match;
+        const matchToEdit = new ClimbClient.MatchDto(match);
+
+        if (!match.player1Characters || !match.player2Characters) throw new Error();
+        matchToEdit.player1Characters = match.player1Characters.slice(0);
+        matchToEdit.player2Characters = match.player2Characters.slice(0);
+
         this.state = {
-            match: new ClimbClient.MatchDto(this.props.match),
+            match: matchToEdit,
         }
     }
 
