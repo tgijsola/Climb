@@ -9,6 +9,7 @@ import {MatchEdit} from "./MatchEdit";
 interface ISetSubmitState {
     set: ClimbClient.SetDto | null;
     selectedMatch: ClimbClient.MatchDto | null;
+    game: ClimbClient.Game | null;
 }
 
 export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmitState> {
@@ -27,6 +28,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         this.state = {
             set: null,
             selectedMatch: null,
+            game: null,
         };
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -37,14 +39,15 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
     }
 
     render() {
-        if (this.state.set == null || this.state.set.matches == null) {
+        if (this.state.set == null || this.state.set.matches == null || this.state.game == null) {
             return <RingLoader color={"#123abc"}/>;
         }
 
         if (this.state.selectedMatch != null) {
             return <MatchEdit
                        match={this.state.selectedMatch}
-                       onCancel={() => this.setState({ selectedMatch: null })}/>;
+                       game={this.state.game}
+                       onDone={() => this.setState({ selectedMatch: null })}/>;
         }
 
         const matches =
@@ -65,9 +68,18 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
                 if (set.matches != null) {
                     set.matches.sort((a, b) => a.index - b.index);
                 }
-                this.setState({ set: set })
+                this.setState({ set: set });
+                console.log(set);
+                this.loadGame(set.gameID);
             })
             .catch(reason => `Could not load set\n${reason}`);
+    }
+
+    private loadGame(gameId: number) {
+        const gameClient = new ClimbClient.GameClient(window.location.origin);
+        gameClient.get(gameId)
+            .then(game => this.setState({ game: game }))
+            .catch(reason => alert(`Can't load game\n${reason}`));
     }
 
     private onSubmit() {
