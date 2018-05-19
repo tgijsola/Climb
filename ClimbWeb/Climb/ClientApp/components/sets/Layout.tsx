@@ -6,6 +6,7 @@ import ApplicationUser = ClimbClient.ApplicationUser;
 
 import { Navbar } from "../_common/Navbar";
 import { Submit } from "./Submit";
+import "../../css/matches.less";
 
 interface ILayoutProps {
     user : ApplicationUser | null;
