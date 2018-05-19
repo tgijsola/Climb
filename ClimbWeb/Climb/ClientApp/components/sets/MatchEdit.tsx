@@ -5,16 +5,24 @@ import { ClimbClient } from "../../gen/climbClient";
 interface IMatchEditProps {
     game: ClimbClient.Game;
     match: ClimbClient.MatchDto;
-    onDone: () => void;
+    onDone: (match: ClimbClient.MatchDto) => void;
 }
 
-export class MatchEdit extends React.Component<IMatchEditProps> {
+interface IMatchEditState {
+    match: ClimbClient.MatchDto;
+}
+
+export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState> {
     constructor(props: IMatchEditProps) {
         super(props);
+
+        this.state = {
+            match: new ClimbClient.MatchDto(this.props.match),
+        }
     }
 
     render() {
-        const match = this.props.match;
+        const match = this.state.match;
 
         if (this.props.game.characters == null || this.props.game.stages == null) throw new Error();
         if (match.player1Characters == null || match.player2Characters == null) throw new Error();
@@ -32,13 +40,12 @@ export class MatchEdit extends React.Component<IMatchEditProps> {
                 <div className="match-edit-input-group">
                     <div className="match-edit-input-label">Stage</div>
                     <div>
-                        <select className="match-edit-input">{stages}</select>
-                        <select className="match-edit-input" value={match.stageID}>{stages}</select>
+                        <select className="match-edit-input" value={match.stageID} onChange={event => this.updateStage(event.target.numberValue)}>{stages}</select>
                     </div>
                 </div>
                 <div className="match-edit-buttons">
-                    <button onClick={this.props.onDone}>Cancel</button>
-                    <button onClick={this.onAccept}>Ok</button>
+                    <button onClick={() => this.props.onDone(this.props.match)}>Cancel</button>
+                    <button onClick={() => this.props.onDone(this.state.match)}>Ok</button>
                 </div>
             </div>
         );
@@ -66,10 +73,9 @@ export class MatchEdit extends React.Component<IMatchEditProps> {
         );
     }
 
-    private onAccept() {
-        // need to copy match at start and then assign it here
-
-
-        this.props.onDone();
+    private updateStage(stageID: number) {
+        let match = this.state.match;
+        match.stageID = stageID;
+        this.setState({match: match});
     }
 }

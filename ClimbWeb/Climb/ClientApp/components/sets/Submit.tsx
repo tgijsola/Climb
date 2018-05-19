@@ -32,6 +32,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         };
 
         this.onSubmit = this.onSubmit.bind(this);
+        this.onMatchEdited = this.onMatchEdited.bind(this);
     }
 
     componentDidMount() {
@@ -47,7 +48,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
             return <MatchEdit
                        match={this.state.selectedMatch}
                        game={this.state.game}
-                       onDone={() => this.setState({ selectedMatch: null })}/>;
+                       onDone={this.onMatchEdited}/>;
         }
 
         const matches =
@@ -80,6 +81,18 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         gameClient.get(gameId)
             .then(game => this.setState({ game: game }))
             .catch(reason => alert(`Can't load game\n${reason}`));
+    }
+
+    private onMatchEdited(match: ClimbClient.MatchDto) {
+        const set = this.state.set;
+        if (set == null || set.matches == null) throw new Error();
+
+        set.matches[match.index] = match;
+
+        this.setState({
+            selectedMatch: null,
+            set: set,
+        });
     }
 
     private onSubmit() {
