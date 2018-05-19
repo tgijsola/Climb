@@ -131,9 +131,17 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
 
         const newMatch = new ClimbClient.MatchDto();
         newMatch.index = set.matches.length;
-        // TODO: Grab from last match.
-        newMatch.player1Characters = [];
-        newMatch.player2Characters = [];
+
+        if (newMatch.index > 0) {
+            const prevMatch = set.matches[newMatch.index - 1];
+            if (!prevMatch.player1Characters || !prevMatch.player2Characters) throw new Error();
+            newMatch.player1Characters = prevMatch.player1Characters.slice(0);
+            newMatch.player2Characters = prevMatch.player2Characters.slice(0);
+        } else {
+            newMatch.player1Characters = [];
+            newMatch.player2Characters = [];
+        }
+
         this.setState({ selectedMatch: newMatch });
     }
 }
