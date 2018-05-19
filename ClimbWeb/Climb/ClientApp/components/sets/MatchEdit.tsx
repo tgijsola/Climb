@@ -5,7 +5,8 @@ import { ClimbClient } from "../../gen/climbClient";
 interface IMatchEditProps {
     game: ClimbClient.Game;
     match: ClimbClient.MatchDto;
-    onDone: (match: ClimbClient.MatchDto) => void;
+    onEdit: (match: ClimbClient.MatchDto) => void;
+    onCancel: () => void;
 }
 
 interface IMatchEditState {
@@ -47,12 +48,12 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                 <div className="match-edit-input-group">
                     <div className="match-edit-input-label">Stage</div>
                     <div>
-                        <select className="match-edit-input" value={match.stageID} onChange={event => this.updateStage(event.target.numberValue)}>{stages}</select>
+                        <select className="match-edit-input" value={match.stageID} onChange={e => this.updateStage(parseInt(e.currentTarget.value))}>{stages}</select>
                     </div>
                 </div>
                 <div className="match-edit-buttons">
-                    <button onClick={() => this.props.onDone(this.props.match)}>Cancel</button>
-                    <button onClick={() => this.props.onDone(this.state.match)}>Ok</button>
+                    <button onClick={this.props.onCancel}>Cancel</button>
+                    <button onClick={() => this.props.onEdit(this.state.match)}>Ok</button>
                 </div>
             </div>
         );

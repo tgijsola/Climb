@@ -29,7 +29,9 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         };
 
         this.onSubmit = this.onSubmit.bind(this);
+        this.onAddMatch = this.onAddMatch.bind(this);
         this.onMatchEdited = this.onMatchEdited.bind(this);
+        this.onMatchCancelled = this.onMatchCancelled.bind(this);
     }
 
     componentDidMount() {
@@ -45,7 +47,8 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
             return <MatchEdit
                        match={this.state.selectedMatch}
                        game={this.state.game}
-                       onDone={this.onMatchEdited}/>;
+                       onEdit={this.onMatchEdited}
+                       onCancel={this.onMatchCancelled}/>;
         }
 
         const matches =
@@ -55,7 +58,10 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         return (
             <div>
                 <div>{matches}</div>
-                <button onClick={this.onSubmit}>Submit</button>
+                <div className="match-summary-buttons">
+                    <button onClick={this.onSubmit}>Submit</button>
+                    <button onClick={this.onAddMatch}>Add Match</button>
+                </div>
             </div>
         );
     }
@@ -80,6 +86,10 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
             .catch(reason => alert(`Can't load game\n${reason}`));
     }
 
+    private onMatchCancelled() {
+        this.setState({ selectedMatch: null });
+    }
+
     private onMatchEdited(match: ClimbClient.MatchDto) {
         const set = this.state.set;
         if (!set || !set.matches) throw new Error();
@@ -96,11 +106,11 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         const set = this.state.set;
         if (!set || !set.matches) throw new Error();
 
-        let setRequest = new ClimbClient.SubmitRequest();
+        const setRequest = new ClimbClient.SubmitRequest();
         setRequest.setID = set.id;
         setRequest.matches = new Array<ClimbClient.MatchForm>(set.matches.length);
 
-        for (var i = 0; i < set.matches.length; i++) {
+        for (let i = 0; i < set.matches.length; i++) {
             const match = set.matches[i];
             const matchForm = new ClimbClient.MatchForm();
             matchForm.init(match);
@@ -113,5 +123,17 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
                 window.location.reload();
             })
             .catch(reason => alert(`Could not submit set\n${reason}`));
+    }
+
+    private onAddMatch() {
+        const set = this.state.set;
+        if (!set || !set.matches) throw new Error();
+
+        const newMatch = new ClimbClient.MatchDto();
+        newMatch.index = set.matches.length;
+        // TODO: Grab from last match.
+        newMatch.player1Characters = [];
+        newMatch.player2Characters = [];
+        this.setState({ selectedMatch: newMatch });
     }
 }
