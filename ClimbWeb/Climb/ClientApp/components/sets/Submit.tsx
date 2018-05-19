@@ -61,7 +61,12 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
 
     private loadSet() {
         this.client.get(this.setId)
-            .then(set => this.setState({ set: set }))
+            .then(set => {
+                if (set.matches != null) {
+                    set.matches.sort((a, b) => a.index - b.index);
+                }
+                this.setState({ set: set })
+            })
             .catch(reason => `Could not load set\n${reason}`);
     }
 
