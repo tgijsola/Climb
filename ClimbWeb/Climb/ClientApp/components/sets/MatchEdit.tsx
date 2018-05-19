@@ -52,13 +52,16 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
     }
 
     private renderPlayerInputs(playerNumber: number, characters: any, characterValues: number[]) {
+        const match = this.state.match;
+        const score = playerNumber === 1 ? match.player1Score : match.player2Score;
+
         return (
             <div>
                 <div className="match-edit-player-title">Player {playerNumber}</div>
                 <div className="match-edit-input-group">
                     <div className="match-edit-input-label">Score</div>
                     <div>
-                        <input className="match-edit-input" type="number"/>
+                        <input className="match-edit-input" type="number" value={score} min="0" max="2" onChange={e => this.updateScore(playerNumber, parseInt(e.currentTarget.value))}/>
                     </div>
                 </div>
                 <div className="match-edit-input-group">
@@ -71,6 +74,17 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                 </div>
             </div>
         );
+    }
+
+    private updateScore(playerNumber: number, score: number) {
+        let match = this.state.match;
+        if (playerNumber === 1) {
+            match.player1Score = score;
+        } else {
+            match.player2Score = score;
+        }
+
+        this.setState({match: match});
     }
 
     private updateStage(stageID: number) {
