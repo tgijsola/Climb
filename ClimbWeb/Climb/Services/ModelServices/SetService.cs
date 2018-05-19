@@ -38,6 +38,8 @@ namespace Climb.Services.ModelServices
 
             dbContext.Sets.Update(set);
 
+            set.Player1Score = set.Player2Score = 0;
+
             for(var i = 0; i < matchForms.Count; i++)
             {
                 var matchForm = matchForms[i];
@@ -48,6 +50,15 @@ namespace Climb.Services.ModelServices
                 {
                     AddCharacter(match, matchForm.Player1Characters[j], set.Player1ID);
                     AddCharacter(match, matchForm.Player2Characters[j], set.Player2ID);
+                }
+
+                if(matchForm.Player1Score > matchForm.Player2Score)
+                {
+                    ++set.Player1Score;
+                }
+                else
+                {
+                    ++set.Player2Score;
                 }
             }
 
