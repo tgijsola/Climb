@@ -58,13 +58,14 @@ namespace Climb.Controllers
         {
             var set = await dbContext.Sets
                 .Include(s => s.Matches).ThenInclude(m => m.MatchCharacters).AsNoTracking()
+                .Include(s => s.League).AsNoTracking()
                 .FirstOrDefaultAsync(s => s.ID == setID);
             if(set == null)
             {
                 return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find Set with ID '{setID}'.", logger);
             }
 
-            var dto = SetDto.Create(set);
+            var dto = SetDto.Create(set, set.League.GameID);
 
             return this.CodeResult(HttpStatusCode.OK, dto);
         }

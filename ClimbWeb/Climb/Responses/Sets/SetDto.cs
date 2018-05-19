@@ -8,6 +8,7 @@ namespace Climb.Responses.Sets
         public readonly int id;
         public readonly int leagueID;
         public readonly int? seasonID;
+        public readonly int gameID;
         public readonly int player1ID;
         public readonly int player2ID;
         public readonly int? player1Score;
@@ -16,7 +17,7 @@ namespace Climb.Responses.Sets
         public readonly DateTime? updatedDate;
         public readonly MatchDto[] matches;
 
-        private SetDto(Set set, MatchDto[] matches)
+        private SetDto(Set set, MatchDto[] matches, int gameID)
         {
             id = set.ID;
             leagueID = set.LeagueID;
@@ -28,9 +29,10 @@ namespace Climb.Responses.Sets
             dueDate = set.DueDate;
             updatedDate = set.UpdatedDate;
             this.matches = matches;
+            this.gameID = gameID;
         }
 
-        public static SetDto Create(Set set)
+        public static SetDto Create(Set set, int gameID)
         {
             var matches = new MatchDto[set.Matches.Count];
             for(var i = 0; i < matches.Length; i++)
@@ -38,7 +40,7 @@ namespace Climb.Responses.Sets
                 matches[i] = new MatchDto(set.Matches[i], set.Player1ID);
             }
 
-            return new SetDto(set, matches);
+            return new SetDto(set, matches, gameID);
         }
     }
 }
