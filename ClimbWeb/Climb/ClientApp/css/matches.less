@@ -1,24 +1,44 @@
+#set-submit-player-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.set-submit-player-top {
+    display: flex;
+    flex-direction: row;
+}
+
+.set-submit-player-meta {
+    margin: auto 5px;
+    text-align: center;
+}
+
 #set-submit-score-container {
+    width: 100%;
+    margin: 0 30px;
     display: flex;
     flex-direction: row;
     font-size: 30px;
+    justify-content: space-around;
+    align-items: flex-end;
 }
 
-@score-width: 45%;
-.set-submit-score {
-    width: @score-width;
+#set-submit-player-names {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
-.set-submit-score.p1 {
+.right {
     text-align: right;
 }
 
-.set-submit-score.p2 {
+.left {
     text-align: left;
 }
 
 #set-submit-score-divide {
-    width: 100 - @score-width * 2; // use math!
     text-align: center;
 }
 

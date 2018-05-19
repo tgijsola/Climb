@@ -58,11 +58,41 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
 
         return (
             <div>
-                <div id="set-submit-score-container">
-                    <div className="set-submit-score p1">{set.player1Score}</div>
-                    <div id="set-submit-score-divide">-</div>
-                    <div className="set-submit-score p2">{set.player2Score}</div>
+                <div id="set-submit-header">
+                    <div id="set-submit-player-info">
+                        <div className="set-submit-player">
+                            <div className="set-submit-player-top">
+                                <img src="https://cdn2.iconfinder.com/data/icons/professions/512/user_boy_avatar-64.png"/>
+                                <div className="set-submit-player-meta">
+                                    <div className="set-submit-player-rank">#4</div>
+                                    <div className="set-submit-player-trend">↓</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="set-submit-score-container">
+                            <div className="set-submit-score right">{set.player1Score}</div>
+                            <div id="set-submit-score-divide">-</div>
+                            <div className="set-submit-score left">{set.player2Score}</div>
+                        </div>
+
+                        <div className="set-submit-player">
+                            <div className="set-submit-player-top">
+                                <div className="set-submit-player-meta">
+                                    <div className="set-submit-player-rank">#4</div>
+                                    <div className="set-submit-player-trend">↓</div>
+                                </div>
+                                <img src="https://cdn2.iconfinder.com/data/icons/professions/512/user_boy_avatar-64.png"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="set-submit-player-names">
+                        <div className="set-submit-player-name left">Player Name</div>
+                        <div className="set-submit-player-name right">Player Name</div>
+                    </div>
                 </div>
+
                 <div>{matches}</div>
                 <div className="match-summary-buttons">
                     <button onClick={this.onSubmit}>Submit</button>
