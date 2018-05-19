@@ -58,6 +58,11 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
 
         return (
             <div>
+                <div id="set-submit-score-container">
+                    <div className="set-submit-score p1">{set.player1Score}</div>
+                    <div id="set-submit-score-divide">-</div>
+                    <div className="set-submit-score p2">{set.player2Score}</div>
+                </div>
                 <div>{matches}</div>
                 <div className="match-summary-buttons">
                     <button onClick={this.onSubmit}>Submit</button>

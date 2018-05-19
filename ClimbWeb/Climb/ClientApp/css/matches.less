@@ -1,3 +1,27 @@
+#set-submit-score-container {
+    display: flex;
+    flex-direction: row;
+    font-size: 30px;
+}
+
+@score-width: 45%;
+.set-submit-score {
+    width: @score-width;
+}
+
+.set-submit-score.p1 {
+    text-align: right;
+}
+
+.set-submit-score.p2 {
+    text-align: left;
+}
+
+#set-submit-score-divide {
+    width: 100 - @score-width * 2; // use math!
+    text-align: center;
+}
+
 .match-summary-container {
     border: 1px rgb(68, 68, 68) solid;
     background-color: #DDDDDD;
