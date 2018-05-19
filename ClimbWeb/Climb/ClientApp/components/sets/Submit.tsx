@@ -89,18 +89,21 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         this.setRequest.matches[0].player2Score = 2;
         this.setRequest.matches[0].player1Characters = [1, 2, 3];
         this.setRequest.matches[0].player2Characters = [2, 3, 1];
+        this.setRequest.matches[0].stageID = 2;
 
         this.setRequest.matches[1] = new ClimbClient.MatchForm();
         this.setRequest.matches[1].player1Score = 0;
         this.setRequest.matches[1].player2Score = 2;
         this.setRequest.matches[1].player1Characters = [1, 2, 3];
         this.setRequest.matches[1].player2Characters = [2, 3, 1];
+        this.setRequest.matches[1].stageID = 1;
 
         this.setRequest.matches[2] = new ClimbClient.MatchForm();
         this.setRequest.matches[2].player1Score = 0;
         this.setRequest.matches[2].player2Score = 2;
         this.setRequest.matches[2].player1Characters = [1, 2, 3];
         this.setRequest.matches[2].player2Characters = [2, 3, 1];
+        this.setRequest.matches[2].stageID = 3;
 
         this.client.submit(this.setRequest)
             .then(() => {

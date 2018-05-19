@@ -33,6 +33,7 @@ export class MatchEdit extends React.Component<IMatchEditProps> {
                     <div className="match-edit-input-label">Stage</div>
                     <div>
                         <select className="match-edit-input">{stages}</select>
+                        <select className="match-edit-input" value={match.stageID}>{stages}</select>
                     </div>
                 </div>
                 <div className="match-edit-buttons">
