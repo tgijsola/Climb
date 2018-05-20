@@ -154,6 +154,16 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
 
         set.matches[match.index] = match;
 
+        set.player1Score = set.player2Score = 0;
+        for (let i = 0; i < set.matches.length; i++) {
+            const match = set.matches[i];
+            if (match.player1Score > match.player2Score) {
+                ++set.player1Score;
+            } else {
+                ++set.player2Score;
+            }
+        }
+
         this.setState({
             selectedMatch: null,
             set: set,
