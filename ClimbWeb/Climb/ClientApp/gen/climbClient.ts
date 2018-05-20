@@ -541,6 +541,51 @@ export class LeagueClient extends BaseClass {
         return Promise.resolve<LeagueUser>(<any>null);
     }
 
+    getUser(userID: number): Promise<LeagueUserDto> {
+        let url_ = this.baseUrl + "/api/v1/leagues/user/{userID}";
+        if (userID === undefined || userID === null)
+            throw new Error("The parameter 'userID' must be defined.");
+        url_ = url_.replace("{userID}", encodeURIComponent("" + userID)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetUser(_response);
+        });
+    }
+
+    protected processGetUser(response: Response): Promise<LeagueUserDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? LeagueUserDto.fromJS(resultData200) : new LeagueUserDto();
+            return result200;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<LeagueUserDto>(<any>null);
+    }
+
     getSeasons(leagueID: number): Promise<Season[]> {
         let url_ = this.baseUrl + "/api/v1/leagues/seasons/{leagueID}";
         if (leagueID === undefined || leagueID === null)
@@ -1428,6 +1473,58 @@ export interface ILeagueUser {
     leagueID: number;
     userID?: string | undefined;
     hasLeft: boolean;
+}
+
+export class LeagueUserDto implements ILeagueUserDto {
+    id: number;
+    leagueID: number;
+    userID?: string | undefined;
+    hasLeft: boolean;
+    username?: string | undefined;
+
+    constructor(data?: ILeagueUserDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.leagueID = data["leagueID"];
+            this.userID = data["userID"];
+            this.hasLeft = data["hasLeft"];
+            this.username = data["username"];
+        }
+    }
+
+    static fromJS(data: any): LeagueUserDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LeagueUserDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["leagueID"] = this.leagueID;
+        data["userID"] = this.userID;
+        data["hasLeft"] = this.hasLeft;
+        data["username"] = this.username;
+        return data; 
+    }
+}
+
+export interface ILeagueUserDto {
+    id: number;
+    leagueID: number;
+    userID?: string | undefined;
+    hasLeft: boolean;
+    username?: string | undefined;
 }
 
 export class Season implements ISeason {

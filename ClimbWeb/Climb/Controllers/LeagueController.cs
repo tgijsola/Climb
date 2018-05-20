@@ -6,6 +6,7 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
+using Climb.Responses.Models;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -98,6 +99,23 @@ namespace Climb.Controllers
             var leagueUser = await leagueService.Join(request.LeagueID, request.UserID);
 
             return this.CodeResultAndLog(HttpStatusCode.Created, leagueUser, "User joined league.", logger);
+        }
+
+        [HttpGet("/api/v1/leagues/user/{userID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(LeagueUserDto))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
+        public async Task<IActionResult> GetUser(int userID)
+        {
+            var leagueUser = await dbContext.LeagueUsers
+                .Include(lu => lu.User).AsNoTracking()
+                .FirstOrDefaultAsync(lu => lu.ID == userID);
+            if(leagueUser == null)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find League User with ID '{userID}'.", logger);
+            }
+
+            var response = new LeagueUserDto(leagueUser);
+            return this.CodeResult(HttpStatusCode.OK, response);
         }
 
         [HttpGet("/api/v1/leagues/seasons/{leagueID:int}")]
