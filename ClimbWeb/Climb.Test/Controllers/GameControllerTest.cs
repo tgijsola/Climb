@@ -2,12 +2,11 @@
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
+using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
@@ -28,6 +27,26 @@ namespace Climb.Test.Controllers
             dbContext = DbContextUtility.CreateMockDb();
 
             testObj = new GameController(gameService, dbContext, Substitute.For<ILogger<GameController>>());
+        }
+
+        [Test]
+        public async Task Get_HasGame_Ok()
+        {
+            var game = GameUtility.Create(dbContext, 2, 2);
+
+            var result = await testObj.Get(game.ID);
+            var resultObj = result.GetObject<Game>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.AreEqual(game.ID, resultObj.ID);
+        }
+
+        [Test]
+        public async Task Get_NoGame_NotFound()
+        {
+            var result = await testObj.Get(0);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
 
         [Test]

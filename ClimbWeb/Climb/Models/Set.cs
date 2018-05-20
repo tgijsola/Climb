@@ -29,8 +29,7 @@ namespace Climb.Models
         [InverseProperty("P2Sets")]
         [ForeignKey("Player2ID")]
         public LeagueUser Player2 { get; set; }
-        [JsonIgnore]
-        public HashSet<Match> Matches { get; set; }
+        public List<Match> Matches { get; set; }
 
         public Set()
         {

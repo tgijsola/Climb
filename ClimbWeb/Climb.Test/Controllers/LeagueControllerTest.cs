@@ -6,6 +6,7 @@ using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
+using Climb.Responses.Models;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
@@ -120,6 +121,27 @@ namespace Climb.Test.Controllers
         public async Task Get_NoLeague_NotFound()
         {
             var result = await testObj.Get(0);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task GetUser_HasUser_Ok()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var leagueUser = LeagueUtility.AddUsersToLeague(league, 1, dbContext)[0];
+
+            var result = await testObj.GetUser(leagueUser.ID);
+            var resultObj = result.GetObject<LeagueUserDto>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+            Assert.AreEqual(leagueUser.ID, resultObj.id);
+        }
+
+        [Test]
+        public async Task GetUser_NoUser_NotFound()
+        {
+            var result = await testObj.GetUser(0);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }

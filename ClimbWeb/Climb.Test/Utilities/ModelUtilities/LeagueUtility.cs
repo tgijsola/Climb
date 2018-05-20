@@ -15,7 +15,12 @@ namespace Climb.Test.Utilities
 
         public static List<LeagueUser> AddUsersToLeague(League league, int count, ApplicationDbContext dbContext)
         {
-            return DbContextUtility.AddNewRange<LeagueUser>(dbContext, count, (lu, i) => lu.LeagueID = league.ID);
+            var users = DbContextUtility.AddNewRange<ApplicationUser>(dbContext, count);
+            return DbContextUtility.AddNewRange<LeagueUser>(dbContext, count, (lu, i) =>
+            {
+                lu.UserID = users[i].Id;
+                lu.LeagueID = league.ID;
+            });
         }
     }
 }

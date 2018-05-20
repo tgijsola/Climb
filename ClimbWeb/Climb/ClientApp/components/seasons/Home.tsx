@@ -4,6 +4,8 @@ import { RingLoader } from "react-spinners";
 
 import { ClimbClient } from "../../gen/climbClient";
 
+import { SetDetails } from "../sets/SetDetails";
+
 interface IState {
     season: ClimbClient.Season | undefined;
     league: ClimbClient.League | undefined;
@@ -11,7 +13,7 @@ interface IState {
     sets: ClimbClient.Set[] | undefined;
 }
 
-export class Home extends React.Component<RouteComponentProps<any> | undefined, IState> {
+export class Home extends React.Component<RouteComponentProps<any>, IState> {
     seasonClient: ClimbClient.SeasonClient;
     leagueClient: ClimbClient.LeagueClient;
 
@@ -45,8 +47,14 @@ export class Home extends React.Component<RouteComponentProps<any> | undefined, 
 
         let body: any;
         if (this.state.sets.length !== 0) {
-            const sets = this.state.sets.map((s, i) => <li key={i}>{`set ${i}`}</li>);
-            body = <ul>{sets}</ul>;
+            const participants = this.state.participants;
+            const sets =
+                this.state.sets.map(
+                    (s, i) => <SetDetails key={i}
+                                          set={s}
+                                          player1={participants.find(lu => lu.id === s.player1ID)}
+                                          player2={participants.find(lu => lu.id === s.player2ID)}/>);
+            body = <div>{sets}</div>;
         } else {
             body = <button onClick={this.startSeason}>Start</button>;
         }
@@ -63,7 +71,6 @@ export class Home extends React.Component<RouteComponentProps<any> | undefined, 
         const seasonId = this.props.match.params.seasonId;
         this.seasonClient.get(seasonId)
             .then(season => {
-                console.log(season);
                 this.setState({ season: season });
 
                 this.leagueClient.get(season.leagueID)

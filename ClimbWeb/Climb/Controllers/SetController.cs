@@ -2,21 +2,36 @@
 using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
+using Climb.Data;
+using Climb.Extensions;
 using Climb.Requests.Sets;
+using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
     public class SetController : BaseController<SetController>
     {
+        private readonly ApplicationDbContext dbContext;
         private readonly ISetService setService;
 
-        public SetController(ISetService setService, ILogger<SetController> logger)
+        public SetController(ApplicationDbContext dbContext, ISetService setService, ILogger<SetController> logger)
             : base(logger)
         {
             this.setService = setService;
+            this.dbContext = dbContext;
+        }
+
+        [HttpGet("/sets/{*page}")]
+        [SwaggerIgnore]
+        public IActionResult Index()
+        {
+            ViewData["Title"] = "Set";
+            ViewData["Script"] = "sets";
+            return View("~/Views/Page.cshtml");
         }
 
         [HttpPost("/api/v1/sets/submit")]
@@ -34,6 +49,25 @@ namespace Climb.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpGet("/api/v1/sets/{setID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(SetDto))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
+        public async Task<IActionResult> Get(int setID)
+        {
+            var set = await dbContext.Sets
+                .Include(s => s.Matches).ThenInclude(m => m.MatchCharacters).AsNoTracking()
+                .Include(s => s.League).AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ID == setID);
+            if(set == null)
+            {
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find Set with ID '{setID}'.", logger);
+            }
+
+            var dto = SetDto.Create(set, set.League.GameID);
+
+            return this.CodeResult(HttpStatusCode.OK, dto);
         }
     }
 }
