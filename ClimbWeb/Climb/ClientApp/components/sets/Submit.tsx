@@ -67,6 +67,8 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
                                     match={m}
                                     onSelect={m => this.setState({ selectedMatch: m })}/>);
 
+        const canSubmit = set.player1Score != set.player2Score;
+
         return (
             <div>
                 <div id="set-submit-header">
@@ -106,7 +108,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
 
                 <div>{matches}</div>
                 <div className="match-summary-buttons">
-                    <button onClick={this.onSubmit}>Submit</button>
+                    <button disabled={!canSubmit} onClick={this.onSubmit}>Submit</button>
                     <button onClick={this.onAddMatch}>Add Match</button>
                 </div>
             </div>
