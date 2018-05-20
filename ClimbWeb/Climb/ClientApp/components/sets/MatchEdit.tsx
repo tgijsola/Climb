@@ -7,6 +7,7 @@ interface IMatchEditProps {
     match: ClimbClient.MatchDto;
     onEdit: (match: ClimbClient.MatchDto) => void;
     onCancel: () => void;
+    onDelete: () => void;
 }
 
 interface IMatchEditState {
@@ -40,6 +41,7 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
 
         return (
             <div id="match-edit-container">
+                <button onClick={this.props.onDelete}>Delete</button>
                 <div id="match-edit-title">Match {match.index + 1}</div>
                 {this.renderPlayerInputs(1, characters, match.player1Characters)}
                 <div className="match-edit-input-group-divider"></div>

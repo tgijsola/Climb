@@ -36,6 +36,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         this.onAddMatch = this.onAddMatch.bind(this);
         this.onMatchEdited = this.onMatchEdited.bind(this);
         this.onMatchCancelled = this.onMatchCancelled.bind(this);
+        this.onMatchDelete = this.onMatchDelete.bind(this);
     }
 
     componentDidMount() {
@@ -47,13 +48,17 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         const set = this.state.set;
         const player1 = this.state.player1;
         const player2 = this.state.player2;
-        if (!set || !set.matches || !game || !player1 || !player2) return <div id="loader"><RingLoader color={"#123abc"}/></div>;
+        if (!set || !set.matches || !game || !player1 || !player2)
+            return <div id="loader">
+                       <RingLoader color={"#123abc"}/>
+                   </div>;
 
         if (this.state.selectedMatch != null) {
             return <MatchEdit match={this.state.selectedMatch}
                               game={game}
                               onEdit={this.onMatchEdited}
-                              onCancel={this.onMatchCancelled}/>;
+                              onCancel={this.onMatchCancelled}
+                              onDelete={this.onMatchDelete}/>;
         }
 
         const matches = set.matches.map(
@@ -129,7 +134,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
             .catch(reason => alert(`Can't load game\n${reason}`));
     }
 
-    private loadPlayers(p1: number, p2 : number) {
+    private loadPlayers(p1: number, p2: number) {
         const leagueClient = new ClimbClient.LeagueClient(window.location.origin);
         leagueClient.getUser(p1)
             .then(player1 => this.setState({ player1: player1 }))
@@ -152,6 +157,25 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         this.setState({
             selectedMatch: null,
             set: set,
+        });
+    }
+
+    private onMatchDelete() {
+        if (!this.state.selectedMatch) throw new Error("Selected match can't be null.");
+
+        const index = this.state.selectedMatch.index;
+
+        const set = this.state.set;
+        if (!set || !set.matches) throw new Error("Set and Matches can't be null");
+        set.matches.splice(index, 1);
+
+        for (let i = 0; i < set.matches.length; i++) {
+            set.matches[i].index = i;
+        }
+
+        this.setState({
+            set: set,
+            selectedMatch: null,
         });
     }
 
