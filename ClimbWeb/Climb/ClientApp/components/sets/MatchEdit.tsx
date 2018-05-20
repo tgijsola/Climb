@@ -38,6 +38,7 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
 
         const characters = this.props.game.characters.map(c => <option key={c.id} value={c.id}>{c.name}</option>);
         const stages = this.props.game.stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)
+        const canOk = match.player1Score != match.player2Score;
 
         return (
             <div id="match-edit-container">
@@ -55,7 +56,7 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                 </div>
                 <div className="match-edit-buttons">
                     <button onClick={this.props.onCancel}>Cancel</button>
-                    <button onClick={() => this.props.onEdit(this.state.match)}>Ok</button>
+                    <button disabled={!canOk} onClick={() => this.props.onEdit(this.state.match)}>Ok</button>
                 </div>
             </div>
         );
