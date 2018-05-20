@@ -10,6 +10,8 @@ interface ISetSubmitState {
     set: ClimbClient.SetDto | null;
     selectedMatch: ClimbClient.MatchDto | null;
     game: ClimbClient.Game | null;
+    player1: ClimbClient.LeagueUserDto | null;
+    player2: ClimbClient.LeagueUserDto | null;
 }
 
 export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmitState> {
@@ -26,6 +28,8 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
             set: null,
             selectedMatch: null,
             game: null,
+            player1: null,
+            player2: null,
         };
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -41,7 +45,9 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
     render() {
         const game = this.state.game;
         const set = this.state.set;
-        if (!set || !set.matches || !game) return <RingLoader color={"#123abc"}/>;
+        const player1 = this.state.player1;
+        const player2 = this.state.player2;
+        if (!set || !set.matches || !game || !player1 || !player2) return <div id="loader"><RingLoader color={"#123abc"}/></div>;
 
         if (this.state.selectedMatch != null) {
             return <MatchEdit match={this.state.selectedMatch}
@@ -88,8 +94,8 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
                     </div>
 
                     <div id="set-submit-player-names">
-                        <div className="set-submit-player-name left">Player Name</div>
-                        <div className="set-submit-player-name right">Player Name</div>
+                        <div className="set-submit-player-name left">{player1.username}</div>
+                        <div className="set-submit-player-name right">{player2.username}</div>
                     </div>
                 </div>
 
@@ -111,6 +117,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
                 this.setState({ set: set });
                 console.log(set);
                 this.loadGame(set.gameID);
+                this.loadPlayers(set.player1ID, set.player2ID);
             })
             .catch(reason => `Could not load set\n${reason}`);
     }
@@ -120,6 +127,16 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         gameClient.get(gameId)
             .then(game => this.setState({ game: game }))
             .catch(reason => alert(`Can't load game\n${reason}`));
+    }
+
+    private loadPlayers(p1: number, p2 : number) {
+        const leagueClient = new ClimbClient.LeagueClient(window.location.origin);
+        leagueClient.getUser(p1)
+            .then(player1 => this.setState({ player1: player1 }))
+            .catch(reason => alert(`Could not load player 1\n${reason}`));
+        leagueClient.getUser(p2)
+            .then(player2 => this.setState({ player2: player2 }))
+            .catch(reason => alert(`Could not load player 2\n${reason}`));
     }
 
     private onMatchCancelled() {
