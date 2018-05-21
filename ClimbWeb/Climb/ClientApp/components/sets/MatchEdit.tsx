@@ -90,7 +90,7 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                         <input className="match-edit-input"
                             type="number"
                             value={score}
-                            min="0" max="2"
+                            min="0" max={game.maxMatchPoints}
                             onChange={(e: any) => this.updateScore(playerNumber, parseInt(e.currentTarget.value))}/>
                     </div>
                 </div>
