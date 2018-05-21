@@ -75,6 +75,7 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
         for (let i = 0; i < game.charactersPerMatch; i++) {
             characterInputs.push(
                 <select className="match-edit-input"
+                        key={i}
                         value={characterValues[i]}
                         onChange={(e: any) => this.updateCharacter(playerNumber, i, parseInt(e.currentTarget.value))}>
                     {characters}
