@@ -52,10 +52,9 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Create_Valid_CreatedResult()
         {
-            const string name = "NewGame";
-            var request = new CreateRequest {Name = name};
+            var request = new CreateRequest();
 
-            gameService.Create(name).Returns(new Game {Name = name});
+            gameService.Create(request).Returns(new Game());
 
             var result = await testObj.Create(request);
 

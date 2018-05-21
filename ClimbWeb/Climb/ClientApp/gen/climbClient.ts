@@ -259,10 +259,18 @@ export class GameClient extends BaseClass {
         return Promise.resolve<Game>(<any>null);
     }
 
-    create(name: string | null | undefined): Promise<Game> {
+    create(name: string | null | undefined, charactersPerMatch: number | undefined, maxMatchPoints: number | undefined): Promise<Game> {
         let url_ = this.baseUrl + "/api/v1/games/create?";
         if (name !== undefined)
             url_ += "name=" + encodeURIComponent("" + name) + "&"; 
+        if (charactersPerMatch === null)
+            throw new Error("The parameter 'charactersPerMatch' cannot be null.");
+        else if (charactersPerMatch !== undefined)
+            url_ += "charactersPerMatch=" + encodeURIComponent("" + charactersPerMatch) + "&"; 
+        if (maxMatchPoints === null)
+            throw new Error("The parameter 'maxMatchPoints' cannot be null.");
+        else if (maxMatchPoints !== undefined)
+            url_ += "maxMatchPoints=" + encodeURIComponent("" + maxMatchPoints) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
@@ -1242,6 +1250,8 @@ export interface ILoginResponse {
 export class Game implements IGame {
     id: number;
     name?: string | undefined;
+    charactersPerMatch: number;
+    maxMatchPoints: number;
     characters?: Character[] | undefined;
     stages?: Stage[] | undefined;
 
@@ -1258,6 +1268,8 @@ export class Game implements IGame {
         if (data) {
             this.id = data["id"];
             this.name = data["name"];
+            this.charactersPerMatch = data["charactersPerMatch"];
+            this.maxMatchPoints = data["maxMatchPoints"];
             if (data["characters"] && data["characters"].constructor === Array) {
                 this.characters = [];
                 for (let item of data["characters"])
@@ -1282,6 +1294,8 @@ export class Game implements IGame {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
+        data["charactersPerMatch"] = this.charactersPerMatch;
+        data["maxMatchPoints"] = this.maxMatchPoints;
         if (this.characters && this.characters.constructor === Array) {
             data["characters"] = [];
             for (let item of this.characters)
@@ -1299,6 +1313,8 @@ export class Game implements IGame {
 export interface IGame {
     id: number;
     name?: string | undefined;
+    charactersPerMatch: number;
+    maxMatchPoints: number;
     characters?: Character[] | undefined;
     stages?: Stage[] | undefined;
 }

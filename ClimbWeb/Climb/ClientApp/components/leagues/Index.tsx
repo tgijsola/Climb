@@ -9,7 +9,7 @@ import { RingLoader } from "react-spinners";
 import "bootstrap";
 
 interface IIndexState {
-    leagues: ClimbClient.Game[] | null
+    leagues: ClimbClient.League[] | null
 }
 
 export class Index extends React.Component<RouteComponentProps<any> | undefined, IIndexState> {

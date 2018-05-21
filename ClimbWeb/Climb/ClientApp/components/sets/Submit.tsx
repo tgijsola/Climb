@@ -216,10 +216,13 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
 
     private onAddMatch() {
         const set = this.state.set;
-        if (!set || !set.matches) throw new Error();
+        const game = this.state.game;
+        if (!set || !set.matches || !game || !game.stages) throw new Error();
 
         const newMatch = new ClimbClient.MatchDto();
         newMatch.index = set.matches.length;
+        newMatch.player1Score = 0;
+        newMatch.player2Score = 0;
 
         if (newMatch.index > 0) {
             const prevMatch = set.matches[newMatch.index - 1];
@@ -229,6 +232,10 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         } else {
             newMatch.player1Characters = [];
             newMatch.player2Characters = [];
+        }
+
+        if (game.stages.length > 0) {
+            newMatch.stageID = game.stages[0].id;
         }
 
         this.setState({ selectedMatch: newMatch });

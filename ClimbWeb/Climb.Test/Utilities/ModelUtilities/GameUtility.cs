@@ -8,20 +8,20 @@ namespace Climb.Test.Utilities
     {
         public static Game Create(ApplicationDbContext dbContext, int characterCount, int stageCount)
         {
-            var game = new Game("Test Game")
+            var game = new Game("Test Game", characterCount, stageCount)
             {
                 Characters = new HashSet<Character>(characterCount),
                 Stages = new HashSet<Stage>(stageCount),
             };
             dbContext.Add(game);
-            
+
             for(var i = 0; i < characterCount; i++)
             {
                 var character = new Character {Name = $"Character {i}"};
                 game.Characters.Add(character);
                 dbContext.Add(character);
             }
-            
+
             for(var i = 0; i < stageCount; i++)
             {
                 var stage = new Stage {Name = $"Character {i}"};

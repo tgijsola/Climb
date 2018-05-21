@@ -24,7 +24,7 @@ namespace Climb.Data
 
         private static Game CreateTestGame(ApplicationDbContext dbContext)
         {
-            var game = new Game("Smash Bros");
+            var game = new Game("Smash Bros", 1, 1);
             dbContext.Games.Add(game);
             dbContext.SaveChanges();
             return game;

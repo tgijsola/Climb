@@ -1,10 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Climb.Models;
+using Climb.Requests.Games;
 
 namespace Climb.Services.ModelServices
 {
     public interface IGameService
     {
-        Task<Game> Create(string name);
+        Task<Game> Create(CreateRequest request);
     }
 }

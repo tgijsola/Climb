@@ -14,7 +14,18 @@ export class Create extends React.Component<RouteComponentProps<any> | undefined
         return (
             <div>
                 <form onSubmit={this.onSubmit}>
-                    <input id="gameNameInput" type="text"/>
+                    <div className="input-group">
+                        <label>Name</label>
+                        <input id="gameNameInput" type="text"/>
+                    </div>
+                    <div className="input-group">
+                        <label>Characters per match</label>
+                        <input id="charactersPerMatchInput" type="number" min="1" value="1"/>
+                    </div>
+                    <div className="input-group">
+                        <label>Max points per match</label>
+                        <input id="maxMatchPointsInput" type="number" min="1" value="2"/>
+                    </div>
                     <button>Submit</button>
                 </form>
             </div>
@@ -26,8 +37,10 @@ export class Create extends React.Component<RouteComponentProps<any> | undefined
 
         const gameClient = new ClimbClient.GameClient(window.location.origin);
         const gameName = (document.getElementById("gameNameInput") as HTMLInputElement).value;
+        const charactersPerMatch = (document.getElementById("charactersPerMatchInput") as HTMLInputElement).valueAsNumber;
+        const maxMatchPoints = (document.getElementById("maxMatchPointsInput") as HTMLInputElement).valueAsNumber;
 
-        gameClient.create(gameName)
+        gameClient.create(gameName, charactersPerMatch, maxMatchPoints)
             .then(game => {
                 console.log(game);
                 window.location.assign("/games");
