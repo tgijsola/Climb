@@ -14,7 +14,6 @@ interface IMatchEditState {
     match: ClimbClient.MatchDto;
 }
 
-// TODO: Reuse characters
 // TODO: Show errors
 export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState> {
     constructor(props: IMatchEditProps) {
@@ -61,7 +60,24 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
     }
 
     private canEditMatch(game: ClimbClient.Game, match: ClimbClient.MatchDto): boolean {
-        return match.player1Score != match.player2Score && (match.player1Score == game.maxMatchPoints || match.player2Score == game.maxMatchPoints);
+        if (!match.player1Characters || !match.player2Characters) throw new Error();
+
+        const differentScores = match.player1Score != match.player2Score;
+        const aPlayerHasMaxScore = match.player1Score == game.maxMatchPoints || match.player2Score == game.maxMatchPoints;
+        const differentCharacters = this.checkUniqueCharacters(match.player1Characters) && this.checkUniqueCharacters(match.player2Characters);
+        return differentScores && aPlayerHasMaxScore && differentCharacters;
+    }
+
+    private checkUniqueCharacters(characters: number[]): boolean {
+        if (characters.length === 1) return true;
+
+        for (var i = 0; i < characters.length - 1; i++) {
+            for (var j = i + 1; j < characters.length; j++) {
+                if (characters[i] === characters[j]) return false;
+            }
+        }
+
+        return true;
     }
 
     private renderPlayerInputs(game: ClimbClient.Game,
