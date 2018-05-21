@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
@@ -13,17 +14,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
-    public class GameController : Controller
+    public class GameController : BaseController<GameController>
     {
         private readonly IGameService gameService;
         private readonly ApplicationDbContext dbContext;
-        private readonly ILogger<GameController> logger;
 
         public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger)
+            : base(logger)
         {
             this.gameService = gameService;
             this.dbContext = dbContext;
-            this.logger = logger;
         }
 
         [HttpGet("/games/{*page}")]
@@ -62,9 +62,15 @@ namespace Climb.Controllers
                 return this.CodeResult(HttpStatusCode.BadRequest, $"Game with name '{request.Name}' already exists.");
             }
 
-            var game = await gameService.Create(request.Name);
-
-            return this.CodeResultAndLog(HttpStatusCode.Created, game, "Game created.", logger);
+            try
+            {
+                var game = await gameService.Create(request);
+                return this.CodeResultAndLog(HttpStatusCode.Created, game, "Game created.", logger);
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
         }
 
         [HttpGet("/api/v1/games")]
