@@ -15,8 +15,7 @@ interface IMatchEditState {
 }
 
 // TODO: Reuse characters
-// TODO: Same score
-// TODO: Need max points
+// TODO: Show errors
 export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState> {
     constructor(props: IMatchEditProps) {
         super(props);
@@ -42,7 +41,7 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
 
         const characters = game.characters.map(c => <option key={c.id} value={c.id}>{c.name}</option>);
         const stageInput = this.renderStageInput(game, match);
-        const canOk = match.player1Score != match.player2Score;
+        const canOk = this.canEditMatch(game, match);
 
         return (
             <div id="match-edit-container">
@@ -59,6 +58,10 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                 </div>
             </div>
         );
+    }
+
+    private canEditMatch(game: ClimbClient.Game, match: ClimbClient.MatchDto): boolean {
+        return match.player1Score != match.player2Score && (match.player1Score == game.maxMatchPoints || match.player2Score == game.maxMatchPoints);
     }
 
     private renderPlayerInputs(game: ClimbClient.Game,
