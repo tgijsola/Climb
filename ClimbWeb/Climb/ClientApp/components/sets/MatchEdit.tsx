@@ -14,6 +14,9 @@ interface IMatchEditState {
     match: ClimbClient.MatchDto;
 }
 
+// TODO: Reuse characters
+// TODO: Same score
+// TODO: Need max points
 export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState> {
     constructor(props: IMatchEditProps) {
         super(props);
@@ -34,11 +37,11 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
         const match = this.state.match;
         const game = this.props.game;
 
-        if (!game.characters || !game.stages) throw new Error();
+        if (!game.characters) throw new Error();
         if (!match.player1Characters || !match.player2Characters) throw new Error();
 
         const characters = game.characters.map(c => <option key={c.id} value={c.id}>{c.name}</option>);
-        const stages = game.stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)
+        const stageInput = this.renderStageInput(game, match);
         const canOk = match.player1Score != match.player2Score;
 
         return (
@@ -49,13 +52,7 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                 <div className="match-edit-input-group-divider"></div>
                 {this.renderPlayerInputs(game, 2, characters, match.player2Characters)}
                 <div className="match-edit-input-group-divider"></div>
-                <div className="match-edit-input-group">
-                    <div className="match-edit-input-label">Stage</div>
-                    <div>
-                        <select className="match-edit-input" value={match.stageID} onChange={(e: any) =>
-                            this.updateStage(parseInt(e.currentTarget.value))}>{stages}</select>
-                    </div>
-                </div>
+                {stageInput}
                 <div className="match-edit-buttons">
                     <button onClick={this.props.onCancel}>Cancel</button>
                     <button disabled={!canOk} onClick={() => this.props.onEdit(this.state.match)}>Ok</button>
@@ -89,15 +86,34 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                     <div className="match-edit-input-label">Score</div>
                     <div>
                         <input className="match-edit-input"
-                            type="number"
-                            value={score}
-                            min="0" max={game.maxMatchPoints}
-                            onChange={(e: any) => this.updateScore(playerNumber, parseInt(e.currentTarget.value))}/>
+                               type="number"
+                               value={score}
+                               min="0" max={game.maxMatchPoints}
+                               onChange={(e: any) => this.updateScore(playerNumber, parseInt(e.currentTarget.value))}/>
                     </div>
                 </div>
                 <div className="match-edit-input-group">
-                    <div className="match-edit-input-label">{`Character${game.charactersPerMatch > 1 ? 's' : ''}`}</div>
+                    <div className="match-edit-input-label">{`Character${game.charactersPerMatch > 1 ? "s" : ""}`
+                    }</div>
                     <div className="match-edit-characters">{characterInputs}</div>
+                </div>
+            </div>
+        );
+    }
+
+    private renderStageInput(game: ClimbClient.Game, match: ClimbClient.MatchDto) {
+        if (!game.stages || game.stages.length === 0) {
+            return null;
+        }
+
+        const stages = game.stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>);
+
+        return (
+            <div className="match-edit-input-group">
+                <div className="match-edit-input-label">Stage</div>
+                <div>
+                    <select className="match-edit-input" value={match.stageID} onChange={(e: any) =>
+                        this.updateStage(parseInt(e.currentTarget.value))}>{stages}</select>
                 </div>
             </div>
         );
