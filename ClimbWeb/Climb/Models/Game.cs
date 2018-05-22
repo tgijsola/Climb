@@ -9,8 +9,8 @@ namespace Climb.Models
         public int CharactersPerMatch { get; set; }
         public int MaxMatchPoints { get; set; }
 
-        public HashSet<Character> Characters { get; set; }
-        public HashSet<Stage> Stages { get; set; }
+        public List<Character> Characters { get; set; }
+        public List<Stage> Stages { get; set; }
 
         public Game()
         {

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Games;
@@ -9,6 +10,7 @@ using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Climb.Test.Controllers
@@ -71,6 +73,40 @@ namespace Climb.Test.Controllers
             dbContext.SaveChanges();
 
             var result = await testObj.Create(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
+        }
+
+        [Test]
+        public async Task AddCharacter_Valid_Created()
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+            var request = new AddCharacterRequest(game.ID, "Char1");
+            gameService.AddCharacter(request).Returns(new Character());
+
+            var result = await testObj.AddCharacter(request);
+            var resultObj = result.GetObject<Character>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.Created);
+            Assert.IsNotNull(resultObj);
+        }
+
+        [Test]
+        public async Task AddCharacter_NotFound_NotFound()
+        {
+            gameService.AddCharacter(null).ThrowsForAnyArgs(new NotFoundException());
+
+            var result = await testObj.AddCharacter(new AddCharacterRequest());
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task AddCharacter_BadRequest_BadRequest()
+        {
+            gameService.AddCharacter(null).ThrowsForAnyArgs(new BadRequestException());
+
+            var result = await testObj.AddCharacter(new AddCharacterRequest());
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
         }

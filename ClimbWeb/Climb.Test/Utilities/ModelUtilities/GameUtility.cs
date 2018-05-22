@@ -10,8 +10,8 @@ namespace Climb.Test.Utilities
         {
             var game = new Game("Test Game", characterCount, stageCount)
             {
-                Characters = new HashSet<Character>(characterCount),
-                Stages = new HashSet<Stage>(stageCount),
+                Characters = new List<Character>(characterCount),
+                Stages = new List<Stage>(stageCount),
             };
             dbContext.Add(game);
 
