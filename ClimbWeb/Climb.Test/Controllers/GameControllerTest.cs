@@ -110,5 +110,39 @@ namespace Climb.Test.Controllers
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
         }
+
+        [Test]
+        public async Task AddStage_Valid_Created()
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+            var request = new AddStageRequest(game.ID, "Stage1");
+            gameService.AddStage(request).Returns(new Stage());
+
+            var result = await testObj.AddStage(request);
+            var resultObj = result.GetObject<Stage>();
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.Created);
+            Assert.IsNotNull(resultObj);
+        }
+
+        [Test]
+        public async Task AddStage_NotFound_NotFound()
+        {
+            gameService.AddStage(null).ThrowsForAnyArgs(new NotFoundException());
+
+            var result = await testObj.AddStage(new AddStageRequest());
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task AddStage_BadRequest_BadRequest()
+        {
+            gameService.AddStage(null).ThrowsForAnyArgs(new BadRequestException());
+
+            var result = await testObj.AddStage(new AddStageRequest());
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
+        }
     }
 }

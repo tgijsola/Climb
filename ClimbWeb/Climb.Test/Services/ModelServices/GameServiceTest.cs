@@ -92,5 +92,33 @@ namespace Climb.Test.Services.ModelServices
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.AddCharacter(request));
         }
+
+        [Test]
+        public async Task AddStage_Valid_Stage()
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+            var request = new AddStageRequest(game.ID, "Stage1");
+
+            var stage = await testObj.AddStage(request);
+
+            Assert.IsNotNull(stage);
+        }
+
+        [Test]
+        public void AddStage_NoGame_NotFoundException()
+        {
+            var request = new AddStageRequest(0, "Stage1");
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddStage(request));
+        }
+
+        [Test]
+        public void AddStage_NameTaken_BadRequestException()
+        {
+            var game = GameUtility.Create(dbContext, 0, 1);
+            var request = new AddStageRequest(game.ID, game.Stages[0].Name);
+
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.AddStage(request));
+        }
     }
 }

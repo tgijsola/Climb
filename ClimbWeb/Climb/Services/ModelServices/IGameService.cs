@@ -8,5 +8,6 @@ namespace Climb.Services.ModelServices
     {
         Task<Game> Create(CreateRequest request);
         Task<Character> AddCharacter(AddCharacterRequest request);
+        Task<Stage> AddStage(AddStageRequest request);
     }
 }

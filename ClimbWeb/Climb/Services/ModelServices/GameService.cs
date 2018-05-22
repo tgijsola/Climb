@@ -68,5 +68,32 @@ namespace Climb.Services.ModelServices
 
             return character;
         }
+
+        public async Task<Stage> AddStage(AddStageRequest request)
+        {
+            var game = await dbContext.Games
+                .Include(g => g.Stages).AsNoTracking()
+                .FirstOrDefaultAsync(g => g.ID == request.GameID);
+            if(game == null)
+            {
+                throw new NotFoundException(typeof(Game), request.GameID);
+            }
+
+            if(game.Stages.Any(c => c.Name == request.Name))
+            {
+                throw new BadRequestException(nameof(request.Name), $"There is already a stage with the name '{request.Name}'.");
+            }
+
+            var stage = new Stage
+            {
+                Name = request.Name,
+                GameID = request.GameID,
+            };
+
+            dbContext.Add(stage);
+            await dbContext.SaveChangesAsync();
+
+            return stage;
+        }
     }
 }

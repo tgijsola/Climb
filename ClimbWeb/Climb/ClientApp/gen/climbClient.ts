@@ -366,6 +366,61 @@ export class GameClient extends BaseClass {
         return Promise.resolve<Character>(<any>null);
     }
 
+    addStage(gameID: number | undefined, name: string | null | undefined): Promise<Stage> {
+        let url_ = this.baseUrl + "/api/v1/addStage?";
+        if (gameID === null)
+            throw new Error("The parameter 'gameID' cannot be null.");
+        else if (gameID !== undefined)
+            url_ += "gameID=" + encodeURIComponent("" + gameID) + "&"; 
+        if (name !== undefined)
+            url_ += "name=" + encodeURIComponent("" + name) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processAddStage(_response);
+        });
+    }
+
+    protected processAddStage(response: Response): Promise<Stage> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 201) {
+            return response.text().then((_responseText) => {
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = resultData201 ? Stage.fromJS(resultData201) : new Stage();
+            return result201;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = resultData400 !== undefined ? resultData400 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Stage>(<any>null);
+    }
+
     listAll(): Promise<Game[]> {
         let url_ = this.baseUrl + "/api/v1/games";
         url_ = url_.replace(/[?&]$/, "");
@@ -1378,7 +1433,6 @@ export class Character implements ICharacter {
     id: number;
     name?: string | undefined;
     gameID: number;
-    game?: Game | undefined;
 
     constructor(data?: ICharacter) {
         if (data) {
@@ -1394,7 +1448,6 @@ export class Character implements ICharacter {
             this.id = data["id"];
             this.name = data["name"];
             this.gameID = data["gameID"];
-            this.game = data["game"] ? Game.fromJS(data["game"]) : <any>undefined;
         }
     }
 
@@ -1410,7 +1463,6 @@ export class Character implements ICharacter {
         data["id"] = this.id;
         data["name"] = this.name;
         data["gameID"] = this.gameID;
-        data["game"] = this.game ? this.game.toJSON() : <any>undefined;
         return data; 
     }
 }
@@ -1419,12 +1471,12 @@ export interface ICharacter {
     id: number;
     name?: string | undefined;
     gameID: number;
-    game?: Game | undefined;
 }
 
 export class Stage implements IStage {
     id: number;
     name?: string | undefined;
+    gameID: number;
 
     constructor(data?: IStage) {
         if (data) {
@@ -1439,6 +1491,7 @@ export class Stage implements IStage {
         if (data) {
             this.id = data["id"];
             this.name = data["name"];
+            this.gameID = data["gameID"];
         }
     }
 
@@ -1453,6 +1506,7 @@ export class Stage implements IStage {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
+        data["gameID"] = this.gameID;
         return data; 
     }
 }
@@ -1460,6 +1514,7 @@ export class Stage implements IStage {
 export interface IStage {
     id: number;
     name?: string | undefined;
+    gameID: number;
 }
 
 export class League implements ILeague {
