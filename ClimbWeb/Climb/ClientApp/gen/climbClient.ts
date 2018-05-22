@@ -1362,8 +1362,8 @@ export class Game implements IGame {
     name?: string | undefined;
     charactersPerMatch: number;
     maxMatchPoints: number;
-    characters?: Character[] | undefined;
-    stages?: Stage[] | undefined;
+    characters: Character[];
+    stages: Stage[];
 
     constructor(data?: IGame) {
         if (data) {
@@ -1371,6 +1371,10 @@ export class Game implements IGame {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.characters = [];
+            this.stages = [];
         }
     }
 
@@ -1425,8 +1429,8 @@ export interface IGame {
     name?: string | undefined;
     charactersPerMatch: number;
     maxMatchPoints: number;
-    characters?: Character[] | undefined;
-    stages?: Stage[] | undefined;
+    characters: Character[];
+    stages: Stage[];
 }
 
 export class Character implements ICharacter {

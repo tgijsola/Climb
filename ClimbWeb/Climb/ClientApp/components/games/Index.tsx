@@ -24,26 +24,23 @@ export class Index extends React.Component<RouteComponentProps<any> | undefined,
     }
 
     render() {
-        let games: any;
+        let games = null;
 
         if (this.state.games != null) {
             if (this.state.games.length === 0) {
                 games = <span>No games created yet!</span>;
             } else {
-                games = this.state.games.map((game) => <li key={game.id}>{game.name}</li>);
+                games = this.state.games.map((game) => <div><Link to={`/games/${game.id}`}>{game.name}</Link></div>);
             }
-        } else {
-            games = <div></div>;
         }
-
 
         return (
             <div>
                 <RingLoader
                     color={"#123abc"}
                     loading={this.state.games == null}/>
-                
-                <Link to={ "/games/create" } className={"btn btn-danger"} role={"button"} >Create New Game</Link>
+
+                <Link to={ "/games/create" } className={"btn btn-danger"} role={"button"}>Create New Game</Link>
 
                 {games}
             </div>
@@ -54,7 +51,6 @@ export class Index extends React.Component<RouteComponentProps<any> | undefined,
         const gameClient = new ClimbClient.GameClient(window.location.origin);
         gameClient.listAll()
             .then(games => {
-                console.log(games);
                 this.setState({ games: games });
             })
             .catch(reason => alert(`Could not load games!\n${reason}`));
