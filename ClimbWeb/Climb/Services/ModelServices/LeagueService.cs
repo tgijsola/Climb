@@ -42,6 +42,11 @@ namespace Climb.Services.ModelServices
                 throw new NotFoundException(typeof(League), leagueID);
             }
 
+            if(!await dbContext.Users.AnyAsync(u => u.Id == userID))
+            {
+                throw new NotFoundException(typeof(ApplicationUser), userID);
+            }
+
             var leagueUser = await dbContext.LeagueUsers
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(lu => lu.UserID == userID);

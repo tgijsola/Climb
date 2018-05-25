@@ -96,18 +96,6 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Join_NoUser_NotFound()
-        {
-            var league = LeagueUtility.CreateLeague(dbContext);
-
-            var request = new JoinRequest(league.ID, "");
-
-            var result = await testObj.Join(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
-        }
-
-        [Test]
         public async Task Get_Valid_Ok()
         {
             var league = LeagueUtility.CreateLeague(dbContext);

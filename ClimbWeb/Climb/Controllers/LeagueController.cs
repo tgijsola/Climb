@@ -82,11 +82,6 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find user.")]
         public async Task<IActionResult> Join(JoinRequest request)
         {
-            if(!await dbContext.Users.AnyAsync(u => u.Id == request.UserID))
-            {
-                return this.CodeResultAndLog(HttpStatusCode.BadRequest, $"No User with ID '{request.UserID}' found.", logger);
-            }
-
             try
             {
                 var leagueUser = await leagueService.Join(request.LeagueID, request.UserID);

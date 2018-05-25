@@ -4,7 +4,6 @@ using Climb.Exceptions;
 using Climb.Models;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
@@ -65,7 +64,10 @@ namespace Climb.Test.Services.ModelServices
             var league = LeagueUtility.CreateLeague(dbContext);
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
 
-            var oldLeagueUser = new LeagueUser(league.ID, user.Id) {HasLeft = true};
+            var oldLeagueUser = new LeagueUser(league.ID, user.Id)
+            {
+                HasLeft = true
+            };
             dbContext.LeagueUsers.Add(oldLeagueUser);
             dbContext.SaveChanges();
 
@@ -81,6 +83,14 @@ namespace Climb.Test.Services.ModelServices
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
 
             Assert.ThrowsAsync<NotFoundException>(() => testObj.Join(0, user.Id));
+        }
+
+        [Test]
+        public void Join_NoUser_NotFound()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Join(league.ID, ""));
         }
     }
 }
