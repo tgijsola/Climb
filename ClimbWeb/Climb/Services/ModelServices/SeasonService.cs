@@ -24,6 +24,16 @@ namespace Climb.Services.ModelServices
 
         public async Task<Season> Create(int leagueID, DateTime start, DateTime end)
         {
+            if(start < DateTime.Now)
+            {
+                throw new BadRequestException(nameof(start), "Start date can't be in the past.");
+            }
+
+            if(end <= start)
+            {
+                throw new BadRequestException(nameof(end), "End date must be after the start date.");
+            }
+
             var league = await dbContext.Leagues
                 .Include(l => l.Members).AsNoTracking()
                 .FirstOrDefaultAsync(l => l.ID == leagueID);
