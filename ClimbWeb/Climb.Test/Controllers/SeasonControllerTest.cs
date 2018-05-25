@@ -166,12 +166,11 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Start_Valid_ReturnsSets()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
-            var participants = season.Participants.ToArray();
+            var (season, participants) = SeasonUtility.CreateSeason(dbContext, 2);
             var sets = new HashSet<Set>();
             for(var i = 0; i < 3; i++)
             {
-                sets.Add(SetUtility.Create(dbContext, participants[0].LeagueUserID, participants[1].LeagueUserID, season));
+                sets.Add(SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season));
             }
 
             seasonService.GenerateSchedule(season.ID).ReturnsForAnyArgs(info => sets);
