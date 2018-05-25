@@ -108,16 +108,6 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
-            if(request.StartDate < DateTime.Now)
-            {
-                return this.CodeResultAndLog(HttpStatusCode.BadRequest, "Can't have start date in the past.", logger);
-            }
-
-            if(request.EndDate < request.StartDate)
-            {
-                return this.CodeResultAndLog(HttpStatusCode.BadRequest, "Can't have an end date earlier than the start date.", logger);
-            }
-
             try
             {
                 var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);

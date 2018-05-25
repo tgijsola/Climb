@@ -17,6 +17,9 @@ namespace Climb.Test.Services.ModelServices
         private ApplicationDbContext dbContext;
         private ScheduleFactory scheduler;
 
+        private static DateTime StartDate => DateTime.Now.AddDays(1);
+        private static DateTime EndDate => DateTime.Now.AddDays(2);
+
         [SetUp]
         public void SetUp()
         {
@@ -31,7 +34,7 @@ namespace Climb.Test.Services.ModelServices
         {
             var league = LeagueUtility.CreateLeague(dbContext);
 
-            var season = await testObj.Create(league.ID, DateTime.MaxValue, DateTime.MaxValue);
+            var season = await testObj.Create(league.ID, StartDate, EndDate);
 
             Assert.IsNotNull(season);
         }
@@ -39,7 +42,19 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public void Create_NoLeague_NotFoundException()
         {
-            Assert.ThrowsAsync<NotFoundException>(() => testObj.Create(0, DateTime.MaxValue, DateTime.MaxValue));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Create(0, StartDate, EndDate));
+        }
+
+        [Test]
+        public void Create_StartInPast_BadRequestException()
+        {
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(0, DateTime.MinValue, EndDate));
+        }
+
+        [Test]
+        public void Create_EndBeforeStart_BadRequestException()
+        {
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(0, DateTime.Now.AddDays(2), StartDate));
         }
 
         [Test]
@@ -48,7 +63,7 @@ namespace Climb.Test.Services.ModelServices
             var league = LeagueUtility.CreateLeague(dbContext);
             LeagueUtility.AddUsersToLeague(league, 1, dbContext);
 
-            var season = await testObj.Create(league.ID, DateTime.MaxValue, DateTime.MaxValue);
+            var season = await testObj.Create(league.ID, StartDate, EndDate);
 
             Assert.IsTrue(season.Participants.Count > 0);
         }

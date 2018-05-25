@@ -154,28 +154,6 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Create_StartInPast_ReturnBadRequest()
-        {
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = gameID);
-            var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(-1), DateTime.Now.AddMinutes(2));
-
-            var result = await testObj.Create(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
-        }
-
-        [Test]
-        public async Task Create_EndBeforeStart_ReturnBadRequest()
-        {
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = gameID);
-            var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(3), DateTime.Now.AddMinutes(2));
-
-            var result = await testObj.Create(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
-        }
-
-        [Test]
         public async Task Start_Valid_Created()
         {
             var season = SeasonUtility.CreateSeason(dbContext, 2).season;
