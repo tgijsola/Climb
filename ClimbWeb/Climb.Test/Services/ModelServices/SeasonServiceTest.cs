@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
+using Climb.Models;
 using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
@@ -15,7 +17,7 @@ namespace Climb.Test.Services.ModelServices
     {
         private SeasonService testObj;
         private ApplicationDbContext dbContext;
-        private ScheduleFactory scheduler;
+        private IScheduleFactory scheduler;
 
         private static DateTime StartDate => DateTime.Now.AddDays(1);
         private static DateTime EndDate => DateTime.Now.AddDays(2);
@@ -24,7 +26,7 @@ namespace Climb.Test.Services.ModelServices
         public void SetUp()
         {
             dbContext = DbContextUtility.CreateMockDb();
-            scheduler = Substitute.For<ScheduleFactory>();
+            scheduler = Substitute.For<IScheduleFactory>();
 
             testObj = new SeasonService(dbContext, scheduler);
         }
@@ -68,7 +70,17 @@ namespace Climb.Test.Services.ModelServices
             Assert.IsTrue(season.Participants.Count > 0);
         }
 
-        // TODO: Valid 
+        [Test]
+        public async Task GenerateSchedule_Valid_ReturnSets()
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, 4).season;
+            var setsToCreate = new HashSet<Set> {new Set(), new Set()};
+            scheduler.GenerateScheduleAsync(null, null).ReturnsForAnyArgs(setsToCreate);
+
+            var sets = await testObj.GenerateSchedule(season.ID);
+
+            Assert.AreEqual(setsToCreate.Count, sets.Count);
+        }
 
         [Test]
         public void GenerateSchedule_NoSeason_NotFoundException()

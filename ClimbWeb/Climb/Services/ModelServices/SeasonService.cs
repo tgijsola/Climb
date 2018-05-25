@@ -14,9 +14,9 @@ namespace Climb.Services.ModelServices
     public class SeasonService : ISeasonService
     {
         private readonly ApplicationDbContext dbContext;
-        private readonly ScheduleFactory scheduleFactory;
+        private readonly IScheduleFactory scheduleFactory;
 
-        public SeasonService(ApplicationDbContext dbContext, ScheduleFactory scheduleFactory)
+        public SeasonService(ApplicationDbContext dbContext, IScheduleFactory scheduleFactory)
         {
             this.dbContext = dbContext;
             this.scheduleFactory = scheduleFactory;
