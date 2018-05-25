@@ -124,11 +124,6 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(string), "Error trying to create sets for the season schedule.")]
         public async Task<IActionResult> Start(int seasonID)
         {
-            if(!await dbContext.Seasons.AnyAsync(s => s.ID == seasonID))
-            {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
-            }
-
             try
             {
                 var sets = await seasonService.GenerateSchedule(seasonID);
@@ -136,8 +131,7 @@ namespace Climb.Controllers
             }
             catch(Exception exception)
             {
-                logger.LogError(exception, $"Could not create schedule for Season {seasonID}.");
-                return this.CodeResult(HttpStatusCode.InternalServerError, $"Could not create schedule for Season '{seasonID}'");
+                return GetExceptionResult(exception, seasonID);
             }
         }
     }

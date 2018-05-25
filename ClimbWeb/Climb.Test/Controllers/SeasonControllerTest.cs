@@ -183,8 +183,10 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Start_NoSeason_NotFound()
+        public async Task Start_NotFound_NotFound()
         {
+            seasonService.GenerateSchedule(0).Throws<NotFoundException>();
+
             var result = await testObj.Start(0);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);

@@ -60,7 +60,11 @@ namespace Climb.Services.ModelServices
             var season = await dbContext.Seasons
                 .Include(s => s.Sets)
                 .Include(s => s.Participants).AsNoTracking()
-                .FirstAsync(s => s.ID == seasonID);
+                .FirstOrDefaultAsync(s => s.ID == seasonID);
+            if(season == null)
+            {
+                throw new NotFoundException(typeof(Season), seasonID);
+            }
 
             var sets = await scheduleFactory.GenerateScheduleAsync(season, dbContext);
 

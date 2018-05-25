@@ -67,5 +67,13 @@ namespace Climb.Test.Services.ModelServices
 
             Assert.IsTrue(season.Participants.Count > 0);
         }
+
+        // TODO: Valid 
+
+        [Test]
+        public void GenerateSchedule_NoSeason_NotFoundException()
+        {
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.GenerateSchedule(0));
+        }
     }
 }
