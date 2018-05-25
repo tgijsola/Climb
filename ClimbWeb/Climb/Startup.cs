@@ -75,7 +75,7 @@ namespace Climb
             services.AddSingleton<IEmailSender, EmailSender>();
             services.AddTransient<ITokenHelper, TokenHelper>();
             services.AddTransient<IUrlUtility, UrlUtility>();
-            services.AddTransient<ScheduleFactory, RoundRobinScheduler>();
+            services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

@@ -14,17 +14,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
-    public class SeasonController : Controller
+    public class SeasonController : BaseController<SeasonController>
     {
         private readonly ISeasonService seasonService;
         private readonly ApplicationDbContext dbContext;
-        private readonly ILogger<SeasonController> logger;
 
         public SeasonController(ISeasonService seasonService, ApplicationDbContext dbContext, ILogger<SeasonController> logger)
+            : base(logger)
         {
             this.dbContext = dbContext;
             this.seasonService = seasonService;
-            this.logger = logger;
         }
 
         [HttpGet("/seasons/{*page}")]
@@ -109,24 +108,15 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
-            if(!await dbContext.Leagues.AnyAsync(l => l.ID == request.LeagueID))
+            try
             {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{request.LeagueID}' found.", logger);
+                var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);
+                return this.CodeResultAndLog(HttpStatusCode.Created, season, "Season created.", logger);
             }
-
-            if(request.StartDate < DateTime.Now)
+            catch(Exception exception)
             {
-                return this.CodeResultAndLog(HttpStatusCode.BadRequest, "Can't have start date in the past.", logger);
+                return GetExceptionResult(exception, request);
             }
-
-            if(request.EndDate < request.StartDate)
-            {
-                return this.CodeResultAndLog(HttpStatusCode.BadRequest, "Can't have an end date earlier than the start date.", logger);
-            }
-
-            var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);
-
-            return this.CodeResultAndLog(HttpStatusCode.Created, season, "Season created.", logger);
         }
 
         [HttpPost("/api/v1/seasons/start")]
@@ -134,11 +124,6 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(string), "Error trying to create sets for the season schedule.")]
         public async Task<IActionResult> Start(int seasonID)
         {
-            if(!await dbContext.Seasons.AnyAsync(s => s.ID == seasonID))
-            {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
-            }
-
             try
             {
                 var sets = await seasonService.GenerateSchedule(seasonID);
@@ -146,8 +131,7 @@ namespace Climb.Controllers
             }
             catch(Exception exception)
             {
-                logger.LogError(exception, $"Could not create schedule for Season {seasonID}.");
-                return this.CodeResult(HttpStatusCode.InternalServerError, $"Could not create schedule for Season '{seasonID}'");
+                return GetExceptionResult(exception, seasonID);
             }
         }
     }
