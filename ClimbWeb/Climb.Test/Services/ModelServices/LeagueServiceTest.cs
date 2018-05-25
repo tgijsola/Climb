@@ -76,11 +76,11 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public void Join_NoLeague_DbException()
+        public void Join_NoLeague_NotFound()
         {
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
 
-            Assert.ThrowsAsync<DbUpdateException>(() => testObj.Join(0, user.Id));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Join(0, user.Id));
         }
     }
 }

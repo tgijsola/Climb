@@ -37,6 +37,11 @@ namespace Climb.Services.ModelServices
 
         public async Task<LeagueUser> Join(int leagueID, string userID)
         {
+            if(!await dbContext.Leagues.AnyAsync(l => l.ID == leagueID))
+            {
+                throw new NotFoundException(typeof(League), leagueID);
+            }
+
             var leagueUser = await dbContext.LeagueUsers
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(lu => lu.UserID == userID);
