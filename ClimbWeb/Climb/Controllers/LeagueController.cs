@@ -98,7 +98,9 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
         public async Task<IActionResult> GetUser(int userID)
         {
-            var leagueUser = await dbContext.LeagueUsers.Include(lu => lu.User).AsNoTracking().FirstOrDefaultAsync(lu => lu.ID == userID);
+            var leagueUser = await dbContext.LeagueUsers
+                .Include(lu => lu.User).AsNoTracking()
+                .FirstOrDefaultAsync(lu => lu.ID == userID);
             if(leagueUser == null)
             {
                 return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find League User with ID '{userID}'.", logger);
@@ -113,7 +115,9 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
         public async Task<IActionResult> GetSeasons(int leagueID)
         {
-            var league = await dbContext.Leagues.Include(l => l.Seasons).AsNoTracking().FirstOrDefaultAsync(l => l.ID == leagueID);
+            var league = await dbContext.Leagues
+                .Include(l => l.Seasons).AsNoTracking()
+                .FirstOrDefaultAsync(l => l.ID == leagueID);
             if(league == null)
             {
                 return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.", logger);
