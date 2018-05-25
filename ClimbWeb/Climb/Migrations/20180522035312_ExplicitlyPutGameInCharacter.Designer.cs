@@ -11,9 +11,10 @@ using System;
 namespace Climb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180522035312_ExplicitlyPutGameInCharacter")]
+    partial class ExplicitlyPutGameInCharacter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,7 +253,7 @@ namespace Climb.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("GameID");
+                    b.Property<int?>("GameID");
 
                     b.Property<string>("Name");
 
@@ -477,7 +478,7 @@ namespace Climb.Migrations
 
             modelBuilder.Entity("Climb.Models.Stage", b =>
                 {
-                    b.HasOne("Climb.Models.Game", "Game")
+                    b.HasOne("Climb.Models.Game")
                         .WithMany("Stages")
                         .HasForeignKey("GameID")
                         .OnDelete(DeleteBehavior.Restrict);

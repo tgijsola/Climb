@@ -73,5 +73,62 @@ namespace Climb.Test.Services.ModelServices
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(request));
         }
+
+        [Test]
+        public async Task AddCharacter_Valid_Character()
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+            var request = new AddCharacterRequest(game.ID, "Char1");
+
+            var character = await testObj.AddCharacter(request);
+
+            Assert.IsNotNull(character);
+        }
+
+        [Test]
+        public void AddCharacter_NoGame_NotFoundException()
+        {
+            var request = new AddCharacterRequest(0, "Char1");
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddCharacter(request));
+        }
+
+        // TODO: Also need to add utility class for normalizing and testing names.
+        [Test]
+        public void AddCharacter_NameTaken_BadRequestException()
+        {
+            var game = GameUtility.Create(dbContext, 1, 0);
+            var request = new AddCharacterRequest(game.ID, game.Characters[0].Name);
+
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.AddCharacter(request));
+        }
+
+        [Test]
+        public async Task AddStage_Valid_Stage()
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+            var request = new AddStageRequest(game.ID, "Stage1");
+
+            var stage = await testObj.AddStage(request);
+
+            Assert.IsNotNull(stage);
+        }
+
+        [Test]
+        public void AddStage_NoGame_NotFoundException()
+        {
+            var request = new AddStageRequest(0, "Stage1");
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddStage(request));
+        }
+
+        [Test]
+        public void AddStage_NameTaken_BadRequestException()
+        {
+            var game = GameUtility.Create(dbContext, 0, 1);
+            var request = new AddStageRequest(game.ID, game.Stages[0].Name);
+
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.AddStage(request));
+        }
     }
 }

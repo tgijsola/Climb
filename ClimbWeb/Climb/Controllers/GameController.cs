@@ -68,6 +68,40 @@ namespace Climb.Controllers
             }
         }
 
+        [HttpPost("/api/v1/addCharacter")]
+        [SwaggerResponse(HttpStatusCode.Created, typeof(Character))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Could not find game.")]
+        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Character name is taken.")]
+        public async Task<IActionResult> AddCharacter(AddCharacterRequest request)
+        {
+            try
+            {
+                var character = await gameService.AddCharacter(request);
+                return this.CodeResultAndLog(HttpStatusCode.Created, character, $"New character {character.Name} created.", logger);
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
+        }
+
+        [HttpPost("/api/v1/addStage")]
+        [SwaggerResponse(HttpStatusCode.Created, typeof(Stage))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Could not find game.")]
+        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Stage name is taken.")]
+        public async Task<IActionResult> AddStage(AddStageRequest request)
+        {
+            try
+            {
+                var stage = await gameService.AddStage(request);
+                return this.CodeResultAndLog(HttpStatusCode.Created, stage, $"New stage {stage.Name} created.", logger);
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
+        }
+
         [HttpGet("/api/v1/games")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(List<Game>))]
         public async Task<IActionResult> ListAll()

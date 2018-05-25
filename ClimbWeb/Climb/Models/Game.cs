@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Climb.Models
 {
@@ -9,8 +10,10 @@ namespace Climb.Models
         public int CharactersPerMatch { get; set; }
         public int MaxMatchPoints { get; set; }
 
-        public HashSet<Character> Characters { get; set; }
-        public HashSet<Stage> Stages { get; set; }
+        [Required]
+        public List<Character> Characters { get; set; }
+        [Required]
+        public List<Stage> Stages { get; set; }
 
         public Game()
         {
