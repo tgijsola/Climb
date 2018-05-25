@@ -60,13 +60,10 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Create_NameTaken_Conflict()
+        public async Task Create_Conflict_Conflict()
         {
-            var gameID = DbContextUtility.AddNew<Game>(dbContext).ID;
-            var request = new CreateRequest {Name = LeagueName, GameID = gameID};
-
-            dbContext.Add(new League {Name = LeagueName, GameID = gameID});
-            dbContext.SaveChanges();
+            var request = new CreateRequest();
+            leagueService.Create(request.Name, request.GameID).Throws(new ConflictException());
 
             var result = await testObj.Create(request);
 

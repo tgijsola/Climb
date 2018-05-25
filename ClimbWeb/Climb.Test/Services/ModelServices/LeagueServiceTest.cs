@@ -40,6 +40,14 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
+        public void Create_NameTaken_Conflict()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+
+            Assert.ThrowsAsync<ConflictException>(() => testObj.Create(league.Name, league.GameID));
+        }
+
+        [Test]
         public async Task Join_NewUser_CreateLeagueUser()
         {
             var game = DbContextUtility.AddNew<Game>(dbContext);

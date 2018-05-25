@@ -22,6 +22,7 @@ namespace Climb.Controllers
             {
                 case NotFoundException _: return this.CodeResultAndLog(HttpStatusCode.NotFound, exception.Message, logger);
                 case BadRequestException _: return this.CodeResultAndLog(HttpStatusCode.BadRequest, exception.Message, logger);
+                case ConflictException _: return this.CodeResultAndLog(HttpStatusCode.Conflict, exception.Message, logger);
                 default:
                     logger.LogError(exception, $"Error handling request\n{request}");
                     return this.CodeResult(HttpStatusCode.InternalServerError, "Server Error");

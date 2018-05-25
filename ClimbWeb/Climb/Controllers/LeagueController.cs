@@ -65,11 +65,6 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.Conflict, typeof(string), "League name taken.")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
-            if(await dbContext.Leagues.AnyAsync(l => l.Name == request.Name))
-            {
-                return this.CodeResultAndLog(HttpStatusCode.Conflict, $"League with name '{request.Name}' already exists.", logger);
-            }
-
             try
             {
                 var league = await leagueService.Create(request.Name, request.GameID);

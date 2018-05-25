@@ -22,6 +22,11 @@ namespace Climb.Services.ModelServices
                 throw new NotFoundException(typeof(Game), gameID);
             }
 
+            if(await dbContext.Leagues.AnyAsync(l => l.Name == name))
+            {
+                throw new ConflictException(typeof(League), nameof(League.Name), name);
+            }
+
             var league = new League(gameID, name);
 
             dbContext.Add(league);
