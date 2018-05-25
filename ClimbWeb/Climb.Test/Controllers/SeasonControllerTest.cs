@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
@@ -90,7 +91,7 @@ namespace Climb.Test.Controllers
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
-        
+
         [TestCase(0)]
         [TestCase(2)]
         public async Task Participants_Valid_Ok(int participantsCount)
@@ -142,9 +143,10 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Create_NoLeague_ReturnNotFound()
+        public async Task Create_NotFound_NotFound()
         {
             var request = new CreateRequest(0, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
+            seasonService.Create(request.LeagueID, request.StartDate, request.EndDate).Throws<NotFoundException>();
 
             var result = await testObj.Create(request);
 

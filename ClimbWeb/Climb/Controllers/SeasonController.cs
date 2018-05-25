@@ -14,17 +14,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
-    public class SeasonController : Controller
+    public class SeasonController : BaseController<SeasonController>
     {
         private readonly ISeasonService seasonService;
         private readonly ApplicationDbContext dbContext;
-        private readonly ILogger<SeasonController> logger;
 
         public SeasonController(ISeasonService seasonService, ApplicationDbContext dbContext, ILogger<SeasonController> logger)
+            : base(logger)
         {
             this.dbContext = dbContext;
             this.seasonService = seasonService;
-            this.logger = logger;
         }
 
         [HttpGet("/seasons/{*page}")]
@@ -109,11 +108,6 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
-            if(!await dbContext.Leagues.AnyAsync(l => l.ID == request.LeagueID))
-            {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{request.LeagueID}' found.", logger);
-            }
-
             if(request.StartDate < DateTime.Now)
             {
                 return this.CodeResultAndLog(HttpStatusCode.BadRequest, "Can't have start date in the past.", logger);
@@ -124,9 +118,15 @@ namespace Climb.Controllers
                 return this.CodeResultAndLog(HttpStatusCode.BadRequest, "Can't have an end date earlier than the start date.", logger);
             }
 
-            var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);
-
-            return this.CodeResultAndLog(HttpStatusCode.Created, season, "Season created.", logger);
+            try
+            {
+                var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);
+                return this.CodeResultAndLog(HttpStatusCode.Created, season, "Season created.", logger);
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
         }
 
         [HttpPost("/api/v1/seasons/start")]

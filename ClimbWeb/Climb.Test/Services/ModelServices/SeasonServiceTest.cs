@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
@@ -36,9 +37,9 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public void Create_NoLeague_InvalidOperationException()
+        public void Create_NoLeague_NotFoundException()
         {
-            Assert.ThrowsAsync<InvalidOperationException>(() => testObj.Create(0, DateTime.MaxValue, DateTime.MaxValue));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Create(0, DateTime.MaxValue, DateTime.MaxValue));
         }
 
         [Test]
