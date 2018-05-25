@@ -2,7 +2,6 @@
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Requests.Games;
-using Climb.Exceptions;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.EntityFrameworkCore;
