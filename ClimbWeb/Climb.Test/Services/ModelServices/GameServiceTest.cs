@@ -2,6 +2,7 @@
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Requests.Games;
+using Climb.Exceptions;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +61,16 @@ namespace Climb.Test.Services.ModelServices
         public void Create_InvalidMaxMatchPoints_BadRequestException(int maxPoints)
         {
             var request = new CreateRequest("GameName", 1, maxPoints);
+
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(request));
+        }
+
+        [Test]
+        public void Create_NameTaken_BadRequest()
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+            var request = new CreateRequest(game.Name, 1, 1);
+
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(request));
         }
