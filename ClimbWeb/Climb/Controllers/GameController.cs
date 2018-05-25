@@ -57,11 +57,6 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Game name is taken.")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
-            if(await dbContext.Games.AnyAsync(g => g.Name == request.Name))
-            {
-                return this.CodeResult(HttpStatusCode.BadRequest, $"Game with name '{request.Name}' already exists.");
-            }
-
             try
             {
                 var game = await gameService.Create(request);

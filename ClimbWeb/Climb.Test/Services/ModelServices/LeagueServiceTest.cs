@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Models;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
@@ -33,9 +33,17 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public void Create_NoGame_DbException()
+        public void Create_NoGame_NotFound()
         {
-            Assert.ThrowsAsync<DbUpdateException>(() => testObj.Create("", 0));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Create("", 0));
+        }
+
+        [Test]
+        public void Create_NameTaken_Conflict()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+
+            Assert.ThrowsAsync<ConflictException>(() => testObj.Create(league.Name, league.GameID));
         }
 
         [Test]
@@ -56,7 +64,10 @@ namespace Climb.Test.Services.ModelServices
             var league = LeagueUtility.CreateLeague(dbContext);
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
 
-            var oldLeagueUser = new LeagueUser(league.ID, user.Id) {HasLeft = true};
+            var oldLeagueUser = new LeagueUser(league.ID, user.Id)
+            {
+                HasLeft = true
+            };
             dbContext.LeagueUsers.Add(oldLeagueUser);
             dbContext.SaveChanges();
 
@@ -67,11 +78,19 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public void Join_NoLeague_DbException()
+        public void Join_NoLeague_NotFound()
         {
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
 
-            Assert.ThrowsAsync<DbUpdateException>(() => testObj.Join(0, user.Id));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Join(0, user.Id));
+        }
+
+        [Test]
+        public void Join_NoUser_NotFound()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Join(league.ID, ""));
         }
     }
 }

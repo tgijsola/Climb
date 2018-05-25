@@ -65,6 +65,16 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
+        public void Create_NameTaken_BadRequest()
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+            var request = new CreateRequest(game.Name, 1, 1);
+
+
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(request));
+        }
+
+        [Test]
         public async Task AddCharacter_Valid_Character()
         {
             var game = GameUtility.Create(dbContext, 0, 0);

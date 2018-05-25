@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
-using Climb.Requests.Games;
 using Microsoft.EntityFrameworkCore;
+using Climb.Requests.Games;
 
 namespace Climb.Services.ModelServices
 {
@@ -19,6 +19,11 @@ namespace Climb.Services.ModelServices
 
         public async Task<Game> Create(CreateRequest request)
         {
+            if(await dbContext.Games.AnyAsync(g => g.Name == request.Name))
+            {
+                throw new BadRequestException();
+            }
+
             if(request.CharactersPerMatch < 1)
             {
                 throw new BadRequestException(nameof(request.CharactersPerMatch), "A game needs at least 1 character per match");

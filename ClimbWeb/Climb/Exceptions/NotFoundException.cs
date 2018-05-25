@@ -12,5 +12,10 @@ namespace Climb.Exceptions
             : base($"Could not find {modelType.Name} with ID '{id}'.")
         {
         }
+        
+        public NotFoundException(Type modelType, string id)
+            : base($"Could not find {modelType.Name} with ID '{id}'.")
+        {
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
@@ -11,6 +12,7 @@ using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Climb.Test.Controllers
@@ -47,9 +49,10 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Create_NoGame_NotFound()
+        public async Task Create_NotFound_NotFound()
         {
             var request = new CreateRequest {Name = LeagueName, GameID = 0};
+            leagueService.Create(request.Name, request.GameID).Throws(new NotFoundException());
 
             var result = await testObj.Create(request);
 
@@ -57,13 +60,10 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Create_NameTaken_Conflict()
+        public async Task Create_Conflict_Conflict()
         {
-            var gameID = DbContextUtility.AddNew<Game>(dbContext).ID;
-            var request = new CreateRequest {Name = LeagueName, GameID = gameID};
-
-            dbContext.Add(new League {Name = LeagueName, GameID = gameID});
-            dbContext.SaveChanges();
+            var request = new CreateRequest();
+            leagueService.Create(request.Name, request.GameID).Throws(new ConflictException());
 
             var result = await testObj.Create(request);
 
@@ -84,25 +84,15 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Join_NoLeague_NotFound()
+        public async Task Join_NotFound_NotFound()
         {
-            var request = new JoinRequest();
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
+            var request = new JoinRequest(0, user.Id);
+            leagueService.Join(request.LeagueID, request.UserID).Throws<NotFoundException>();
 
             var result = await testObj.Join(request);
 
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
-        }
-
-        [Test]
-        public async Task Join_NoUser_NotFound()
-        {
-            var league = LeagueUtility.CreateLeague(dbContext);
-
-            var request = new JoinRequest(league.ID, "");
-
-            var result = await testObj.Join(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
 
         [Test]

@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
@@ -90,7 +91,7 @@ namespace Climb.Test.Controllers
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
-        
+
         [TestCase(0)]
         [TestCase(2)]
         public async Task Participants_Valid_Ok(int participantsCount)
@@ -142,35 +143,14 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Create_NoLeague_ReturnNotFound()
+        public async Task Create_NotFound_NotFound()
         {
             var request = new CreateRequest(0, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
+            seasonService.Create(request.LeagueID, request.StartDate, request.EndDate).Throws<NotFoundException>();
 
             var result = await testObj.Create(request);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
-        }
-
-        [Test]
-        public async Task Create_StartInPast_ReturnBadRequest()
-        {
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = gameID);
-            var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(-1), DateTime.Now.AddMinutes(2));
-
-            var result = await testObj.Create(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
-        }
-
-        [Test]
-        public async Task Create_EndBeforeStart_ReturnBadRequest()
-        {
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = gameID);
-            var request = new CreateRequest(league.ID, DateTime.Now.AddMinutes(3), DateTime.Now.AddMinutes(2));
-
-            var result = await testObj.Create(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
         }
 
         [Test]
@@ -186,12 +166,11 @@ namespace Climb.Test.Controllers
         [Test]
         public async Task Start_Valid_ReturnsSets()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
-            var participants = season.Participants.ToArray();
+            var (season, participants) = SeasonUtility.CreateSeason(dbContext, 2);
             var sets = new HashSet<Set>();
             for(var i = 0; i < 3; i++)
             {
-                sets.Add(SetUtility.Create(dbContext, participants[0].LeagueUserID, participants[1].LeagueUserID, season));
+                sets.Add(SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season));
             }
 
             seasonService.GenerateSchedule(season.ID).ReturnsForAnyArgs(info => sets);
@@ -203,8 +182,10 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Start_NoSeason_NotFound()
+        public async Task Start_NotFound_NotFound()
         {
+            seasonService.GenerateSchedule(0).Throws<NotFoundException>();
+
             var result = await testObj.Start(0);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);

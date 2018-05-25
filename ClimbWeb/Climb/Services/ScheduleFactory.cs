@@ -6,7 +6,7 @@ using Climb.Models;
 
 namespace Climb.Services
 {
-    public abstract class ScheduleFactory
+    public abstract class ScheduleFactory : IScheduleFactory
     {
         protected abstract HashSet<Set> GenerateScheduleInternal(Season season);
 
