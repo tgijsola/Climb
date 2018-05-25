@@ -1479,7 +1479,7 @@ export interface ICharacter {
 
 export class Stage implements IStage {
     id: number;
-    name?: string | undefined;
+    name: string;
     gameID: number;
 
     constructor(data?: IStage) {
@@ -1517,7 +1517,7 @@ export class Stage implements IStage {
 
 export interface IStage {
     id: number;
-    name?: string | undefined;
+    name: string;
     gameID: number;
 }
 
