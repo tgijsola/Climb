@@ -1435,7 +1435,7 @@ export interface IGame {
 
 export class Character implements ICharacter {
     id: number;
-    name?: string | undefined;
+    name: string;
     gameID: number;
 
     constructor(data?: ICharacter) {
@@ -1473,7 +1473,7 @@ export class Character implements ICharacter {
 
 export interface ICharacter {
     id: number;
-    name?: string | undefined;
+    name: string;
     gameID: number;
 }
 
