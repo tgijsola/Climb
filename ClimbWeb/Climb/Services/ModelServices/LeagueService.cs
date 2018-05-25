@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,11 @@ namespace Climb.Services.ModelServices
 
         public async Task<League> Create(string name, int gameID)
         {
+            if(!await dbContext.Games.AnyAsync(g => g.ID == gameID))
+            {
+                throw new NotFoundException(typeof(Game), gameID);
+            }
+
             var league = new League(gameID, name);
 
             dbContext.Add(league);

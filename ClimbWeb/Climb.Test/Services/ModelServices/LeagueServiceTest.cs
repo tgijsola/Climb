@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Models;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
@@ -33,9 +34,9 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public void Create_NoGame_DbException()
+        public void Create_NoGame_NotFound()
         {
-            Assert.ThrowsAsync<DbUpdateException>(() => testObj.Create("", 0));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Create("", 0));
         }
 
         [Test]

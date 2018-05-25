@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
@@ -11,6 +12,7 @@ using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Climb.Test.Controllers
@@ -47,9 +49,10 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Create_NoGame_NotFound()
+        public async Task Create_NotFound_NotFound()
         {
             var request = new CreateRequest {Name = LeagueName, GameID = 0};
+            leagueService.Create(request.Name, request.GameID).Throws(new NotFoundException());
 
             var result = await testObj.Create(request);
 
