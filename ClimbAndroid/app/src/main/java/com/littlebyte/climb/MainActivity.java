@@ -11,14 +11,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.Map;
 
-import climb.ApiCallback;
 import climb.ApiException;
-import models.ApplicationUser;
-import models.LoginResponse;
-import models.Season;
-import models.Set;
+import models.*;
 import services.*;
 
 public class MainActivity extends AppCompatActivity {
@@ -64,33 +59,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-
-
-        /*try {
-            accountApi.accountRegisterAsync(email, password, confirm, new ApiCallback<ApplicationUser>() {
-                @Override
-                public void onFailure(ApiException e, int i, Map<String, List<String>> map) {
-                    mTextView.setText("Couldn't register!");
-                }
-
-                @Override
-                public void onSuccess(ApplicationUser applicationUser, int i, Map<String, List<String>> map) {
-                    mTextView.setText("Welcome " + applicationUser.getEmail());
-                }
-
-                @Override
-                public void onUploadProgress(long l, long l1, boolean b) {
-                }
-
-                @Override
-                public void onDownloadProgress(long l, long l1, boolean b) {
-                }
-            });
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public void onLoginClick(View view) {
@@ -116,50 +84,10 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("jwt", loginResponse.getToken());
         editor.commit();
-
-        /*try {
-            accountApi.accountLogInAsync(email, password, true, new ApiCallback<LoginResponse>() {
-                @Override
-                public void onFailure(ApiException e, int i, Map<String, List<String>> map) {
-                    mTextView.setText("Couldn't log in!");
-                }
-
-                @Override
-                public void onSuccess(LoginResponse loginResponse, int i, Map<String, List<String>> map) {
-                    loginResponse.getToken();
-                    mTextView.setText("Logged In with token: " + loginResponse.getToken());
-                    SharedPreferences preferences = getSharedPreferences("user", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("jwt", loginResponse.getToken());
-                    editor.commit();
-                }
-
-                @Override
-                public void onUploadProgress(long l, long l1, boolean b) {
-                }
-
-                @Override
-                public void onDownloadProgress(long l, long l1, boolean b) {
-                }
-            });
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public void onTestClick(View view) {
         final TextView mTextView = findViewById(R.id.textView);
-
-        SharedPreferences preferences = getSharedPreferences("user", MODE_PRIVATE);
-        String token = preferences.getString("jwt", "");
-
-      /*  try {
-            String response = accountApi.accountTest("", token);
-            mTextView.setText("Worked:" + response);
-        } catch (ApiException e) {
-            mTextView.setText("Couldn't test!");
-            e.printStackTrace();
-        }*/
 
         Handler handler = new Handler();
         handler.post(new Runnable() {
@@ -181,31 +109,5 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-
-        /*try {
-            accountApi.accountTestAsync("", token, new ApiCallback<String>() {
-                @Override
-                public void onFailure(ApiException e, int i, Map<String, List<String>> map) {
-                    mTextView.setText("Couldn't test!");
-                }
-
-                @Override
-                public void onSuccess(String response, int i, Map<String, List<String>> map) {
-                    mTextView.setText("Worked:" + response);
-                }
-
-                @Override
-                public void onUploadProgress(long l, long l1, boolean b) {
-                }
-
-                @Override
-                public void onDownloadProgress(long l, long l1, boolean b) {
-                }
-            });
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }*/
     }
 }
