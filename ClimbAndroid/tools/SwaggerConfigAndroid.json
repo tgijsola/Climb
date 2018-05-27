@@ -1,5 +1,0 @@
-{
-    "modelPackage": "models",
-    "apiPackage": "services",
-    "invokerPackage": "climb"
-}
