@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Climb.Services
 {
-    public abstract class CdnService
+    public abstract class CdnService : ICdnService
     {
         private readonly string root;
 
