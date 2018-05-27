@@ -3,5 +3,5 @@
     "apiPackage": "services",
     "invokerPackage": "climb",
     "fullJavaUtil": true,
-    "dateLibrary": "java8"
+    "dateLibrary": "joda"
 }
