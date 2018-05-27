@@ -1,6 +1,6 @@
 {
-    "modelPackage": "models",
-    "apiPackage": "services",
+    "modelPackage": "climb.models",
+    "apiPackage": "climb.services",
     "invokerPackage": "climb",
     "fullJavaUtil": true,
     "dateLibrary": "joda"

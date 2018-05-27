@@ -13,8 +13,8 @@ import android.widget.TextView;
 import java.util.List;
 
 import climb.ApiException;
-import models.*;
-import services.*;
+import climb.models.*;
+import climb.services.*;
 
 public class MainActivity extends AppCompatActivity {
     private AccountApi accountApi;
