@@ -13,9 +13,5 @@ namespace Climb.Services.ModelServices
             this.dbContext = dbContext;
         }
 
-        public async Task<ApplicationUser> GetByEmail(string email)
-        {
-            return await dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
-        }
     }
 }
