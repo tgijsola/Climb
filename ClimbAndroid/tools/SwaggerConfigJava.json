@@ -1,0 +1,7 @@
+{
+    "modelPackage": "models",
+    "apiPackage": "services",
+    "invokerPackage": "climb",
+    "fullJavaUtil": true,
+    "dateLibrary": "java8"
+}
