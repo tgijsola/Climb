@@ -1,17 +1,21 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
+using Climb.Extensions;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
-    public class UserController : Controller
+    public class UserController : BaseController<UserController>
     {
         private readonly IApplicationUserService applicationUserService;
 
-        public UserController(IApplicationUserService applicationUserService)
+        public UserController(IApplicationUserService applicationUserService, ILogger<UserController> logger)
+            : base(logger)
         {
             this.applicationUserService = applicationUserService;
         }
@@ -26,9 +30,17 @@ namespace Climb.Controllers
         }
 
         [HttpPost("/api/v1/users/uploadProfilePic")]
-        public async Task<IActionResult> UploadProfilePic(int id, IFormFile image)
+        public async Task<IActionResult> UploadProfilePic(string userID, IFormFile image)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var imageUrl = await applicationUserService.UploadProfilePic(userID, image);
+                return this.CodeResultAndLog(HttpStatusCode.Created, imageUrl, $"Uploaded new profile pic for {userID}.", logger);
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, new {id = userID, image});
+            }
         }
     }
 }
