@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
 using Climb.Data;
-using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services.ModelServices;
@@ -46,10 +45,10 @@ namespace Climb.Controllers
                 .FirstOrDefaultAsync(g => g.ID == gameID);
             if(game == null)
             {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find Game with ID '{gameID}'.", logger);
+                return CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find Game with ID '{gameID}'.");
             }
 
-            return this.CodeResult(HttpStatusCode.OK, game);
+            return CodeResult(HttpStatusCode.OK, game);
         }
 
         [HttpPost("/api/v1/games/create")]
@@ -60,7 +59,7 @@ namespace Climb.Controllers
             try
             {
                 var game = await gameService.Create(request);
-                return this.CodeResultAndLog(HttpStatusCode.Created, game, "Game created.", logger);
+                return CodeResultAndLog(HttpStatusCode.Created, game, "Game created.");
             }
             catch(Exception exception)
             {
@@ -77,7 +76,7 @@ namespace Climb.Controllers
             try
             {
                 var character = await gameService.AddCharacter(request);
-                return this.CodeResultAndLog(HttpStatusCode.Created, character, $"New character {character.Name} created.", logger);
+                return CodeResultAndLog(HttpStatusCode.Created, character, $"New character {character.Name} created.");
             }
             catch(Exception exception)
             {
@@ -94,7 +93,7 @@ namespace Climb.Controllers
             try
             {
                 var stage = await gameService.AddStage(request);
-                return this.CodeResultAndLog(HttpStatusCode.Created, stage, $"New stage {stage.Name} created.", logger);
+                return CodeResultAndLog(HttpStatusCode.Created, stage, $"New stage {stage.Name} created.");
             }
             catch(Exception exception)
             {
@@ -108,7 +107,7 @@ namespace Climb.Controllers
         {
             var games = await dbContext.Games.ToListAsync();
 
-            return this.CodeResult(HttpStatusCode.OK, games);
+            return CodeResult(HttpStatusCode.OK, games);
         }
     }
 }
