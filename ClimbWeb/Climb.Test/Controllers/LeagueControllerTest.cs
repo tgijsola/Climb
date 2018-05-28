@@ -3,7 +3,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
-using Climb.Exceptions;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
@@ -12,7 +11,6 @@ using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Climb.Test.Controllers
@@ -49,28 +47,6 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Create_NotFound_NotFound()
-        {
-            var request = new CreateRequest {Name = LeagueName, GameID = 0};
-            leagueService.Create(request.Name, request.GameID).Throws(new NotFoundException());
-
-            var result = await testObj.Create(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
-        }
-
-        [Test]
-        public async Task Create_Conflict_Conflict()
-        {
-            var request = new CreateRequest();
-            leagueService.Create(request.Name, request.GameID).Throws(new ConflictException());
-
-            var result = await testObj.Create(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.Conflict);
-        }
-
-        [Test]
         public async Task Join_Valid_Created()
         {
             var league = LeagueUtility.CreateLeague(dbContext);
@@ -81,18 +57,6 @@ namespace Climb.Test.Controllers
             var result = await testObj.Join(request);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.Created);
-        }
-
-        [Test]
-        public async Task Join_NotFound_NotFound()
-        {
-            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
-            var request = new JoinRequest(0, user.Id);
-            leagueService.Join(request.LeagueID, request.UserID).Throws<NotFoundException>();
-
-            var result = await testObj.Join(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
 
         [Test]
