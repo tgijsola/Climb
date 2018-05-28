@@ -4,7 +4,6 @@ using Climb.Controllers;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Extensions;
-using Climb.Exceptions;
 using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services.ModelServices;

@@ -5,11 +5,9 @@ namespace Climb.Models
 {
     public class Character
     {
-        [Required]
         public int ID { get; set; }
         [Required]
         public string Name { get; set; }
-        [Required]
         public int GameID { get; set; }
 
         [JsonIgnore]

@@ -57,7 +57,6 @@ export class Index extends React.Component<RouteComponentProps<any> | undefined,
         const leagueClient = new ClimbClient.LeagueClient(window.location.origin);
         leagueClient.listAll()
             .then(leagues => {
-                console.log(leagues);
                 this.setState({ leagues: leagues });
             })
             .catch(reason => alert(`Could not load leagues!\n${reason}`));

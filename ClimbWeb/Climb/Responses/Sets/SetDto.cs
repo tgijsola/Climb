@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Climb.Models;
 
 namespace Climb.Responses.Sets
@@ -15,6 +16,7 @@ namespace Climb.Responses.Sets
         public readonly int? player2Score;
         public readonly DateTime dueDate;
         public readonly DateTime? updatedDate;
+        [Required]
         public readonly MatchDto[] matches;
 
         private SetDto(Set set, MatchDto[] matches, int gameID)

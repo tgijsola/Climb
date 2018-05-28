@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
 using Climb.Data;
-using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
@@ -47,10 +46,10 @@ namespace Climb.Controllers
                 .FirstOrDefaultAsync(s => s.ID == seasonID);
             if(season == null)
             {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
+                return CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.");
             }
 
-            return this.CodeResult(HttpStatusCode.OK, season);
+            return CodeResult(HttpStatusCode.OK, season);
         }
 
         [HttpGet("/api/v1/seasons/sets/{seasonID:int}")]
@@ -63,10 +62,10 @@ namespace Climb.Controllers
                 .FirstOrDefaultAsync(s => s.ID == seasonID);
             if(season == null)
             {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
+                return CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.");
             }
 
-            return this.CodeResult(HttpStatusCode.OK, season.Sets);
+            return CodeResult(HttpStatusCode.OK, season.Sets);
         }
 
         [HttpGet("/api/v1/seasons/participants/{seasonID:int}")]
@@ -79,11 +78,11 @@ namespace Climb.Controllers
                 .FirstOrDefaultAsync(s => s.ID == seasonID);
             if(season == null)
             {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.", logger);
+                return CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.");
             }
 
             var participants = season.Participants.Select(slu => slu.LeagueUser);
-            return this.CodeResult(HttpStatusCode.OK, participants);
+            return CodeResult(HttpStatusCode.OK, participants);
         }
 
         [HttpGet("/api/v1/seasons")]
@@ -96,10 +95,10 @@ namespace Climb.Controllers
                 .FirstOrDefaultAsync(l => l.ID == leagueID);
             if(league == null)
             {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.", logger);
+                return CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.");
             }
 
-            return this.CodeResult(HttpStatusCode.OK, league.Seasons);
+            return CodeResult(HttpStatusCode.OK, league.Seasons);
         }
 
         [HttpPost("/api/v1/seasons/create")]
@@ -111,7 +110,7 @@ namespace Climb.Controllers
             try
             {
                 var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);
-                return this.CodeResultAndLog(HttpStatusCode.Created, season, "Season created.", logger);
+                return CodeResultAndLog(HttpStatusCode.Created, season, "Season created.");
             }
             catch(Exception exception)
             {
@@ -127,7 +126,7 @@ namespace Climb.Controllers
             try
             {
                 var sets = await seasonService.GenerateSchedule(seasonID);
-                return this.CodeResultAndLog(HttpStatusCode.Created, sets, "Schedule created.", logger);
+                return CodeResultAndLog(HttpStatusCode.Created, sets, "Schedule created.");
             }
             catch(Exception exception)
             {
