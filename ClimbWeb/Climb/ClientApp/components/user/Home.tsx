@@ -2,6 +2,7 @@
 import { RouteComponentProps } from "react-router";
 import { ClimbClient } from "../../gen/climbClient";
 import { RingLoader } from "react-spinners";
+import { FileUpload } from "../_common/FileUpload";
 
 interface IUserHomeProps {
     userId: string;
@@ -10,16 +11,6 @@ interface IUserHomeProps {
 interface IUserHomeState {
     user: ClimbClient.UserDto | undefined;
     profilePic: string | undefined;
-}
-
-class FileParameter implements ClimbClient.FileParameter {
-    data: any;
-    fileName: string;
-
-    constructor(data: any, fileName: string) {
-        this.data = data;
-        this.fileName = fileName;
-    }
 }
 
 export class Home extends React.Component<RouteComponentProps<IUserHomeProps>, IUserHomeState> {
@@ -88,7 +79,7 @@ export class Home extends React.Component<RouteComponentProps<IUserHomeProps>, I
         const fileInput = (document.getElementById("fileInput") as HTMLInputElement);
         if (!fileInput || !fileInput.files) throw new Error("Could not find file input.");
         const file = fileInput.files[0];
-        const fileParam = new FileParameter(file, file.name);
+        const fileParam = new FileUpload(file);
 
         this.userClient.uploadProfilePic(id, fileParam)
             .then(profilePicUrl => this.setState({ profilePic: profilePicUrl }))
