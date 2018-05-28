@@ -1171,6 +1171,104 @@ export class SetClient extends BaseClass {
     }
 }
 
+export class UserClient extends BaseClass {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        super();
+        this.http = http ? http : <any>window;
+        this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
+    }
+
+    get(userID: string): Promise<UserDto> {
+        let url_ = this.baseUrl + "/api/v1/users/{userID}";
+        if (userID === undefined || userID === null)
+            throw new Error("The parameter 'userID' must be defined.");
+        url_ = url_.replace("{userID}", encodeURIComponent("" + userID)); 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGet(_response);
+        });
+    }
+
+    protected processGet(response: Response): Promise<UserDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? UserDto.fromJS(resultData200) : new UserDto();
+            return result200;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<UserDto>(<any>null);
+    }
+
+    uploadProfilePic(userID: string | null, image: FileParameter | null | undefined): Promise<FileResponse | null> {
+        let url_ = this.baseUrl + "/api/v1/users/uploadProfilePic?";
+        if (userID === undefined)
+            throw new Error("The parameter 'userID' must be defined.");
+        else
+            url_ += "userID=" + encodeURIComponent("" + userID) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (image !== null && image !== undefined)
+            content_.append("image", image.data, image.fileName ? image.fileName : "image");
+
+        let options_ = <RequestInit>{
+            body: content_,
+            method: "POST",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUploadProfilePic(_response);
+        });
+    }
+
+    protected processUploadProfilePic(response: Response): Promise<FileResponse | null> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse | null>(<any>null);
+    }
+}
+
 export class IdentityUserOfString implements IIdentityUserOfString {
     id?: string | undefined;
     userName?: string | undefined;
@@ -1293,6 +1391,7 @@ export interface IIdentityUser extends IIdentityUserOfString {
 }
 
 export class ApplicationUser extends IdentityUser implements IApplicationUser {
+    profilePicKey?: string | undefined;
 
     constructor(data?: IApplicationUser) {
         super(data);
@@ -1301,6 +1400,7 @@ export class ApplicationUser extends IdentityUser implements IApplicationUser {
     init(data?: any) {
         super.init(data);
         if (data) {
+            this.profilePicKey = data["profilePicKey"];
         }
     }
 
@@ -1313,12 +1413,14 @@ export class ApplicationUser extends IdentityUser implements IApplicationUser {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["profilePicKey"] = this.profilePicKey;
         super.toJSON(data);
         return data; 
     }
 }
 
 export interface IApplicationUser extends IIdentityUser {
+    profilePicKey?: string | undefined;
 }
 
 export class LoginResponse implements ILoginResponse {
@@ -2183,6 +2285,66 @@ export interface IMatchDto {
     player1Characters?: number[] | undefined;
     player2Characters?: number[] | undefined;
     stageID?: number | undefined;
+}
+
+export class UserDto implements IUserDto {
+    id: string;
+    username: string;
+    email: string;
+    profilePic: string;
+
+    constructor(data?: IUserDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.username = data["username"];
+            this.email = data["email"];
+            this.profilePic = data["profilePic"];
+        }
+    }
+
+    static fromJS(data: any): UserDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["username"] = this.username;
+        data["email"] = this.email;
+        data["profilePic"] = this.profilePic;
+        return data; 
+    }
+}
+
+export interface IUserDto {
+    id: string;
+    username: string;
+    email: string;
+    profilePic: string;
+}
+
+export interface FileParameter {
+    data: any;
+    fileName: string;
+}
+
+export interface FileResponse {
+    data: Blob;
+    status: number;
+    fileName?: string;
+    headers?: { [name: string]: any };
 }
 
 export class SwaggerException extends Error {

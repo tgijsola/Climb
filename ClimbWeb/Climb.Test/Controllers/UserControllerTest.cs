@@ -2,6 +2,9 @@
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
+using Climb.Extensions;
+using Climb.Responses;
+using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -24,8 +27,38 @@ namespace Climb.Test.Controllers
             dbContext = DbContextUtility.CreateMockDb();
             applicationUserService = Substitute.For<IApplicationUserService>();
             var logger = Substitute.For<ILogger<UserController>>();
+            var cdnService = Substitute.For<ICdnService>();
 
-            testObj = new UserController(applicationUserService, logger);
+            testObj = new UserController(dbContext, applicationUserService, logger, cdnService);
+        }
+
+        [Test]
+        public async Task Get_Valid_Ok()
+        {
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext, u => u.Email = "user@email.com");
+
+            var result = await testObj.Get(user.Id);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+        }
+
+        [Test]
+        public async Task Get_Valid_ReturnUser()
+        {
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext, u => u.Email = "user@email.com");
+
+            var result = await testObj.Get(user.Id);
+            var resultObj = result.GetObject<UserDto>();
+
+            Assert.AreEqual(user.Email, resultObj.Email);
+        }
+
+        [Test]
+        public async Task Get_NoUser_NotFound()
+        {
+            var result = await testObj.Get("");
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
 
         [Test]
@@ -37,6 +70,20 @@ namespace Climb.Test.Controllers
             var result = await testObj.UploadProfilePic(user.Id, file);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.Created);
+        }
+
+        [Test]
+        public async Task UploadProfilePic_Valid_ReturnUrl()
+        {
+            const string imageUrl = "www.image.com";
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
+            var file = Substitute.For<IFormFile>();
+            applicationUserService.UploadProfilePic(user.Id, file).Returns(imageUrl);
+
+            var result = await testObj.UploadProfilePic(user.Id, file);
+            var resultObj = result.GetObject<string>();
+
+            Assert.AreEqual(imageUrl, resultObj);
         }
     }
 }
