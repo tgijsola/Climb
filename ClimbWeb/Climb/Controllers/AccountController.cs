@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
-    public class AccountController : BaseController<AccountController>
+    public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
@@ -24,9 +24,9 @@ namespace Climb.Controllers
         private readonly IConfiguration configuration;
         private readonly ITokenHelper tokenHelper;
         private readonly IUrlUtility urlUtility;
+        private readonly ILogger<AccountController> logger;
 
         public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, ILogger<AccountController> logger)
-            : base(logger)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
@@ -34,6 +34,7 @@ namespace Climb.Controllers
             this.configuration = configuration;
             this.tokenHelper = tokenHelper;
             this.urlUtility = urlUtility;
+            this.logger = logger;
         }
 
         [HttpGet("/account/{*page}")]
@@ -52,11 +53,7 @@ namespace Climb.Controllers
         {
             if(TryValidateModel(request))
             {
-                var user = new ApplicationUser
-                {
-                    UserName = request.Email,
-                    Email = request.Email
-                };
+                var user = new ApplicationUser {UserName = request.Email, Email = request.Email};
                 var result = await userManager.CreateAsync(user, request.Password);
                 if(result.Succeeded)
                 {
@@ -65,7 +62,7 @@ namespace Climb.Controllers
                     await emailSender.SendEmailConfirmationAsync(request.Email, callbackUrl);
 
                     await signInManager.SignInAsync(user, false);
-                    return CodeResultAndLog(HttpStatusCode.Created, user, "User created a new account with password.");
+                    return this.CodeResultAndLog(HttpStatusCode.Created, user, "User created a new account with password.", logger);
                 }
 
                 foreach(var error in result.Errors)
@@ -74,7 +71,7 @@ namespace Climb.Controllers
                 }
             }
 
-            return CodeResultAndLog(HttpStatusCode.BadRequest, "Email or password is not valid.");
+            return this.CodeResultAndLog(HttpStatusCode.BadRequest, "Email or password is not valid.", logger);
         }
 
         [HttpPost("/api/v1/account/logIn")]
@@ -89,10 +86,10 @@ namespace Climb.Controllers
                 var token = tokenHelper.CreateUserToken(configuration.GetSecurityKey(), DateTime.Now.AddMinutes(30), request.Email);
                 var response = new LoginResponse(token);
 
-                return CodeResultAndLog(HttpStatusCode.OK, response, "User logged in.");
+                return this.CodeResultAndLog(HttpStatusCode.OK, response, "User logged in.", logger);
             }
 
-            return CodeResultAndLog(HttpStatusCode.BadRequest, "Email or password is incorrect.", "User login failed.");
+            return this.CodeResultAndLog(HttpStatusCode.BadRequest, "Email or password is incorrect.", "User login failed.", logger);
         }
 
         [HttpGet("/api/v1/account/test")]

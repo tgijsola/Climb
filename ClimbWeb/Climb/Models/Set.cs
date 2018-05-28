@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
@@ -30,7 +29,6 @@ namespace Climb.Models
         [InverseProperty("P2Sets")]
         [ForeignKey("Player2ID")]
         public LeagueUser Player2 { get; set; }
-        [Required]
         public List<Match> Matches { get; set; }
 
         public Set()

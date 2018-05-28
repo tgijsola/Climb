@@ -20,30 +20,13 @@ namespace Climb.Controllers
         {
             switch(exception)
             {
-                case NotFoundException _: return CodeResultAndLog(HttpStatusCode.NotFound, exception.Message);
-                case BadRequestException _: return CodeResultAndLog(HttpStatusCode.BadRequest, exception.Message);
-                case ConflictException _: return CodeResultAndLog(HttpStatusCode.Conflict, exception.Message);
+                case NotFoundException _: return this.CodeResultAndLog(HttpStatusCode.NotFound, exception.Message, logger);
+                case BadRequestException _: return this.CodeResultAndLog(HttpStatusCode.BadRequest, exception.Message, logger);
+                case ConflictException _: return this.CodeResultAndLog(HttpStatusCode.Conflict, exception.Message, logger);
                 default:
                     logger.LogError(exception, $"Error handling request\n{request}");
-                    return CodeResult(HttpStatusCode.InternalServerError, "Server Error");
+                    return this.CodeResult(HttpStatusCode.InternalServerError, "Server Error");
             }
-        }
-
-        protected ObjectResult CodeResult(HttpStatusCode code, object value)
-        {
-            return new ObjectResult(value) {StatusCode = (int)code};
-        }
-
-        protected ObjectResult CodeResultAndLog(HttpStatusCode code, object value, string message)
-        {
-            logger.LogInformation(message);
-            return new ObjectResult(value) {StatusCode = (int)code};
-        }
-
-        protected ObjectResult CodeResultAndLog(HttpStatusCode code, string value)
-        {
-            logger.LogInformation(value);
-            return new ObjectResult(value) {StatusCode = (int)code};
         }
     }
 }

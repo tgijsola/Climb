@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Climb.Models;
 
 namespace Climb.Responses.Sets
@@ -10,9 +9,7 @@ namespace Climb.Responses.Sets
         public readonly int index;
         public readonly int player1Score;
         public readonly int player2Score;
-        [Required]
         public readonly IReadOnlyCollection<int> player1Characters;
-        [Required]
         public readonly IReadOnlyCollection<int> player2Characters;
         public readonly int? stageID;
 

@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
 using Climb.Data;
+using Climb.Extensions;
 using Climb.Requests.Sets;
 using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
@@ -61,12 +62,12 @@ namespace Climb.Controllers
                 .FirstOrDefaultAsync(s => s.ID == setID);
             if(set == null)
             {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find Set with ID '{setID}'.");
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find Set with ID '{setID}'.", logger);
             }
 
             var dto = SetDto.Create(set, set.League.GameID);
 
-            return CodeResult(HttpStatusCode.OK, dto);
+            return this.CodeResult(HttpStatusCode.OK, dto);
         }
     }
 }

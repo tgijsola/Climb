@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
 using Climb.Data;
+using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
 using Climb.Responses.Models;
@@ -41,7 +42,7 @@ namespace Climb.Controllers
         {
             var leagues = await dbContext.Leagues.ToListAsync();
 
-            return CodeResult(HttpStatusCode.OK, leagues);
+            return this.CodeResult(HttpStatusCode.OK, leagues);
         }
 
         [HttpGet("/api/v1/leagues/{leagueID:int}")]
@@ -52,10 +53,10 @@ namespace Climb.Controllers
             var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ID == leagueID);
             if(league == null)
             {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.");
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.", logger);
             }
 
-            return CodeResult(HttpStatusCode.OK, league);
+            return this.CodeResult(HttpStatusCode.OK, league);
         }
 
         [HttpPost("/api/v1/leagues/create")]
@@ -67,9 +68,9 @@ namespace Climb.Controllers
             try
             {
                 var league = await leagueService.Create(request.Name, request.GameID);
-                return CodeResult(HttpStatusCode.Created, league);
+                return this.CodeResult(HttpStatusCode.Created, league);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 return GetExceptionResult(exception, request);
             }
@@ -84,9 +85,9 @@ namespace Climb.Controllers
             try
             {
                 var leagueUser = await leagueService.Join(request.LeagueID, request.UserID);
-                return CodeResultAndLog(HttpStatusCode.Created, leagueUser, "User joined league.");
+                return this.CodeResultAndLog(HttpStatusCode.Created, leagueUser, "User joined league.", logger);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 return GetExceptionResult(exception, request);
             }
@@ -102,11 +103,11 @@ namespace Climb.Controllers
                 .FirstOrDefaultAsync(lu => lu.ID == userID);
             if(leagueUser == null)
             {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find League User with ID '{userID}'.");
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find League User with ID '{userID}'.", logger);
             }
 
             var response = new LeagueUserDto(leagueUser);
-            return CodeResult(HttpStatusCode.OK, response);
+            return this.CodeResult(HttpStatusCode.OK, response);
         }
 
         [HttpGet("/api/v1/leagues/seasons/{leagueID:int}")]
@@ -119,10 +120,10 @@ namespace Climb.Controllers
                 .FirstOrDefaultAsync(l => l.ID == leagueID);
             if(league == null)
             {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.");
+                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.", logger);
             }
 
-            return CodeResult(HttpStatusCode.OK, league.Seasons);
+            return this.CodeResult(HttpStatusCode.OK, league.Seasons);
         }
     }
 }

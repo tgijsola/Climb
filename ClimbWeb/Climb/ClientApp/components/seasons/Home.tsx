@@ -17,7 +17,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IState> {
     seasonClient: ClimbClient.SeasonClient;
     leagueClient: ClimbClient.LeagueClient;
 
-    constructor(props: RouteComponentProps<any>) {
+    constructor(props: RouteComponentProps<any> | undefined) {
         super(props);
 
         this.seasonClient = new ClimbClient.SeasonClient(window.location.origin);

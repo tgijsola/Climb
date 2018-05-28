@@ -39,7 +39,7 @@ export class Home extends React.Component<RouteComponentProps<any>, IGameHomeSta
         if (!game)
             return <div id="loader">
                        <RingLoader color={"#123abc"}/>
-                   </div>;
+                   </div>
 
         const characters = this.state.characters.sort((a, b) => a.name.localeCompare(b.name)).map(c => <li key={c.id}>{c.name}</li>);
         const stages = this.state.stages.sort((a, b) => a.name.localeCompare(b.name)).map(s => <li key={s.id}>{s.name}</li>);
