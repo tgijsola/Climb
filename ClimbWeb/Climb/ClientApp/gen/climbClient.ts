@@ -1474,7 +1474,7 @@ export interface ILoginResponse {
 
 export class Game implements IGame {
     id: number;
-    name?: string | undefined;
+    name: string;
     charactersPerMatch: number;
     maxMatchPoints: number;
     characters: Character[];
@@ -1541,7 +1541,7 @@ export class Game implements IGame {
 
 export interface IGame {
     id: number;
-    name?: string | undefined;
+    name: string;
     charactersPerMatch: number;
     maxMatchPoints: number;
     characters: Character[];
@@ -1639,7 +1639,7 @@ export interface IStage {
 export class League implements ILeague {
     id: number;
     gameID: number;
-    name?: string | undefined;
+    name: string;
 
     constructor(data?: ILeague) {
         if (data) {
@@ -1677,13 +1677,13 @@ export class League implements ILeague {
 export interface ILeague {
     id: number;
     gameID: number;
-    name?: string | undefined;
+    name: string;
 }
 
 export class LeagueUser implements ILeagueUser {
     id: number;
     leagueID: number;
-    userID?: string | undefined;
+    userID: string;
     hasLeft: boolean;
 
     constructor(data?: ILeagueUser) {
@@ -1724,16 +1724,16 @@ export class LeagueUser implements ILeagueUser {
 export interface ILeagueUser {
     id: number;
     leagueID: number;
-    userID?: string | undefined;
+    userID: string;
     hasLeft: boolean;
 }
 
 export class LeagueUserDto implements ILeagueUserDto {
     id: number;
     leagueID: number;
-    userID?: string | undefined;
+    userID: string;
     hasLeft: boolean;
-    username?: string | undefined;
+    username: string;
 
     constructor(data?: ILeagueUserDto) {
         if (data) {
@@ -1775,9 +1775,9 @@ export class LeagueUserDto implements ILeagueUserDto {
 export interface ILeagueUserDto {
     id: number;
     leagueID: number;
-    userID?: string | undefined;
+    userID: string;
     hasLeft: boolean;
-    username?: string | undefined;
+    username: string;
 }
 
 export class Season implements ISeason {
@@ -1842,7 +1842,7 @@ export class Set implements ISet {
     player2Score?: number | undefined;
     dueDate: Date;
     updatedDate?: Date | undefined;
-    matches?: Match[] | undefined;
+    matches: Match[];
 
     constructor(data?: ISet) {
         if (data) {
@@ -1850,6 +1850,9 @@ export class Set implements ISet {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.matches = [];
         }
     }
 
@@ -1909,7 +1912,7 @@ export interface ISet {
     player2Score?: number | undefined;
     dueDate: Date;
     updatedDate?: Date | undefined;
-    matches?: Match[] | undefined;
+    matches: Match[];
 }
 
 export class Match implements IMatch {
@@ -1919,7 +1922,7 @@ export class Match implements IMatch {
     player1Score: number;
     player2Score: number;
     stageID?: number | undefined;
-    matchCharacters?: MatchCharacter[] | undefined;
+    matchCharacters: MatchCharacter[];
 
     constructor(data?: IMatch) {
         if (data) {
@@ -1927,6 +1930,9 @@ export class Match implements IMatch {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.matchCharacters = [];
         }
     }
 
@@ -1977,7 +1983,7 @@ export interface IMatch {
     player1Score: number;
     player2Score: number;
     stageID?: number | undefined;
-    matchCharacters?: MatchCharacter[] | undefined;
+    matchCharacters: MatchCharacter[];
 }
 
 export class MatchCharacter implements IMatchCharacter {
@@ -2151,7 +2157,7 @@ export class SetDto implements ISetDto {
     player2Score?: number | undefined;
     dueDate: Date;
     updatedDate?: Date | undefined;
-    matches?: MatchDto[] | undefined;
+    matches: MatchDto[];
 
     constructor(data?: ISetDto) {
         if (data) {
@@ -2159,6 +2165,9 @@ export class SetDto implements ISetDto {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.matches = [];
         }
     }
 
@@ -2221,7 +2230,7 @@ export interface ISetDto {
     player2Score?: number | undefined;
     dueDate: Date;
     updatedDate?: Date | undefined;
-    matches?: MatchDto[] | undefined;
+    matches: MatchDto[];
 }
 
 export class MatchDto implements IMatchDto {
@@ -2229,8 +2238,8 @@ export class MatchDto implements IMatchDto {
     index: number;
     player1Score: number;
     player2Score: number;
-    player1Characters?: number[] | undefined;
-    player2Characters?: number[] | undefined;
+    player1Characters: number[];
+    player2Characters: number[];
     stageID?: number | undefined;
 
     constructor(data?: IMatchDto) {
@@ -2239,6 +2248,10 @@ export class MatchDto implements IMatchDto {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.player1Characters = [];
+            this.player2Characters = [];
         }
     }
 
@@ -2295,8 +2308,8 @@ export interface IMatchDto {
     index: number;
     player1Score: number;
     player2Score: number;
-    player1Characters?: number[] | undefined;
-    player2Characters?: number[] | undefined;
+    player1Characters: number[];
+    player2Characters: number[];
     stageID?: number | undefined;
 }
 

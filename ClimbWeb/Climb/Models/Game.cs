@@ -6,7 +6,8 @@ namespace Climb.Models
     public class Game
     {
         public int ID { get; set; }
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } = "";
         public int CharactersPerMatch { get; set; }
         public int MaxMatchPoints { get; set; }
 

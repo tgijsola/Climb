@@ -3,7 +3,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
 using Climb.Data;
-using Climb.Extensions;
 using Climb.Responses;
 using Climb.Services;
 using Climb.Services.ModelServices;
@@ -45,11 +44,11 @@ namespace Climb.Controllers
             var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userID);
             if(user == null)
             {
-                return this.CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find user with ID '{userID}'.", logger);
+                return CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find user with ID '{userID}'.");
             }
 
             var response = UserDto.Create(user, cdnService);
-            return this.CodeResult(HttpStatusCode.OK, response);
+            return CodeResult(HttpStatusCode.OK, response);
         }
 
         [HttpPost("/api/v1/users/uploadProfilePic")]
@@ -60,7 +59,7 @@ namespace Climb.Controllers
             try
             {
                 var imageUrl = await applicationUserService.UploadProfilePic(userID, image);
-                return this.CodeResultAndLog(HttpStatusCode.Created, imageUrl, $"Uploaded new profile pic for {userID}.", logger);
+                return CodeResultAndLog(HttpStatusCode.Created, imageUrl, $"Uploaded new profile pic for {userID}.");
             }
             catch(Exception exception)
             {

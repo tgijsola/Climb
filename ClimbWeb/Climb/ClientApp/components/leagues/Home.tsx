@@ -16,7 +16,7 @@ interface IState {
 export class Home extends React.Component<RouteComponentProps<ILeaguesHomeProps>, IState> {
     leagueClient: ClimbClient.LeagueClient;
 
-    constructor(props: RouteComponentProps<ILeaguesHomeProps> | undefined) {
+    constructor(props: RouteComponentProps<ILeaguesHomeProps>) {
         super(props);
 
         this.leagueClient = new ClimbClient.LeagueClient(window.location.origin);
@@ -68,7 +68,6 @@ export class Home extends React.Component<RouteComponentProps<ILeaguesHomeProps>
         const leagueId = this.props.match.params.leagueId;
         this.leagueClient.get(leagueId)
             .then(league => {
-                console.log(league);
                 this.setState({ league: league });
                 this.loadSeasons();
             })

@@ -12,7 +12,7 @@ interface ISetDetailsProps {
 
 export class SetDetails extends React.Component<ISetDetailsProps> {
     render() {
-        if (this.props.player1 == undefined || this.props.player2 == undefined) return <div></div>;
+        if (!this.props.player1 || !this.props.player2) return <div></div>;
 
         const set = this.props.set;
         return (

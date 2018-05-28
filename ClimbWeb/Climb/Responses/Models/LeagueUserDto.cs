@@ -1,4 +1,5 @@
-﻿using Climb.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using Climb.Models;
 
 namespace Climb.Responses.Models
 {
@@ -6,8 +7,10 @@ namespace Climb.Responses.Models
     {
         public readonly int id;
         public readonly int leagueID;
+        [Required]
         public readonly string userID;
         public readonly bool hasLeft;
+        [Required]
         public readonly string username;
 
         public LeagueUserDto(LeagueUser leagueUser)
