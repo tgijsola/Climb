@@ -70,7 +70,6 @@ namespace Climb.Test.Services.ModelServices
             var game = GameUtility.Create(dbContext, 0, 0);
             var request = new CreateRequest(game.Name, 1, 1);
 
-
             Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(request));
         }
 
@@ -95,12 +94,12 @@ namespace Climb.Test.Services.ModelServices
 
         // TODO: Also need to add utility class for normalizing and testing names.
         [Test]
-        public void AddCharacter_NameTaken_BadRequestException()
+        public void AddCharacter_NameTaken_ConflictException()
         {
             var game = GameUtility.Create(dbContext, 1, 0);
             var request = new AddCharacterRequest(game.ID, game.Characters[0].Name);
 
-            Assert.ThrowsAsync<BadRequestException>(() => testObj.AddCharacter(request));
+            Assert.ThrowsAsync<ConflictException>(() => testObj.AddCharacter(request));
         }
 
         [Test]
@@ -123,12 +122,12 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public void AddStage_NameTaken_BadRequestException()
+        public void AddStage_NameTaken_ConflictException()
         {
             var game = GameUtility.Create(dbContext, 0, 1);
             var request = new AddStageRequest(game.ID, game.Stages[0].Name);
 
-            Assert.ThrowsAsync<BadRequestException>(() => testObj.AddStage(request));
+            Assert.ThrowsAsync<ConflictException>(() => testObj.AddStage(request));
         }
     }
 }
