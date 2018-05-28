@@ -17,9 +17,6 @@ export class MatchSummary extends React.Component<IMatchSummaryProps> {
         const match = this.props.match;
         const game = this.props.game;
 
-        if (match.player1Characters == null) return null;
-        if (match.player2Characters == null) return null;
-
         const p1Characters = match.player1Characters.map((c, i) => <span key={i}>{c}</span>);
         const p2Characters = match.player2Characters.map((c, i) => <span key={i}>{c}</span>);
 
@@ -43,8 +40,6 @@ export class MatchSummary extends React.Component<IMatchSummaryProps> {
             return <div></div>
         }
         
-        if (!game.stages) throw new Error("Stages are not loaded.");
-
         const stage = game.stages.find(s => s.id === match.stageID);
         if (!stage) throw new Error(`Could not find stage with ID '${match.stageID}'.`);
         const stageName = stage.name;

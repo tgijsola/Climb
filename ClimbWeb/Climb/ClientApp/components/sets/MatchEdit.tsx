@@ -35,9 +35,6 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
         const match = this.state.match;
         const game = this.props.game;
 
-        if (!game.characters) throw new Error();
-        if (!match.player1Characters || !match.player2Characters) throw new Error();
-
         const characters = game.characters.map(c => <option key={c.id} value={c.id}>{c.name}</option>);
         const stageInput = this.renderStageInput(game, match);
         const canOk = this.canEditMatch(game, match);
@@ -121,9 +118,7 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
     }
 
     private renderStageInput(game: ClimbClient.Game, match: ClimbClient.MatchDto) {
-        if (!game.stages || game.stages.length === 0) {
-            return null;
-        }
+        if (game.stages.length === 0) return null;
 
         const stages = game.stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>);
 
@@ -153,7 +148,6 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
         const match = this.state.match;
 
         const characters = playerNumber === 1 ? match.player1Characters : match.player2Characters;
-        if (characters == null) throw new Error();
         characters[characterIndex] = characterID;
 
         this.setState({ match: match });

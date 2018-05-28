@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Climb.Data;
 using Newtonsoft.Json;
 
@@ -8,6 +9,7 @@ namespace Climb.Models
     {
         public int ID { get; set; }
         public int LeagueID { get; set; }
+        [Required]
         public string UserID { get; set; }
         public bool HasLeft { get; set; }
 

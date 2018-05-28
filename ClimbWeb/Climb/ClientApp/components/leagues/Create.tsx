@@ -51,7 +51,6 @@ export class Create extends React.Component<RouteComponentProps<any> | undefined
 
         leaguesClient.create(gameId, leagueName)
             .then(game => {
-                console.log(game);
                 window.location.assign("/leagues");
             })
             .catch(reason => alert(`Could not create league!\n${reason}`));
