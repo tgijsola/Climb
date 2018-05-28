@@ -13,12 +13,6 @@ os.makedirs(newpath)
 swaggerUrl = hostAddress + "swagger/v1/swagger.json"
 print(f'Reading Swagger Doc from {swaggerUrl}')
 
-# subprocess.run(
-#     f'java -jar swagger-codegen-cli.jar generate \
-#         -i {swaggerUrl} \
-#         -l android --library=volley \
-#         -c SwaggerConfigAndroid.json \
-#         -o .\\tmp\\', shell=True, check=True)
 subprocess.run(
     f'java -jar swagger-codegen-cli.jar generate \
         -i {swaggerUrl} \

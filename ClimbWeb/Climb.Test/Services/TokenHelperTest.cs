@@ -3,8 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Services;
-using Climb.Services.ModelServices;
-using NSubstitute;
+using Climb.Test.Utilities;
 using NUnit.Framework;
 
 namespace Climb.Test.Services
@@ -16,23 +15,20 @@ namespace Climb.Test.Services
         private const string ID = "testId";
 
         private TokenHelper testObj;
-        private IApplicationUserService userService;
-        private ApplicationUser user;
+        private ApplicationDbContext dbContext;
 
         [SetUp]
         public void SetUp()
         {
-            userService = Substitute.For<IApplicationUserService>();
+            dbContext = DbContextUtility.CreateMockDb();
 
-            testObj = new TokenHelper(userService);
-
-            user = new ApplicationUser {Id = ID, Email = Email};
+            testObj = new TokenHelper(dbContext);
         }
 
         [Test]
         public async Task GetUserID_Valid_ReturnsID()
         {
-            userService.GetByEmail(Email).Returns(Task.FromResult(user));
+            AddUser();
             var token = CreateToken(Email);
 
             var userID = await testObj.GetAuthorizedUserID(token);
@@ -43,7 +39,7 @@ namespace Climb.Test.Services
         [Test]
         public async Task GetUserID_ValidWithPrefix_ReturnsIDAsync()
         {
-            userService.GetByEmail(Email).Returns(Task.FromResult(user));
+            AddUser();
             var token = CreateToken(Email);
             token = $"Bearer {token}";
 
@@ -59,7 +55,7 @@ namespace Climb.Test.Services
 
             var userID = await testObj.GetAuthorizedUserID(token);
 
-            Assert.IsEmpty(userID);
+            Assert.IsTrue(string.IsNullOrEmpty(userID));
         }
 
         [Test]
@@ -84,6 +80,15 @@ namespace Climb.Test.Services
 
             var serializedToken = new JwtSecurityTokenHandler().WriteToken(token);
             return serializedToken;
+        }
+
+        private void AddUser()
+        {
+            DbContextUtility.AddNew<ApplicationUser>(dbContext, u =>
+            {
+                u.Id = ID;
+                u.Email = Email;
+            });
         }
     }
 }

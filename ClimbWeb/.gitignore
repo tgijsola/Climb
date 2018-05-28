@@ -290,3 +290,4 @@ __pycache__/
 # ASP Net Core 
 appsettings*
 Climb/wwwroot/dist/
+Climb/wwwroot/temp/
