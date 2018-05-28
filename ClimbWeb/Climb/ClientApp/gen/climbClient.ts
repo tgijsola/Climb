@@ -76,15 +76,19 @@ export class AccountClient extends BaseClass {
         return Promise.resolve<ApplicationUser>(<any>null);
     }
 
-    logIn(email: string | null | undefined, password: string | null | undefined, rememberMe: boolean | undefined): Promise<LoginResponse> {
+    logIn(email: string | null, password: string | null, rememberMe: boolean): Promise<LoginResponse> {
         let url_ = this.baseUrl + "/api/v1/account/logIn?";
-        if (email !== undefined)
+        if (email === undefined)
+            throw new Error("The parameter 'email' must be defined.");
+        else
             url_ += "email=" + encodeURIComponent("" + email) + "&"; 
-        if (password !== undefined)
+        if (password === undefined)
+            throw new Error("The parameter 'password' must be defined.");
+        else
             url_ += "password=" + encodeURIComponent("" + password) + "&"; 
-        if (rememberMe === null)
-            throw new Error("The parameter 'rememberMe' cannot be null.");
-        else if (rememberMe !== undefined)
+        if (rememberMe === undefined || rememberMe === null)
+            throw new Error("The parameter 'rememberMe' must be defined and cannot be null.");
+        else
             url_ += "rememberMe=" + encodeURIComponent("" + rememberMe) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
@@ -259,17 +263,19 @@ export class GameClient extends BaseClass {
         return Promise.resolve<Game>(<any>null);
     }
 
-    create(name: string | null | undefined, charactersPerMatch: number | undefined, maxMatchPoints: number | undefined): Promise<Game> {
+    create(name: string | null, charactersPerMatch: number, maxMatchPoints: number): Promise<Game> {
         let url_ = this.baseUrl + "/api/v1/games/create?";
-        if (name !== undefined)
+        if (name === undefined)
+            throw new Error("The parameter 'name' must be defined.");
+        else
             url_ += "name=" + encodeURIComponent("" + name) + "&"; 
-        if (charactersPerMatch === null)
-            throw new Error("The parameter 'charactersPerMatch' cannot be null.");
-        else if (charactersPerMatch !== undefined)
+        if (charactersPerMatch === undefined || charactersPerMatch === null)
+            throw new Error("The parameter 'charactersPerMatch' must be defined and cannot be null.");
+        else
             url_ += "charactersPerMatch=" + encodeURIComponent("" + charactersPerMatch) + "&"; 
-        if (maxMatchPoints === null)
-            throw new Error("The parameter 'maxMatchPoints' cannot be null.");
-        else if (maxMatchPoints !== undefined)
+        if (maxMatchPoints === undefined || maxMatchPoints === null)
+            throw new Error("The parameter 'maxMatchPoints' must be defined and cannot be null.");
+        else
             url_ += "maxMatchPoints=" + encodeURIComponent("" + maxMatchPoints) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
@@ -311,13 +317,15 @@ export class GameClient extends BaseClass {
         return Promise.resolve<Game>(<any>null);
     }
 
-    addCharacter(gameID: number | undefined, name: string | null | undefined): Promise<Character> {
+    addCharacter(gameID: number, name: string | null): Promise<Character> {
         let url_ = this.baseUrl + "/api/v1/addCharacter?";
-        if (gameID === null)
-            throw new Error("The parameter 'gameID' cannot be null.");
-        else if (gameID !== undefined)
+        if (gameID === undefined || gameID === null)
+            throw new Error("The parameter 'gameID' must be defined and cannot be null.");
+        else
             url_ += "gameID=" + encodeURIComponent("" + gameID) + "&"; 
-        if (name !== undefined)
+        if (name === undefined)
+            throw new Error("The parameter 'name' must be defined.");
+        else
             url_ += "name=" + encodeURIComponent("" + name) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
@@ -366,13 +374,15 @@ export class GameClient extends BaseClass {
         return Promise.resolve<Character>(<any>null);
     }
 
-    addStage(gameID: number | undefined, name: string | null | undefined): Promise<Stage> {
+    addStage(gameID: number, name: string | null): Promise<Stage> {
         let url_ = this.baseUrl + "/api/v1/addStage?";
-        if (gameID === null)
-            throw new Error("The parameter 'gameID' cannot be null.");
-        else if (gameID !== undefined)
+        if (gameID === undefined || gameID === null)
+            throw new Error("The parameter 'gameID' must be defined and cannot be null.");
+        else
             url_ += "gameID=" + encodeURIComponent("" + gameID) + "&"; 
-        if (name !== undefined)
+        if (name === undefined)
+            throw new Error("The parameter 'name' must be defined.");
+        else
             url_ += "name=" + encodeURIComponent("" + name) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
@@ -556,13 +566,15 @@ export class LeagueClient extends BaseClass {
         return Promise.resolve<League>(<any>null);
     }
 
-    create(gameID: number | undefined, name: string | null | undefined): Promise<League> {
+    create(gameID: number, name: string | null): Promise<League> {
         let url_ = this.baseUrl + "/api/v1/leagues/create?";
-        if (gameID === null)
-            throw new Error("The parameter 'gameID' cannot be null.");
-        else if (gameID !== undefined)
+        if (gameID === undefined || gameID === null)
+            throw new Error("The parameter 'gameID' must be defined and cannot be null.");
+        else
             url_ += "gameID=" + encodeURIComponent("" + gameID) + "&"; 
-        if (name !== undefined)
+        if (name === undefined)
+            throw new Error("The parameter 'name' must be defined.");
+        else
             url_ += "name=" + encodeURIComponent("" + name) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
@@ -611,13 +623,15 @@ export class LeagueClient extends BaseClass {
         return Promise.resolve<League>(<any>null);
     }
 
-    join(leagueID: number | undefined, userID: string | null | undefined): Promise<LeagueUser> {
+    join(leagueID: number, userID: string | null): Promise<LeagueUser> {
         let url_ = this.baseUrl + "/api/v1/leagues/join?";
-        if (leagueID === null)
-            throw new Error("The parameter 'leagueID' cannot be null.");
-        else if (leagueID !== undefined)
+        if (leagueID === undefined || leagueID === null)
+            throw new Error("The parameter 'leagueID' must be defined and cannot be null.");
+        else
             url_ += "leagueID=" + encodeURIComponent("" + leagueID) + "&"; 
-        if (userID !== undefined)
+        if (userID === undefined)
+            throw new Error("The parameter 'userID' must be defined.");
+        else
             url_ += "userID=" + encodeURIComponent("" + userID) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
@@ -958,19 +972,19 @@ export class SeasonClient extends BaseClass {
         return Promise.resolve<Season[]>(<any>null);
     }
 
-    create(leagueID: number | undefined, startDate: Date | undefined, endDate: Date | undefined): Promise<Season> {
+    create(leagueID: number, startDate: Date, endDate: Date): Promise<Season> {
         let url_ = this.baseUrl + "/api/v1/seasons/create?";
-        if (leagueID === null)
-            throw new Error("The parameter 'leagueID' cannot be null.");
-        else if (leagueID !== undefined)
+        if (leagueID === undefined || leagueID === null)
+            throw new Error("The parameter 'leagueID' must be defined and cannot be null.");
+        else
             url_ += "leagueID=" + encodeURIComponent("" + leagueID) + "&"; 
-        if (startDate === null)
-            throw new Error("The parameter 'startDate' cannot be null.");
-        else if (startDate !== undefined)
+        if (startDate === undefined || startDate === null)
+            throw new Error("The parameter 'startDate' must be defined and cannot be null.");
+        else
             url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toJSON() : "") + "&"; 
-        if (endDate === null)
-            throw new Error("The parameter 'endDate' cannot be null.");
-        else if (endDate !== undefined)
+        if (endDate === undefined || endDate === null)
+            throw new Error("The parameter 'endDate' must be defined and cannot be null.");
+        else
             url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toJSON() : "") + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2032,7 +2046,7 @@ export interface IMatchCharacter {
 
 export class SubmitRequest implements ISubmitRequest {
     setID: number;
-    matches?: MatchForm[] | undefined;
+    matches: MatchForm[];
 
     constructor(data?: ISubmitRequest) {
         if (data) {
@@ -2040,6 +2054,9 @@ export class SubmitRequest implements ISubmitRequest {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.matches = [];
         }
     }
 
@@ -2075,14 +2092,14 @@ export class SubmitRequest implements ISubmitRequest {
 
 export interface ISubmitRequest {
     setID: number;
-    matches?: MatchForm[] | undefined;
+    matches: MatchForm[];
 }
 
 export class MatchForm implements IMatchForm {
     player1Score: number;
     player2Score: number;
-    player1Characters?: number[] | undefined;
-    player2Characters?: number[] | undefined;
+    player1Characters: number[];
+    player2Characters: number[];
     stageID?: number | undefined;
 
     constructor(data?: IMatchForm) {
@@ -2091,6 +2108,10 @@ export class MatchForm implements IMatchForm {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.player1Characters = [];
+            this.player2Characters = [];
         }
     }
 
@@ -2141,8 +2162,8 @@ export class MatchForm implements IMatchForm {
 export interface IMatchForm {
     player1Score: number;
     player2Score: number;
-    player1Characters?: number[] | undefined;
-    player2Characters?: number[] | undefined;
+    player1Characters: number[];
+    player2Characters: number[];
     stageID?: number | undefined;
 }
 

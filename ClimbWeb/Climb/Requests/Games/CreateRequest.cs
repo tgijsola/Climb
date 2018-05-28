@@ -1,9 +1,14 @@
-﻿namespace Climb.Requests.Games
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Climb.Requests.Games
 {
     public class CreateRequest
     {
+        [Required]
         public string Name { get; set; }
+        [Required]
         public int CharactersPerMatch { get; set; }
+        [Required]
         public int MaxMatchPoints { get; set; }
 
         public CreateRequest()
