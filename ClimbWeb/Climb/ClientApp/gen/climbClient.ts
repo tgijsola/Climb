@@ -1227,7 +1227,11 @@ export class UserClient extends BaseClass {
         return Promise.resolve<UserDto>(<any>null);
     }
 
-    uploadProfilePic(userID: string | null, image: FileParameter | null | undefined): Promise<FileResponse | null> {
+    /**
+     * @image (optional) 
+     * @return Profile picture URL.
+     */
+    uploadProfilePic(userID: string | null, image: FileParameter | null | undefined): Promise<string> {
         let url_ = this.baseUrl + "/api/v1/users/uploadProfilePic?";
         if (userID === undefined)
             throw new Error("The parameter 'userID' must be defined.");
@@ -1252,20 +1256,29 @@ export class UserClient extends BaseClass {
         });
     }
 
-    protected processUploadProfilePic(response: Response): Promise<FileResponse | null> {
+    protected processUploadProfilePic(response: Response): Promise<string> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        if (status === 201) {
+            return response.text().then((_responseText) => {
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = resultData201 !== undefined ? resultData201 : <any>null;
+            return result201;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = resultData404 !== undefined ? resultData404 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result404);
+            });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<FileResponse | null>(<any>null);
+        return Promise.resolve<string>(<any>null);
     }
 }
 
@@ -2338,13 +2351,6 @@ export interface IUserDto {
 export interface FileParameter {
     data: any;
     fileName: string;
-}
-
-export interface FileResponse {
-    data: Blob;
-    status: number;
-    fileName?: string;
-    headers?: { [name: string]: any };
 }
 
 export class SwaggerException extends Error {

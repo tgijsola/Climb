@@ -9,6 +9,17 @@ interface IUserHomeProps {
 
 interface IUserHomeState {
     user: ClimbClient.UserDto | undefined;
+    profilePic: string | undefined;
+}
+
+class FileParameter implements ClimbClient.FileParameter {
+    data: any;
+    fileName: string;
+
+    constructor(data: any, fileName: string) {
+        this.data = data;
+        this.fileName = fileName;
+    }
 }
 
 export class Home extends React.Component<RouteComponentProps<IUserHomeProps>, IUserHomeState> {
@@ -19,8 +30,11 @@ export class Home extends React.Component<RouteComponentProps<IUserHomeProps>, I
 
         this.userClient = new ClimbClient.UserClient(window.location.origin);
 
+        this.onUploadProfilePic = this.onUploadProfilePic.bind(this);
+
         this.state = {
             user: undefined,
+            profilePic: undefined,
         }
     }
 
@@ -38,11 +52,21 @@ export class Home extends React.Component<RouteComponentProps<IUserHomeProps>, I
             );
         }
 
+        const profilePic = this.state.profilePic;
+
         return (
             <div>
                 <h2 id="subtitle">Home</h2>
                 <div>Hello {user.username}</div>
-                <img src={user.profilePic}/>
+                <img src={profilePic}/>
+
+                <div>
+                    <div className="input-group">
+                        <label>New profile picture</label>
+                        <input id="fileInput" type="file" accept="image/*"/>
+                        <button onClick={this.onUploadProfilePic}>Upload</button>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -50,7 +74,24 @@ export class Home extends React.Component<RouteComponentProps<IUserHomeProps>, I
     private loadUser() {
         const userId = this.props.match.params.userId;
         this.userClient.get(userId)
-            .then(user => this.setState({ user: user }))
+            .then(user => this.setState({
+                user: user,
+                profilePic: user.profilePic,
+            }))
             .catch(reason => alert(`Could not load usern${reason}`));
+    }
+
+    private onUploadProfilePic() {
+        if (!this.state.user) throw Error("User not loaded yet.");
+
+        const id = this.state.user.id;
+        const fileInput = (document.getElementById("fileInput") as HTMLInputElement);
+        if (!fileInput || !fileInput.files) throw new Error("Could not find file input.");
+        const file = fileInput.files[0];
+        const fileParam = new FileParameter(file, file.name);
+
+        this.userClient.uploadProfilePic(id, fileParam)
+            .then(profilePicUrl => this.setState({ profilePic: profilePicUrl }))
+            .catch(reason => `Could not upload profile picture\n${reason}`);
     }
 }
