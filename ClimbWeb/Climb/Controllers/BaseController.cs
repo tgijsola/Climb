@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using Climb.Exceptions;
-using Climb.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

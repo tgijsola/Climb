@@ -53,7 +53,7 @@ namespace Climb.Controllers
 
         [HttpPost("/api/v1/games/create")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(Game))]
-        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Game name is taken.")]
+        [SwaggerResponse(HttpStatusCode.Conflict, typeof(string), "Game name is taken.")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
             try
@@ -70,7 +70,7 @@ namespace Climb.Controllers
         [HttpPost("/api/v1/addCharacter")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(Character))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Could not find game.")]
-        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Character name is taken.")]
+        [SwaggerResponse(HttpStatusCode.Conflict, typeof(string), "Character name is taken.")]
         public async Task<IActionResult> AddCharacter(AddCharacterRequest request)
         {
             try
@@ -87,7 +87,7 @@ namespace Climb.Controllers
         [HttpPost("/api/v1/addStage")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(Stage))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Could not find game.")]
-        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Stage name is taken.")]
+        [SwaggerResponse(HttpStatusCode.Conflict, typeof(string), "Stage name is taken.")]
         public async Task<IActionResult> AddStage(AddStageRequest request)
         {
             try

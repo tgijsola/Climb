@@ -1,17 +1,16 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
-using Climb.Exceptions;
 using Climb.Extensions;
+using Climb.Models;
 using Climb.Requests.Sets;
 using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Climb.Test.Controllers
@@ -34,40 +33,6 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Submit_ServiceException_ServerError()
-        {
-            setService.Update(0, null).ThrowsForAnyArgs<Exception>();
-            var set = SetUtility.Create(dbContext);
-            var request = new SubmitRequest {SetID = set.ID, Matches = new MatchForm[0]};
-
-            var result = await testObj.Submit(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.InternalServerError);
-        }
-
-        [Test]
-        public async Task Submit_NoSet_NotFound()
-        {
-            setService.Update(0, null).ThrowsForAnyArgs<NotFoundException>();
-            var request = new SubmitRequest {SetID = 0, Matches = new MatchForm[0]};
-
-            var result = await testObj.Submit(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
-        }
-
-        [Test]
-        public async Task Submit_BadRequest_BadRequest()
-        {
-            setService.Update(0, null).ThrowsForAnyArgs<BadRequestException>();
-            var request = new SubmitRequest {SetID = 0, Matches = new MatchForm[0]};
-
-            var result = await testObj.Submit(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.BadRequest);
-        }
-
-        [Test]
         public async Task Get_HasSet_Ok()
         {
             var set = SetUtility.Create(dbContext);
@@ -85,6 +50,37 @@ namespace Climb.Test.Controllers
             var result = await testObj.Get(0);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task Submit_Valid_Ok()
+        {
+            var request = CreateSet().request;
+
+            var result = await testObj.Submit(request);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+        }
+
+        [Test]
+        public async Task Submit_Valid_ReturnSetDto()
+        {
+            var (set, request) = CreateSet();
+
+            var result = await testObj.Submit(request);
+            var resultObj = result.GetObject<SetDto>();
+
+            Assert.AreEqual(set.ID, resultObj.id);
+        }
+
+        private (Set set, SubmitRequest request) CreateSet()
+        {
+            var set = SetUtility.Create(dbContext);
+            set.Matches = new List<Match>();
+            setService.Update(set.ID, Arg.Any<MatchForm[]>()).Returns(set);
+            var request = new SubmitRequest {SetID = set.ID};
+
+            return (set, request);
         }
     }
 }

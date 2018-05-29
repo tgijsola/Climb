@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Controllers;
 using Climb.Data;
-using Climb.Exceptions;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
@@ -13,7 +12,6 @@ using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Climb.Test.Controllers
@@ -143,17 +141,6 @@ namespace Climb.Test.Controllers
         }
 
         [Test]
-        public async Task Create_NotFound_NotFound()
-        {
-            var request = new CreateRequest(0, DateTime.Now.AddMinutes(1), DateTime.Now.AddMinutes(2));
-            seasonService.Create(request.LeagueID, request.StartDate, request.EndDate).Throws<NotFoundException>();
-
-            var result = await testObj.Create(request);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
-        }
-
-        [Test]
         public async Task Start_Valid_Created()
         {
             var season = SeasonUtility.CreateSeason(dbContext, 2).season;
@@ -179,27 +166,6 @@ namespace Climb.Test.Controllers
             var setResults = result.GetObject<ICollection<Set>>();
 
             Assert.IsTrue(setResults.Count == sets.Count);
-        }
-
-        [Test]
-        public async Task Start_NotFound_NotFound()
-        {
-            seasonService.GenerateSchedule(0).Throws<NotFoundException>();
-
-            var result = await testObj.Start(0);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
-        }
-
-        [Test]
-        public async Task Start_ServiceError_ServerError()
-        {
-            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
-            seasonService.GenerateSchedule(season.ID).Throws<Exception>();
-
-            var result = await testObj.Start(season.ID);
-
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.InternalServerError);
         }
     }
 }

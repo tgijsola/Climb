@@ -120,7 +120,6 @@ namespace Climb.Controllers
 
         [HttpPost("/api/v1/seasons/start")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(Set[]))]
-        [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(string), "Error trying to create sets for the season schedule.")]
         public async Task<IActionResult> Start(int seasonID)
         {
             try

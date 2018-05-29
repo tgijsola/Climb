@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
-using Microsoft.EntityFrameworkCore;
 using Climb.Requests.Games;
+using Microsoft.EntityFrameworkCore;
 
 namespace Climb.Services.ModelServices
 {
@@ -36,7 +36,7 @@ namespace Climb.Services.ModelServices
 
             if(await dbContext.Games.AnyAsync(g => g.Name == request.Name))
             {
-                throw new BadRequestException(nameof(request.Name), $"A game with the name '{request.Name}' already exists.");
+                throw new ConflictException(typeof(Game), nameof(Game.Name), request.Name);
             }
 
             var game = new Game(request.Name, request.CharactersPerMatch, request.MaxMatchPoints);
@@ -59,7 +59,7 @@ namespace Climb.Services.ModelServices
 
             if(game.Characters.Any(c => c.Name == request.Name))
             {
-                throw new BadRequestException(nameof(request.Name), $"There is already a character with the name '{request.Name}'.");
+                throw new ConflictException(typeof(Character), nameof(Character.Name), request.Name);
             }
 
             var character = new Character
@@ -86,7 +86,7 @@ namespace Climb.Services.ModelServices
 
             if(game.Stages.Any(c => c.Name == request.Name))
             {
-                throw new BadRequestException(nameof(request.Name), $"There is already a stage with the name '{request.Name}'.");
+                throw new ConflictException(typeof(Stage), nameof(Stage.Name), request.Name);
             }
 
             var stage = new Stage
