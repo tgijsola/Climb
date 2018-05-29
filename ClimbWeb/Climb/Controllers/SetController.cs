@@ -34,20 +34,22 @@ namespace Climb.Controllers
         }
 
         [HttpPost("/api/v1/sets/submit")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(SetDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
         [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string))]
         public async Task<IActionResult> Submit([FromBody] SubmitRequest request)
         {
             try
             {
-                await setService.Update(request.SetID, request.Matches);
+                var set = await setService.Update(request.SetID, request.Matches);
+                dbContext.Entry(set).Reference(s => s.League).Load();
+                var response = SetDto.Create(set, set.League.GameID);
+                return CodeResultAndLog(HttpStatusCode.OK, response, $"Set {set.ID} updated.");
             }
             catch(Exception exception)
             {
                 return GetExceptionResult(exception, request);
             }
-
-            return Ok();
         }
 
         [HttpGet("/api/v1/sets/{setID:int}")]

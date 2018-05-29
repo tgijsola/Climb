@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Climb.Models;
 using Climb.Requests.Sets;
 
 namespace Climb.Services.ModelServices
 {
     public interface ISetService
     {
-        Task Update(int setID, IReadOnlyList<MatchForm> matchForms);
+        Task<Set> Update(int setID, IReadOnlyList<MatchForm> matchForms);
     }
 }

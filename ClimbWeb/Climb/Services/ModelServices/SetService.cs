@@ -18,7 +18,7 @@ namespace Climb.Services.ModelServices
             this.dbContext = dbContext;
         }
 
-        public async Task Update(int setID, IReadOnlyList<MatchForm> matchForms)
+        public async Task<Set> Update(int setID, IReadOnlyList<MatchForm> matchForms)
         {
             var set = await dbContext.Sets
                 .Include(s => s.Matches).ThenInclude(m => m.MatchCharacters)
@@ -63,6 +63,8 @@ namespace Climb.Services.ModelServices
             }
 
             await dbContext.SaveChangesAsync();
+
+            return set;
 
             void AddCharacter(Match match, int characterID, int playerID)
             {
