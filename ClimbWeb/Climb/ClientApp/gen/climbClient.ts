@@ -302,12 +302,12 @@ export class GameClient extends BaseClass {
             result201 = resultData201 ? Game.fromJS(resultData201) : new Game();
             return result201;
             });
-        } else if (status === 400) {
+        } else if (status === 409) {
             return response.text().then((_responseText) => {
-            let result400: any = null;
-            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result400 = resultData400 !== undefined ? resultData400 : <any>null;
-            return throwException("A server error occurred.", status, _responseText, _headers, result400);
+            let result409: any = null;
+            let resultData409 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result409 = resultData409 !== undefined ? resultData409 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result409);
             });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
@@ -359,12 +359,12 @@ export class GameClient extends BaseClass {
             result404 = resultData404 !== undefined ? resultData404 : <any>null;
             return throwException("A server error occurred.", status, _responseText, _headers, result404);
             });
-        } else if (status === 400) {
+        } else if (status === 409) {
             return response.text().then((_responseText) => {
-            let result400: any = null;
-            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result400 = resultData400 !== undefined ? resultData400 : <any>null;
-            return throwException("A server error occurred.", status, _responseText, _headers, result400);
+            let result409: any = null;
+            let resultData409 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result409 = resultData409 !== undefined ? resultData409 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result409);
             });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
@@ -416,12 +416,12 @@ export class GameClient extends BaseClass {
             result404 = resultData404 !== undefined ? resultData404 : <any>null;
             return throwException("A server error occurred.", status, _responseText, _headers, result404);
             });
-        } else if (status === 400) {
+        } else if (status === 409) {
             return response.text().then((_responseText) => {
-            let result400: any = null;
-            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result400 = resultData400 !== undefined ? resultData400 : <any>null;
-            return throwException("A server error occurred.", status, _responseText, _headers, result400);
+            let result409: any = null;
+            let resultData409 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result409 = resultData409 !== undefined ? resultData409 : <any>null;
+            return throwException("A server error occurred.", status, _responseText, _headers, result409);
             });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
@@ -1088,7 +1088,7 @@ export class SetClient extends BaseClass {
         this.baseUrl = baseUrl ? baseUrl : "http://localhost:52912";
     }
 
-    submit(request: SubmitRequest | null): Promise<void> {
+    submit(request: SubmitRequest | null): Promise<SetDto> {
         let url_ = this.baseUrl + "/api/v1/sets/submit";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1099,6 +1099,7 @@ export class SetClient extends BaseClass {
             method: "POST",
             headers: {
                 "Content-Type": "application/json", 
+                "Accept": "application/json"
             }
         };
 
@@ -1107,10 +1108,17 @@ export class SetClient extends BaseClass {
         });
     }
 
-    protected processSubmit(response: Response): Promise<void> {
+    protected processSubmit(response: Response): Promise<SetDto> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 404) {
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? SetDto.fromJS(resultData200) : new SetDto();
+            return result200;
+            });
+        } else if (status === 404) {
             return response.text().then((_responseText) => {
             let result404: any = null;
             let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
@@ -1129,7 +1137,7 @@ export class SetClient extends BaseClass {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<void>(<any>null);
+        return Promise.resolve<SetDto>(<any>null);
     }
 
     get(setID: number): Promise<SetDto> {
