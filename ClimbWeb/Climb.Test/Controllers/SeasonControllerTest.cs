@@ -157,7 +157,7 @@ namespace Climb.Test.Controllers
             var sets = new HashSet<Set>();
             for(var i = 0; i < 3; i++)
             {
-                sets.Add(SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season));
+                sets.Add(SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season.LeagueID));
             }
 
             seasonService.GenerateSchedule(season.ID).ReturnsForAnyArgs(info => sets);

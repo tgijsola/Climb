@@ -51,10 +51,10 @@ namespace Climb.Test.Services
         {
             var (season, participants) = SeasonUtility.CreateSeason(dbContext, 2);
 
-            var set1 = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season);
+            var set1 = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season.LeagueID);
             season.Sets = new HashSet<Set> {set1};
 
-            var set2 = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season);
+            var set2 = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season.LeagueID);
             testObj.sets = new HashSet<Set> {set2};
 
             await testObj.GenerateScheduleAsync(season, dbContext);

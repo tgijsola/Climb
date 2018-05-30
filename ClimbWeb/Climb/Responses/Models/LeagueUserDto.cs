@@ -5,21 +5,25 @@ namespace Climb.Responses.Models
 {
     public class LeagueUserDto
     {
-        public readonly int id;
-        public readonly int leagueID;
+        public int ID { get; }
+        public int LeagueID { get; }
         [Required]
-        public readonly string userID;
-        public readonly bool hasLeft;
+        public string UserID { get; }
+        public bool HasLeft { get; }
         [Required]
-        public readonly string username;
+        public string Username { get; }
+        public int Points { get; }
+        public int Rank { get; }
 
         public LeagueUserDto(LeagueUser leagueUser)
         {
-            id = leagueUser.ID;
-            leagueID = leagueUser.ID;
-            userID = leagueUser.UserID;
-            hasLeft = leagueUser.HasLeft;
-            username = leagueUser.User.UserName;
+            ID = leagueUser.ID;
+            LeagueID = leagueUser.ID;
+            UserID = leagueUser.UserID;
+            HasLeft = leagueUser.HasLeft;
+            Username = leagueUser.User.UserName;
+            Points = leagueUser.Points;
+            Rank = leagueUser.Rank;
         }
     }
 }

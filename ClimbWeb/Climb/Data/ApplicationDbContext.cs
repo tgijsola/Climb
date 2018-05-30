@@ -16,6 +16,7 @@ namespace Climb.Data
         public DbSet<Set> Sets { get; set; }
         public DbSet<Match> Matches { get; set; }
         public DbSet<MatchCharacter> MatchCharacters { get; set; }
+        public DbSet<RankSnapshot> RankSnapshots { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

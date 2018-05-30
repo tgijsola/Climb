@@ -2,8 +2,10 @@
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
+using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
@@ -13,13 +15,15 @@ namespace Climb.Test.Services.ModelServices
     {
         private LeagueService testObj;
         private ApplicationDbContext dbContext;
+        private IPointService pointService;
 
         [SetUp]
         public void SetUp()
         {
             dbContext = DbContextUtility.CreateMockDb();
+            pointService = Substitute.For<IPointService>();
 
-            testObj = new LeagueService(dbContext);
+            testObj = new LeagueService(dbContext, pointService);
         }
 
         [Test]
@@ -92,5 +96,57 @@ namespace Climb.Test.Services.ModelServices
 
             Assert.ThrowsAsync<NotFoundException>(() => testObj.Join(league.ID, ""));
         }
+
+        [Test]
+        public void TakeSnapshots_NoLeague_NotFound()
+        {
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.TakeSnapshots(0));
+        }
+
+        [Test]
+        public async Task TakeSnapshots_Season_ReturnSnapshots()
+        {
+            var season = CreateSeason();
+            CreateSets(season.League, season);
+
+            var snapshots = await testObj.TakeSnapshots(season.LeagueID);
+
+            Assert.AreEqual(season.League.Members.Count, snapshots.Count);
+        }
+
+        [Test]
+        public async Task TakeSnapshots_SeasonAndExhibition_ReturnSnapshots()
+        {
+            var season = CreateSeason();
+            CreateSets(season.League, null);
+            CreateSets(season.League, season);
+
+            var snapshots = await testObj.TakeSnapshots(season.LeagueID);
+
+            Assert.AreEqual(season.League.Members.Count, snapshots.Count);
+        }
+
+        private Season CreateSeason()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            LeagueUtility.AddUsersToLeague(league, 10, dbContext);
+            var season = DbContextUtility.AddNew<Season>(dbContext, s => s.League = league);
+            return season;
+        }
+
+        private void CreateSets(League league, Season season)
+        {
+            var firstMember = league.Members[0];
+            for(var i = 1; i < league.Members.Count; i++)
+            {
+                var nextMember = league.Members[i].ID;
+                var set = SetUtility.Create(dbContext, firstMember.ID, nextMember, league.ID, season);
+                set.IsComplete = true;
+                set.Player1Score = 2;
+                set.Player2Score = 1;
+            }
+        }
+
+        // TODO: snapshot is correct
     }
 }

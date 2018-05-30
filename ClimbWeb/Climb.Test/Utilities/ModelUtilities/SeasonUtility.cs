@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Climb.Data;
 using Climb.Models;
@@ -29,7 +28,7 @@ namespace Climb.Test.Utilities
             var participants = season.Participants.ToArray();
             for(var i = 1; i < participants.Length; i++)
             {
-                var set = SetUtility.Create(dbContext, participants[0].LeagueUserID, participants[i].LeagueUserID, season);
+                var set = SetUtility.Create(dbContext, participants[0].LeagueUserID, participants[i].LeagueUserID, season.LeagueID);
                 sets.Add(set);
             }
 

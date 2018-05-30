@@ -12,6 +12,9 @@ namespace Climb.Models
         [Required]
         public string UserID { get; set; }
         public bool HasLeft { get; set; }
+        public int Points { get; set; }
+        public int Rank { get; set; }
+        // TODO: IsNew
 
         [JsonIgnore]
         public League League { get; set; }
@@ -19,6 +22,8 @@ namespace Climb.Models
         public ApplicationUser User { get; set; }
         [JsonIgnore]
         public HashSet<SeasonLeagueUser> Seasons { get; set; }
+        [JsonIgnore]
+        public List<RankSnapshot> RankSnapshots { get; set; }
 
         #region For DB
         [JsonIgnore]
