@@ -13,6 +13,8 @@ namespace Climb.Test.Services.ModelServices
     [TestFixture]
     public class LeagueServiceTest
     {
+        private const int StartingPoints = 2000;
+
         private LeagueService testObj;
         private ApplicationDbContext dbContext;
         private IPointService pointService;
@@ -126,10 +128,32 @@ namespace Climb.Test.Services.ModelServices
             Assert.AreEqual(season.League.Members.Count, snapshots.Count);
         }
 
+        [Test]
+        public async Task TakeSnapshots_Season_StartingValuesAreCorrect()
+        {
+            var season = CreateSeason();
+            CreateSets(season.League, season);
+
+            var snapshots = await testObj.TakeSnapshots(season.LeagueID);
+
+            foreach(var snapshot in snapshots)
+            {
+                Assert.AreEqual(snapshot.LeagueUser.Rank, snapshot.Rank);
+                Assert.AreEqual(snapshot.LeagueUser.Points, snapshot.Points);
+            }
+        }
+
         private Season CreateSeason()
         {
             var league = LeagueUtility.CreateLeague(dbContext);
-            LeagueUtility.AddUsersToLeague(league, 10, dbContext);
+            var members = LeagueUtility.AddUsersToLeague(league, 10, dbContext);
+            for(var i = 0; i < members.Count; i++)
+            {
+                var member = members[i];
+                member.Points = StartingPoints - i;
+                member.Rank = i + 1;
+            }
+
             var season = DbContextUtility.AddNew<Season>(dbContext, s => s.League = league);
             return season;
         }
@@ -146,7 +170,5 @@ namespace Climb.Test.Services.ModelServices
                 set.Player2Score = 1;
             }
         }
-
-        // TODO: snapshot is correct
     }
 }
