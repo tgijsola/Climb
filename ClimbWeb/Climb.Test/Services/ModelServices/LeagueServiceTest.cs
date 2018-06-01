@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
@@ -100,6 +101,52 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
+        public void UpdateStandings_NoLeague_NotFoundException()
+        {
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.UpdateStandings(0));
+        }
+
+        [Test]
+        public async Task UpdateStandings_UniquePoints_NoTies()
+        {
+            var league = CreateLeague(10);
+            for(var i = 0; i < league.Members.Count; i++)
+            {
+                league.Members[i].Points = i;
+            }
+
+            await testObj.UpdateStandings(league.ID);
+
+            var members = league.Members.OrderBy(lu => lu.Rank).ToList();
+
+            for(var i = 0; i < members.Count; ++i)
+            {
+                Assert.AreEqual(i + 1, members[i].Rank);
+            }
+        }
+
+        [Test]
+        public async Task UpdateStandings_SharedPoints_CorrectlySkipPlace()
+        {
+            var league = CreateLeague(3);
+            league.Members[0].Points = 2;
+            league.Members[1].Points = 2;
+            league.Members[2].Points = 1;
+
+            await testObj.UpdateStandings(league.ID);
+
+            var members = league.Members.OrderBy(lu => lu.Rank).ToList();
+
+            Assert.AreEqual(1, members[0].Rank);
+            Assert.AreEqual(1, members[1].Rank);
+            Assert.AreEqual(3, members[2].Rank);
+        }
+
+        // TODO: Sets for all players
+        // TODO: Sets for some players
+        // TODO: Sets for no players
+
+        [Test]
         public void TakeSnapshots_NoLeague_NotFound()
         {
             Assert.ThrowsAsync<NotFoundException>(() => testObj.TakeSnapshots(0));
@@ -108,7 +155,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task TakeSnapshots_Season_ReturnSnapshots()
         {
-            var season = CreateSeason();
+            var season = CreateSeason(10);
             CreateSets(season.League, season);
 
             var snapshots = await testObj.TakeSnapshots(season.LeagueID);
@@ -119,7 +166,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task TakeSnapshots_SeasonAndExhibition_ReturnSnapshots()
         {
-            var season = CreateSeason();
+            var season = CreateSeason(10);
             CreateSets(season.League, null);
             CreateSets(season.League, season);
 
@@ -129,9 +176,10 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public async Task TakeSnapshots_Season_StartingValuesAreCorrect()
+        public async Task TakeSnapshots_Season_SnapshotIsCorrect()
         {
-            var season = CreateSeason();
+            Assert.Fail();
+            var season = CreateSeason(10);
             CreateSets(season.League, season);
 
             var snapshots = await testObj.TakeSnapshots(season.LeagueID);
@@ -140,22 +188,30 @@ namespace Climb.Test.Services.ModelServices
             {
                 Assert.AreEqual(snapshot.LeagueUser.Rank, snapshot.Rank);
                 Assert.AreEqual(snapshot.LeagueUser.Points, snapshot.Points);
+                Assert.AreEqual(0, snapshot.DeltaRank, $"League User={snapshot.LeagueUserID}");
+                Assert.AreEqual(0, snapshot.DeltaPoints, $"League User={snapshot.LeagueUserID}");
             }
         }
 
-        private Season CreateSeason()
+        private Season CreateSeason(int memberCount)
         {
-            var league = LeagueUtility.CreateLeague(dbContext);
-            var members = LeagueUtility.AddUsersToLeague(league, 10, dbContext);
-            for(var i = 0; i < members.Count; i++)
+            var league = CreateLeague(memberCount);
+            for(var i = 0; i < league.Members.Count; i++)
             {
-                var member = members[i];
+                var member = league.Members[i];
                 member.Points = StartingPoints - i;
                 member.Rank = i + 1;
             }
 
             var season = DbContextUtility.AddNew<Season>(dbContext, s => s.League = league);
             return season;
+        }
+
+        private League CreateLeague(int memberCount)
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            LeagueUtility.AddUsersToLeague(league, memberCount, dbContext);
+            return league;
         }
 
         private void CreateSets(League league, Season season)

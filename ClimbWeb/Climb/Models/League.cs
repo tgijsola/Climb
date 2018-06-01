@@ -10,6 +10,7 @@ namespace Climb.Models
         public int GameID { get; set; }
         [Required]
         public string Name { get; set; } = "";
+        public int SetsTillRank { get; set; } = 4;
 
         [JsonIgnore]
         public Game Game { get; set; }
@@ -29,5 +30,7 @@ namespace Climb.Models
             GameID = gameID;
             Name = name;
         }
+
+        public bool IsMemberNew(LeagueUser member) => member.SetCount >= SetsTillRank;
     }
 }

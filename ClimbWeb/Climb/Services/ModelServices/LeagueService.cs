@@ -71,7 +71,7 @@ namespace Climb.Services.ModelServices
             return leagueUser;
         }
 
-        public async Task<IReadOnlyList<RankSnapshot>> TakeSnapshots(int leagueID)
+        public async Task<League> UpdateStandings(int leagueID)
         {
             var league = await dbContext.Leagues
                 .Include(l => l.Members)
@@ -81,22 +81,24 @@ namespace Climb.Services.ModelServices
                 throw new NotFoundException(typeof(League), leagueID);
             }
 
-            IReadOnlyList<Set> playedSets = await dbContext.Sets.Where(s => s.LeagueID == leagueID && s.IsComplete && !s.IsLocked).ToArrayAsync();
+            var playedSets = await dbContext.Sets.Where(s => s.LeagueID == leagueID
+                                                             && s.IsComplete
+                                                             && !s.IsLocked).ToArrayAsync();
 
-            var pointsPerMember = new Dictionary<int, int>();
-            CalculatePointDeltas();
-            AssignPoints();
+            dbContext.Sets.UpdateRange(playedSets);
+            dbContext.UpdateRange(league.Members);
+
+            UpdatePoints();
             UpdateRanks();
-            var snapshots = CreateSnapshots();
-            // TODO: King
 
-            await dbContext.RankSnapshots.AddRangeAsync(snapshots);
             await dbContext.SaveChangesAsync();
 
-            return snapshots;
+            return league;
 
-            void CalculatePointDeltas()
+            void UpdatePoints()
             {
+                var pointsPerMember = new Dictionary<int, int>();
+
                 foreach(var set in playedSets)
                 {
                     var player1Won = set.WinnerID == set.Player1ID;
@@ -117,29 +119,26 @@ namespace Climb.Services.ModelServices
 
                     set.IsLocked = true;
                 }
-            }
 
-            void AssignPoints()
-            {
                 foreach(var member in league.Members)
                 {
                     if(pointsPerMember.TryGetValue(member.ID, out var eloDelta))
                     {
                         member.Points += eloDelta;
-                        member.Rank = league.Members.Count;
                     }
                 }
             }
 
             void UpdateRanks()
             {
-                var activeMembers = league.Members.Where(lu => pointsPerMember.ContainsKey(lu.ID)).OrderByDescending(lu => lu.Points).ToList();
+                var activeMembers = league.Members.Where(lu => !league.IsMemberNew(lu))
+                    .OrderByDescending(lu => lu.Points).ToList();
+
                 var rank = 0;
                 var lastPoints = -1;
                 for(var i = 0; i < activeMembers.Count; i++)
                 {
                     var member = activeMembers[i];
-
                     if(member.Points != lastPoints)
                     {
                         lastPoints = member.Points;
@@ -149,36 +148,47 @@ namespace Climb.Services.ModelServices
                     member.Rank = rank;
                 }
             }
+        }
 
-            IReadOnlyList<RankSnapshot> CreateSnapshots()
+        public async Task<IReadOnlyList<RankSnapshot>> TakeSnapshots(int leagueID)
+        {
+            var league = await dbContext.Leagues
+                .Include(l => l.Members).ThenInclude(lu => lu.RankSnapshots)
+                .FirstOrDefaultAsync(l => l.ID == leagueID);
+            if(league == null)
             {
-                var createdDate = DateTime.Now;
-                var rankSnapshots = new RankSnapshot[league.Members.Count];
-                for(var i = 0; i < league.Members.Count; ++i)
-                {
-                    var member = league.Members[i];
-                    RankSnapshot lastSnapshot = null;
-                    if(member.RankSnapshots?.Count > 0)
-                    {
-                        lastSnapshot = member.RankSnapshots.MaxBy(rs => rs.CreatedDate);
-                    }
+                throw new NotFoundException(typeof(League), leagueID);
+            }
 
-                    var rankDelta = member.Rank - (lastSnapshot?.Rank ?? 0);
-                    var eloDelta = member.Points - (lastSnapshot?.Points ?? 0);
-                    var rankSnapshot = new RankSnapshot
-                    {
-                        LeagueUser = member,
-                        Rank = member.Rank,
-                        DeltaRank = rankDelta,
-                        Points = member.Points,
-                        DeltaPoints = eloDelta,
-                        CreatedDate = createdDate
-                    };
-                    rankSnapshots[i] = rankSnapshot;
+            var createdDate = DateTime.Now;
+            var rankSnapshots = new RankSnapshot[league.Members.Count];
+            for(var i = 0; i < league.Members.Count; ++i)
+            {
+                var member = league.Members[i];
+                RankSnapshot lastSnapshot = null;
+                if(member.RankSnapshots?.Count > 0)
+                {
+                    lastSnapshot = member.RankSnapshots.MaxBy(rs => rs.CreatedDate);
                 }
 
-                return rankSnapshots;
+                var rankDelta = member.Rank - (lastSnapshot?.Rank ?? 0);
+                var pointsDelta = member.Points - (lastSnapshot?.Points ?? 0);
+                var rankSnapshot = new RankSnapshot
+                {
+                    LeagueUserID = member.ID,
+                    Rank = member.Rank,
+                    Points = member.Points,
+                    DeltaRank = rankDelta,
+                    DeltaPoints = pointsDelta,
+                    CreatedDate = createdDate
+                };
+                rankSnapshots[i] = rankSnapshot;
             }
+
+            await dbContext.RankSnapshots.AddRangeAsync(rankSnapshots);
+            await dbContext.SaveChangesAsync();
+
+            return rankSnapshots;
         }
     }
 }
