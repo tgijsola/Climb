@@ -1655,6 +1655,7 @@ export class League implements ILeague {
     id: number;
     gameID: number;
     name: string;
+    setsTillRank: number;
 
     constructor(data?: ILeague) {
         if (data) {
@@ -1670,6 +1671,7 @@ export class League implements ILeague {
             this.id = data["id"];
             this.gameID = data["gameID"];
             this.name = data["name"];
+            this.setsTillRank = data["setsTillRank"];
         }
     }
 
@@ -1685,6 +1687,7 @@ export class League implements ILeague {
         data["id"] = this.id;
         data["gameID"] = this.gameID;
         data["name"] = this.name;
+        data["setsTillRank"] = this.setsTillRank;
         return data; 
     }
 }
@@ -1693,6 +1696,7 @@ export interface ILeague {
     id: number;
     gameID: number;
     name: string;
+    setsTillRank: number;
 }
 
 export class LeagueUser implements ILeagueUser {
@@ -1700,6 +1704,9 @@ export class LeagueUser implements ILeagueUser {
     leagueID: number;
     userID: string;
     hasLeft: boolean;
+    points: number;
+    rank: number;
+    setCount: number;
 
     constructor(data?: ILeagueUser) {
         if (data) {
@@ -1716,6 +1723,9 @@ export class LeagueUser implements ILeagueUser {
             this.leagueID = data["leagueID"];
             this.userID = data["userID"];
             this.hasLeft = data["hasLeft"];
+            this.points = data["points"];
+            this.rank = data["rank"];
+            this.setCount = data["setCount"];
         }
     }
 
@@ -1732,6 +1742,9 @@ export class LeagueUser implements ILeagueUser {
         data["leagueID"] = this.leagueID;
         data["userID"] = this.userID;
         data["hasLeft"] = this.hasLeft;
+        data["points"] = this.points;
+        data["rank"] = this.rank;
+        data["setCount"] = this.setCount;
         return data; 
     }
 }
@@ -1741,6 +1754,9 @@ export interface ILeagueUser {
     leagueID: number;
     userID: string;
     hasLeft: boolean;
+    points: number;
+    rank: number;
+    setCount: number;
 }
 
 export class LeagueUserDto implements ILeagueUserDto {
@@ -1749,6 +1765,8 @@ export class LeagueUserDto implements ILeagueUserDto {
     userID: string;
     hasLeft: boolean;
     username: string;
+    points: number;
+    rank: number;
 
     constructor(data?: ILeagueUserDto) {
         if (data) {
@@ -1766,6 +1784,8 @@ export class LeagueUserDto implements ILeagueUserDto {
             this.userID = data["userID"];
             this.hasLeft = data["hasLeft"];
             this.username = data["username"];
+            this.points = data["points"];
+            this.rank = data["rank"];
         }
     }
 
@@ -1783,6 +1803,8 @@ export class LeagueUserDto implements ILeagueUserDto {
         data["userID"] = this.userID;
         data["hasLeft"] = this.hasLeft;
         data["username"] = this.username;
+        data["points"] = this.points;
+        data["rank"] = this.rank;
         return data; 
     }
 }
@@ -1793,6 +1815,8 @@ export interface ILeagueUserDto {
     userID: string;
     hasLeft: boolean;
     username: string;
+    points: number;
+    rank: number;
 }
 
 export class Season implements ISeason {
@@ -1857,6 +1881,8 @@ export class Set implements ISet {
     player2Score?: number | undefined;
     dueDate: Date;
     updatedDate?: Date | undefined;
+    isLocked: boolean;
+    isComplete: boolean;
     matches: Match[];
 
     constructor(data?: ISet) {
@@ -1882,6 +1908,8 @@ export class Set implements ISet {
             this.player2Score = data["player2Score"];
             this.dueDate = data["dueDate"] ? new Date(data["dueDate"].toString()) : <any>undefined;
             this.updatedDate = data["updatedDate"] ? new Date(data["updatedDate"].toString()) : <any>undefined;
+            this.isLocked = data["isLocked"];
+            this.isComplete = data["isComplete"];
             if (data["matches"] && data["matches"].constructor === Array) {
                 this.matches = [];
                 for (let item of data["matches"])
@@ -1908,6 +1936,8 @@ export class Set implements ISet {
         data["player2Score"] = this.player2Score;
         data["dueDate"] = this.dueDate ? this.dueDate.toISOString() : <any>undefined;
         data["updatedDate"] = this.updatedDate ? this.updatedDate.toISOString() : <any>undefined;
+        data["isLocked"] = this.isLocked;
+        data["isComplete"] = this.isComplete;
         if (this.matches && this.matches.constructor === Array) {
             data["matches"] = [];
             for (let item of this.matches)
@@ -1927,6 +1957,8 @@ export interface ISet {
     player2Score?: number | undefined;
     dueDate: Date;
     updatedDate?: Date | undefined;
+    isLocked: boolean;
+    isComplete: boolean;
     matches: Match[];
 }
 
@@ -2180,6 +2212,8 @@ export class SetDto implements ISetDto {
     dueDate: Date;
     updatedDate?: Date | undefined;
     matches: MatchDto[];
+    isLocked: boolean;
+    isComplete: boolean;
 
     constructor(data?: ISetDto) {
         if (data) {
@@ -2210,6 +2244,8 @@ export class SetDto implements ISetDto {
                 for (let item of data["matches"])
                     this.matches.push(MatchDto.fromJS(item));
             }
+            this.isLocked = data["isLocked"];
+            this.isComplete = data["isComplete"];
         }
     }
 
@@ -2237,6 +2273,8 @@ export class SetDto implements ISetDto {
             for (let item of this.matches)
                 data["matches"].push(item.toJSON());
         }
+        data["isLocked"] = this.isLocked;
+        data["isComplete"] = this.isComplete;
         return data; 
     }
 }
@@ -2253,6 +2291,8 @@ export interface ISetDto {
     dueDate: Date;
     updatedDate?: Date | undefined;
     matches: MatchDto[];
+    isLocked: boolean;
+    isComplete: boolean;
 }
 
 export class MatchDto implements IMatchDto {
