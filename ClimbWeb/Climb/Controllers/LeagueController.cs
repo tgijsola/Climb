@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
 using Climb.Data;
+using Climb.Exceptions;
 using Climb.Models;
 using Climb.Requests.Leagues;
 using Climb.Responses.Models;
+using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -123,6 +126,25 @@ namespace Climb.Controllers
             }
 
             return CodeResult(HttpStatusCode.OK, league.Seasons);
+        }
+
+        [HttpGet("/api/v1/leagues/sets/{leagueUserID:int}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(SetDto[]))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "No league user found.")]
+        public async Task<IActionResult> GetSets(int leagueUserID)
+        {
+            var leagueUser = await dbContext.LeagueUsers
+                .Include(lu => lu.League).AsNoTracking()
+                .Include(lu => lu.P1Sets).ThenInclude(s => s.Matches).AsNoTracking()
+                .Include(lu => lu.P2Sets).ThenInclude(s => s.Matches).AsNoTracking()
+                .FirstOrDefaultAsync(lu => lu.ID == leagueUserID);
+            if(leagueUser == null)
+            {
+                return GetExceptionResult(new NotFoundException(typeof(LeagueUser), leagueUserID), leagueUserID);
+            }
+
+            var sets = leagueUser.GetAllSets().Select(s => SetDto.Create(s, leagueUser.League.GameID)).ToArray();
+            return CodeResult(HttpStatusCode.OK, sets);
         }
     }
 }
