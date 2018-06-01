@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Climb.Data;
 using Newtonsoft.Json;
 
@@ -42,6 +43,11 @@ namespace Climb.Models
         {
             LeagueID = leagueID;
             UserID = userID;
+        }
+
+        public IReadOnlyList<Set> GetAllSets()
+        {
+            return P1Sets.Concat(P2Sets).ToArray();
         }
 
         public int CompareTo(LeagueUser other)

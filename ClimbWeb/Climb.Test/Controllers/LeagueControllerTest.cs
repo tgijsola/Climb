@@ -7,6 +7,7 @@ using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
 using Climb.Responses.Models;
+using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
@@ -129,6 +130,52 @@ namespace Climb.Test.Controllers
             var result = await testObj.GetSeasons(0);
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task GetSets_NoLeagueUser_NotFound()
+        {
+            var result = await testObj.GetSets(0);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task GetSets_HasSets_Ok()
+        {
+            var members = CreateMembersWithSets(2);
+
+            var result = await testObj.GetSets(members[0].ID);
+
+            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+        }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(10)]
+        public async Task GetSets_HasSets_ReturnSets(int setCount)
+        {
+            var members = CreateMembersWithSets(setCount);
+
+            var result = await testObj.GetSets(members[0].ID);
+            var resultObj = result.GetObject<SetDto[]>();
+
+            Assert.AreEqual(setCount, resultObj.Length);
+        }
+
+        private List<LeagueUser> CreateMembersWithSets(int setCount)
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var members = LeagueUtility.AddUsersToLeague(league, 2, dbContext);
+            // TODO: Remove season after merge from league-ranking branch.
+            var season = DbContextUtility.AddNew<Season>(dbContext, s => s.League = league);
+
+            for(var i = 0; i < setCount; ++i)
+            {
+                SetUtility.Create(dbContext, members[0].ID, members[1].ID, season);
+            }
+
+            return members;
         }
     }
 }
