@@ -172,7 +172,7 @@ namespace Climb.Test.Controllers
 
             for(var i = 0; i < setCount; ++i)
             {
-                SetUtility.Create(dbContext, members[0].ID, members[1].ID, season);
+                SetUtility.Create(dbContext, members[0].ID, members[1].ID, season.LeagueID, season);
             }
 
             return members;
