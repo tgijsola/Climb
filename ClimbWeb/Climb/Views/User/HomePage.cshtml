@@ -1,4 +1,4 @@
-﻿@model Climb.Data.ApplicationUser
+﻿@model Climb.ViewModels.User.HomeViewModel
 
 @{
     ViewBag.Title = "User-Home";
@@ -6,11 +6,11 @@
 }
 
 <h2>User-Home</h2>
-<h3>Hello @Model.UserName</h3>
+<h3>Hello @Model.User.UserName</h3>
 <h4>Leagues</h4>
 @{
-    foreach(var leagueUser in Model.LeagueUsers)
+    foreach(var league in Model.Leagues)
     {
-        <div>@leagueUser.League.Name</div>
+        <div>@league.Name</div>
     }
 }

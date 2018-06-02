@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -12,9 +12,10 @@
     </environment>
 </head>
 <body>
-    @RenderBody()
+<partial name="~/Views/Shared/Navbar.cshtml" model="@Model"/>
+@RenderBody()
 
-    <script src="~/dist/vendor.js" asp-append-version="true"></script>
-    @RenderSection("scripts", required: false)
+<script src="~/dist/vendor.js" asp-append-version="true"></script>
+@RenderSection("scripts", required: false)
 </body>
 </html>

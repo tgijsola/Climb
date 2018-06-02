@@ -6,6 +6,7 @@ using Climb.Data;
 using Climb.Responses;
 using Climb.Services;
 using Climb.Services.ModelServices;
+using Climb.ViewModels.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,9 @@ namespace Climb.Controllers
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == id);
 
-            return View(user);
+            var viewModel = new HomeViewModel(user);
+
+            return View(viewModel);
         }
 
         [HttpGet("/user/{*page}")]
