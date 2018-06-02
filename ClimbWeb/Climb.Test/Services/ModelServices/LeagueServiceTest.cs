@@ -176,21 +176,28 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public async Task TakeSnapshots_Season_SnapshotIsCorrect()
+        public async Task TakeSnapshots_HasSnapshot_SnapshotIsCorrect()
         {
-            Assert.Fail();
-            var season = CreateSeason(10);
-            CreateSets(season.League, season);
+            const int deltaRank = 4;
+            const int deltaPoints = -50;
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var member = LeagueUtility.AddUsersToLeague(league, 1, dbContext)[0];
+            member.Rank = 14;
+            member.Points = 2000;
 
-            var snapshots = await testObj.TakeSnapshots(season.LeagueID);
-
-            foreach(var snapshot in snapshots)
+            DbContextUtility.AddNew<RankSnapshot>(dbContext, rs =>
             {
-                Assert.AreEqual(snapshot.LeagueUser.Rank, snapshot.Rank);
-                Assert.AreEqual(snapshot.LeagueUser.Points, snapshot.Points);
-                Assert.AreEqual(0, snapshot.DeltaRank, $"League User={snapshot.LeagueUserID}");
-                Assert.AreEqual(0, snapshot.DeltaPoints, $"League User={snapshot.LeagueUserID}");
-            }
+                rs.LeagueUserID = member.ID;
+                rs.Rank = member.Rank + deltaRank;
+                rs.Points = member.Points + deltaPoints;
+            });
+
+            var snapshot = (await testObj.TakeSnapshots(league.ID))[0];
+
+            Assert.AreEqual(member.Rank, snapshot.Rank, "Rank");
+            Assert.AreEqual(member.Points, snapshot.Points, "Points");
+            Assert.AreEqual(-deltaRank, snapshot.DeltaRank, "Delta Rank");
+            Assert.AreEqual(-deltaPoints, snapshot.DeltaPoints, "Delta Points");
         }
 
         private Season CreateSeason(int memberCount)
