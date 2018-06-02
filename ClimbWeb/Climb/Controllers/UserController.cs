@@ -27,6 +27,17 @@ namespace Climb.Controllers
             this.cdnService = cdnService;
         }
 
+        [HttpGet("/user/home/{id}")]
+        [SwaggerIgnore]
+        public async Task<IActionResult> HomePage(string id)
+        {
+            var user = await dbContext.Users
+                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            return View(user);
+        }
+
         [HttpGet("/user/{*page}")]
         [SwaggerIgnore]
         public IActionResult Index()

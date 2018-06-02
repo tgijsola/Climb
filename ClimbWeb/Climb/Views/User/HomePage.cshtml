@@ -1,0 +1,16 @@
+﻿@model Climb.Data.ApplicationUser
+
+@{
+    ViewBag.Title = "User-Home";
+    Layout = "_Layout";
+}
+
+<h2>User-Home</h2>
+<h3>Hello @Model.UserName</h3>
+<h4>Leagues</h4>
+@{
+    foreach(var leagueUser in Model.LeagueUsers)
+    {
+        <div>@leagueUser.League.Name</div>
+    }
+}
