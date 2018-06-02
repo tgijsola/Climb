@@ -167,12 +167,10 @@ namespace Climb.Test.Controllers
         {
             var league = LeagueUtility.CreateLeague(dbContext);
             var members = LeagueUtility.AddUsersToLeague(league, 2, dbContext);
-            // TODO: Remove season after merge from league-ranking branch.
-            var season = DbContextUtility.AddNew<Season>(dbContext, s => s.League = league);
 
             for(var i = 0; i < setCount; ++i)
             {
-                SetUtility.Create(dbContext, members[0].ID, members[1].ID, season.LeagueID, season);
+                SetUtility.Create(dbContext, members[0].ID, members[1].ID, league.ID);
             }
 
             return members;
