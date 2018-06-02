@@ -89,7 +89,7 @@ namespace Climb.Test.Controllers
             var resultObj = result.GetObject<LeagueUserDto>();
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
-            Assert.AreEqual(leagueUser.ID, resultObj.id);
+            Assert.AreEqual(leagueUser.ID, resultObj.ID);
         }
 
         [Test]

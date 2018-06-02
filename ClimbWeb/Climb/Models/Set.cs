@@ -17,6 +17,8 @@ namespace Climb.Models
         public int? Player2Score { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public bool IsLocked { get; set; }
+        public bool IsComplete { get; set; }
 
         [JsonIgnore]
         public League League { get; set; }
@@ -32,6 +34,8 @@ namespace Climb.Models
         public LeagueUser Player2 { get; set; }
         [Required]
         public List<Match> Matches { get; set; }
+        [JsonIgnore]
+        public int? WinnerID => Player1Score > Player2Score ? Player1ID : Player1Score < Player2Score ? (int?)Player2ID : null;
 
         public Set()
         {

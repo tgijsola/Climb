@@ -10,13 +10,16 @@ namespace Climb.Models
         public int GameID { get; set; }
         [Required]
         public string Name { get; set; } = "";
+        public int SetsTillRank { get; set; } = 4;
 
         [JsonIgnore]
         public Game Game { get; set; }
         [JsonIgnore]
-        public HashSet<LeagueUser> Members { get; set; }
+        public List<LeagueUser> Members { get; set; }
         [JsonIgnore]
         public HashSet<Season> Seasons { get; set; }
+        [JsonIgnore]
+        public List<Set> Sets { get; set; }
 
         public League()
         {
@@ -27,5 +30,7 @@ namespace Climb.Models
             GameID = gameID;
             Name = name;
         }
+
+        public bool IsMemberNew(LeagueUser member) => member.SetCount >= SetsTillRank;
     }
 }

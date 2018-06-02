@@ -41,7 +41,7 @@ namespace Climb.Test.Controllers
             var resultObj = result.GetObject<SetDto>();
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
-            Assert.AreEqual(set.ID, resultObj.id);
+            Assert.AreEqual(set.ID, resultObj.ID);
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace Climb.Test.Controllers
             var result = await testObj.Submit(request);
             var resultObj = result.GetObject<SetDto>();
 
-            Assert.AreEqual(set.ID, resultObj.id);
+            Assert.AreEqual(set.ID, resultObj.ID);
         }
 
         private (Set set, SubmitRequest request) CreateSet()

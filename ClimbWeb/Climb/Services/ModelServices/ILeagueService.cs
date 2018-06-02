@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Climb.Models;
 
 namespace Climb.Services.ModelServices
@@ -7,5 +8,7 @@ namespace Climb.Services.ModelServices
     {
         Task<League> Create(string name, int gameID);
         Task<LeagueUser> Join(int leagueID, string userID);
+        Task<League> UpdateStandings(int leagueID);
+        Task<IReadOnlyList<RankSnapshot>> TakeSnapshots(int leagueID);
     }
 }

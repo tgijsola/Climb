@@ -1,17 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Climb.Data;
 using Newtonsoft.Json;
 
 namespace Climb.Models
 {
-    public class LeagueUser
+    public class LeagueUser : IComparable<LeagueUser>
     {
         public int ID { get; set; }
         public int LeagueID { get; set; }
         [Required]
         public string UserID { get; set; }
         public bool HasLeft { get; set; }
+        public int Points { get; set; }
+        public int Rank { get; set; }
+        // TODO: Update this value.
+        public int SetCount { get; set; }
 
         [JsonIgnore]
         public League League { get; set; }
@@ -19,6 +24,8 @@ namespace Climb.Models
         public ApplicationUser User { get; set; }
         [JsonIgnore]
         public HashSet<SeasonLeagueUser> Seasons { get; set; }
+        [JsonIgnore]
+        public List<RankSnapshot> RankSnapshots { get; set; }
 
         #region For DB
         [JsonIgnore]
@@ -35,6 +42,11 @@ namespace Climb.Models
         {
             LeagueID = leagueID;
             UserID = userID;
+        }
+
+        public int CompareTo(LeagueUser other)
+        {
+            return Points.CompareTo(other.Points);
         }
     }
 }

@@ -61,13 +61,13 @@ namespace Climb.Test.Controllers
         public async Task Sets_HasSets_Ok()
         {
             var season = SeasonUtility.CreateSeason(dbContext, 2).season;
-            SeasonUtility.CreateSets(dbContext, season);
+            var sets = SeasonUtility.CreateSets(dbContext, season);
 
             var result = await testObj.Sets(season.ID);
-            var resultObj = result.GetObject<IEnumerable<Set>>();
+            var resultObj = result.GetObject<HashSet<Set>>();
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
-            Assert.IsNotEmpty(resultObj);
+            Assert.AreEqual(sets.Count, resultObj.Count);
         }
 
         [Test]
@@ -157,7 +157,7 @@ namespace Climb.Test.Controllers
             var sets = new HashSet<Set>();
             for(var i = 0; i < 3; i++)
             {
-                sets.Add(SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season));
+                sets.Add(SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season.LeagueID));
             }
 
             seasonService.GenerateSchedule(season.ID).ReturnsForAnyArgs(info => sets);

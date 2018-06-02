@@ -16,11 +16,11 @@ namespace Climb.Test.Services
     {
         private class FakeScheduler : ScheduleFactory
         {
-            public HashSet<Set> sets;
+            public HashSet<Set> generatedSets;
 
             protected override HashSet<Set> GenerateScheduleInternal(Season season)
             {
-                return sets;
+                return generatedSets;
             }
         }
 
@@ -51,11 +51,11 @@ namespace Climb.Test.Services
         {
             var (season, participants) = SeasonUtility.CreateSeason(dbContext, 2);
 
-            var set1 = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season);
-            season.Sets = new HashSet<Set> {set1};
+            var oldSet = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season.LeagueID);
+            season.Sets = new HashSet<Set> {oldSet};
 
-            var set2 = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season);
-            testObj.sets = new HashSet<Set> {set2};
+            var newSet = new Set(season.LeagueID, season.ID, participants[0].ID, participants[1].ID, DateTime.Now.AddDays(1));
+            testObj.generatedSets = new HashSet<Set> {newSet};
 
             await testObj.GenerateScheduleAsync(season, dbContext);
 

@@ -77,6 +77,7 @@ namespace Climb
             services.AddTransient<IUrlUtility, UrlUtility>();
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
             services.AddTransient<ICdnService, FileStorageCdn>();
+            services.AddTransient<IPointService, EloPointService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
