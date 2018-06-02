@@ -28,11 +28,10 @@ namespace Climb.Test.Utilities
             var participants = season.Participants.ToArray();
             for(var i = 1; i < participants.Length; i++)
             {
-                var set = SetUtility.Create(dbContext, participants[0].LeagueUserID, participants[i].LeagueUserID, season.LeagueID);
+                var set = SetUtility.Create(dbContext, participants[0].LeagueUserID, participants[i].LeagueUserID, season.LeagueID, season);
                 sets.Add(set);
             }
 
-            dbContext.AddRange(sets);
             return sets;
         }
     }

@@ -61,13 +61,13 @@ namespace Climb.Test.Controllers
         public async Task Sets_HasSets_Ok()
         {
             var season = SeasonUtility.CreateSeason(dbContext, 2).season;
-            SeasonUtility.CreateSets(dbContext, season);
+            var sets = SeasonUtility.CreateSets(dbContext, season);
 
             var result = await testObj.Sets(season.ID);
-            var resultObj = result.GetObject<IEnumerable<Set>>();
+            var resultObj = result.GetObject<HashSet<Set>>();
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
-            Assert.IsNotEmpty(resultObj);
+            Assert.AreEqual(sets.Count, resultObj.Count);
         }
 
         [Test]
