@@ -4,8 +4,7 @@ const gulp = require("gulp"),
     fs = require("fs"),
     del = require("del"),
     ts = require("gulp-typescript"),
-    less = require("gulp-less"),
-    concatCss = require("gulp-concat-css");
+    less = require("gulp-less");
 
 const prepareTask = "clean:prepare";
 const postTask = "clean:post";
@@ -34,13 +33,6 @@ gulp.task(lessTask,
     function() {
         return gulp.src(paths.less)
             .pipe(less())
-            .pipe(gulp.dest(paths.output + "/temp"));
-    });
-
-gulp.task(cssConcatTask,
-    function() {
-        return gulp.src(paths.css)
-            .pipe(concatCss("bundle.css"))
             .pipe(gulp.dest(paths.output));
     });
 
@@ -54,11 +46,8 @@ gulp.task(typeScriptTask,
             .pipe(gulp.dest(paths.output));
     });
 
-//gulp.watch(paths.styles, gulp.parallel(lessTask));
-//gulp.watch(paths.styles, gulp.parallel(typeScriptTask));
-
 gulp.task("default",
     gulp.series(prepareTask,
-        gulp.parallel(gulp.series(lessTask, cssConcatTask),
+        gulp.parallel(lessTask,
             typeScriptTask),
         postTask));
