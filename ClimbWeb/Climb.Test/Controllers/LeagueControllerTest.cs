@@ -132,36 +132,36 @@ namespace Climb.Test.Controllers
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
         }
 
-        [Test]
-        public async Task GetSets_NoLeagueUser_NotFound()
-        {
-            var result = await testObj.GetSets(0);
+        //[Test]
+        //public async Task GetSets_NoLeagueUser_NotFound()
+        //{
+        //    var result = await testObj.GetSets(0);
 
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
-        }
+        //    ControllerUtility.AssertStatusCode(result, HttpStatusCode.NotFound);
+        //}
 
-        [Test]
-        public async Task GetSets_HasSets_Ok()
-        {
-            var members = CreateMembersWithSets(2);
+        //[Test]
+        //public async Task GetSets_HasSets_Ok()
+        //{
+        //    var members = CreateMembersWithSets(2);
 
-            var result = await testObj.GetSets(members[0].ID);
+        //    var result = await testObj.GetSets(members[0].ID);
 
-            ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
-        }
+        //    ControllerUtility.AssertStatusCode(result, HttpStatusCode.OK);
+        //}
 
-        [TestCase(0)]
-        [TestCase(1)]
-        [TestCase(10)]
-        public async Task GetSets_HasSets_ReturnSets(int setCount)
-        {
-            var members = CreateMembersWithSets(setCount);
+        //[TestCase(0)]
+        //[TestCase(1)]
+        //[TestCase(10)]
+        //public async Task GetSets_HasSets_ReturnSets(int setCount)
+        //{
+        //    var members = CreateMembersWithSets(setCount);
 
-            var result = await testObj.GetSets(members[0].ID);
-            var resultObj = result.GetObject<SetDto[]>();
+        //    var result = await testObj.GetSets(members[0].ID);
+        //    var resultObj = result.GetObject<SetDto[]>();
 
-            Assert.AreEqual(setCount, resultObj.Length);
-        }
+        //    Assert.AreEqual(setCount, resultObj.Length);
+        //}
 
         private List<LeagueUser> CreateMembersWithSets(int setCount)
         {
