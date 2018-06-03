@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Climb.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Climb
 {
-    public static class Program
+    public class Program
     {
         public static void Main(string[] args)
         {

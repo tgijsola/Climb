@@ -24,15 +24,6 @@ namespace Climb.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet("/sets/{*page}")]
-        [SwaggerIgnore]
-        public IActionResult Index()
-        {
-            ViewData["Title"] = "Set";
-            ViewData["Script"] = "sets";
-            return View("~/Views/Page.cshtml");
-        }
-
         [HttpPost("/api/v1/sets/submit")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(SetDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]

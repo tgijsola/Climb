@@ -1,4 +1,32 @@
-﻿@using Climb.ViewModels
-@model BaseViewModel
+@using Climb.ViewModels
+@model Climb.ViewModels.BaseViewModel
 
-<div id="navbar">Navbar</div>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                @if(Model.User == null)
+                {
+                    <li><a href="#">Log In</a></li>
+                }
+                else
+                {
+                    foreach(var league in Model.Leagues)
+                    {
+                        <li>
+                            <a asp-controller="League" asp-action="Home" asp-route-leagueID="@league.ID">@league.Name</a>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -6,7 +6,7 @@ using Climb.Data;
 using Climb.Responses;
 using Climb.Services;
 using Climb.Services.ModelServices;
-using Climb.ViewModels.User;
+using Climb.ViewModels.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,26 +28,16 @@ namespace Climb.Controllers
             this.cdnService = cdnService;
         }
 
-        [HttpGet("/user/home/{id}")]
-        [SwaggerIgnore]
-        public async Task<IActionResult> HomePage(string id)
+        [HttpGet("users/home/{userID}")]
+        public async Task<IActionResult> Home(string userID)
         {
             var user = await dbContext.Users
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == id);
+                .FirstOrDefaultAsync(u => u.Id == userID);
 
             var viewModel = new HomeViewModel(user);
 
             return View(viewModel);
-        }
-
-        [HttpGet("/user/{*page}")]
-        [SwaggerIgnore]
-        public IActionResult Index()
-        {
-            ViewData["Title"] = "User";
-            ViewData["Script"] = "user";
-            return View("~/Views/Page.cshtml");
         }
 
         [HttpGet("/api/v1/users/{userID}")]

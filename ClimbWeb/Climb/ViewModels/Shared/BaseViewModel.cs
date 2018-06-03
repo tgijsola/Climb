@@ -9,16 +9,20 @@ namespace Climb.ViewModels
     {
         public ApplicationUser User { get; }
         public IReadOnlyList<League> Leagues { get; }
+        //public IReadOnlyList<Season> Seasons { get; }
 
         protected BaseViewModel(ApplicationUser user)
         {
             User = user;
 
-            var leagues = user.LeagueUsers
+            var leagues = user?.LeagueUsers
                 .Select(lu => lu.League)
                 .OrderBy(l => l.Name)
                 .ToArray();
             Leagues = leagues;
+
+            //var seasons = user.LeagueUsers
+            //    .Select(lu => lu.Seasons.FirstOrDefault(slu => slu.Season.st))
         }
     }
 }

@@ -25,15 +25,6 @@ namespace Climb.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet("/games/{*page}")]
-        [SwaggerIgnore]
-        public IActionResult Index()
-        {
-            ViewData["Title"] = "Game";
-            ViewData["Script"] = "games";
-            return View("~/Views/Page.cshtml");
-        }
-
         [HttpGet("/api/v1/games/{gameID:int}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(Game))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]

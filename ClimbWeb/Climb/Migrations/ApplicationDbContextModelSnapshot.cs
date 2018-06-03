@@ -138,8 +138,6 @@ namespace Climb.Migrations
 
                     b.Property<int>("LeagueID");
 
-                    b.Property<string>("UserID")
-                        .IsRequired();
                     b.Property<int>("Points");
 
                     b.Property<int>("Rank");
@@ -450,7 +448,7 @@ namespace Climb.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Climb.Data.ApplicationUser", "User")
-                        .WithMany("LeagueUsers")
+                        .WithMany()
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });

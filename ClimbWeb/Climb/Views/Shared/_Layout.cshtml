@@ -6,16 +6,23 @@
     <title>@ViewData["Title"] - Climb</title>
     <base href="~/" />
 
-    <link rel="stylesheet" href="~/dist/vendor.css" asp-append-version="true" />
+    @*<link rel="stylesheet" href="~/dist/vendor.css" asp-append-version="true" />
     <environment exclude="Development">
         <link rel="stylesheet" href="~/dist/site.css" asp-append-version="true" />
-    </environment>
+    </environment>*@
+    
+    <script src="lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
+    <script src="lib/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap-theme.min.css" />
+    
+    <link rel="stylesheet" href="~/dist/site.css" />
 </head>
 <body>
-<partial name="~/Views/Shared/Navbar.cshtml" model="@Model"/>
-@RenderBody()
+    <partial name="./Navbar.cshtml" />
+    @RenderBody()
 
-<script src="~/dist/vendor.js" asp-append-version="true"></script>
-@RenderSection("scripts", required: false)
+    @*<script src="~/dist/vendor.js" asp-append-version="true"></script>*@
+    @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -25,15 +25,6 @@ namespace Climb.Controllers
             this.seasonService = seasonService;
         }
 
-        [HttpGet("/seasons/{*page}")]
-        [SwaggerIgnore]
-        public IActionResult Index()
-        {
-            ViewData["Title"] = "Season";
-            ViewData["Script"] = "seasons";
-            return View("~/Views/Page.cshtml");
-        }
-
         [HttpGet("/api/v1/seasons/{seasonID:int}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(Season))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]

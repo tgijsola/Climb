@@ -36,15 +36,6 @@ namespace Climb.Controllers
             this.urlUtility = urlUtility;
         }
 
-        [HttpGet("/account/{*page}")]
-        [SwaggerIgnore]
-        public IActionResult Index()
-        {
-            ViewData["Title"] = "Account";
-            ViewData["Script"] = "account";
-            return View("~/Views/Page.cshtml");
-        }
-
         [HttpPost("/api/v1/account/register")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(ApplicationUser))]
         [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Email or password is not valid.")]
