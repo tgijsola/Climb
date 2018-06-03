@@ -1,0 +1,22 @@
+﻿@model Climb.ViewModels.Site.HomeViewModel
+
+@{
+    ViewBag.Title = "Climb";
+    Layout = "_LayoutWithNavbar";
+}
+
+<link rel="stylesheet" href="~/dist/site-home.css" />
+
+<div id="banner">
+    <img src="~/images/logo/logo-128x128.png" />
+    <h1>Welcome to Climb!</h1>
+    <p id="description">
+        This site is for Fighting Games Leagues. Climb has Seasons, Power Rankings, Stats, and more! Happy punching and good luck in your Climb to the top!
+    </p>
+    
+    <h4>Games</h4>
+    @foreach(var game in Model.Games)
+    {
+        <div>@game.Name</div>
+    }
+</div>

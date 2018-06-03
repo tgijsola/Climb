@@ -11,6 +11,7 @@
     <ItemGroup>
       <Content Remove="Views\Account\LogIn.cshtml" />
       <Content Remove="Views\Account\Register.cshtml" />
+      <Content Remove="Views\Site\Home.cshtml" />
       <Content Remove="Views\League\Home.cshtml" />
       <Content Remove="Views\User\Home.cshtml" />
     </ItemGroup>
@@ -41,6 +42,7 @@
     <ItemGroup>
       <None Include="Views\Account\LogIn.cshtml" />
       <None Include="Views\Account\Register.cshtml" />
+      <None Include="Views\Site\Home.cshtml" />
       <None Include="Views\League\Home.cshtml" />
       <None Include="Views\User\Home.cshtml" />
     </ItemGroup>
