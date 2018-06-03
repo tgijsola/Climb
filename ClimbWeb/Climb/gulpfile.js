@@ -6,23 +6,27 @@ var gulp = require("gulp"),
     ts = require("gulp-typescript"),
     less = require("gulp-less");
 
+const cleanTask = "clean";
+const lessTask = "less";
+const typeScriptTask = "typescript";
+
 var paths = {
     styles: "ClientApp/styles/**/*.less",
     scripts: "ClientApp/scripts/**/*.ts",
     output: "wwwroot/dist"
 };
 
-gulp.task("clean", function () {
+gulp.task(cleanTask, function () {
     return del("wwwroot/dist/**/*");
 });
 
-gulp.task("less", function () {
+gulp.task(lessTask, function () {
     return gulp.src(paths.styles)
         .pipe(less())
         .pipe(gulp.dest(paths.output));
 });
 
-gulp.task("typescript",
+gulp.task(typeScriptTask,
     function() {
         return gulp.src(paths.scripts)
             .pipe(ts({
@@ -32,6 +36,7 @@ gulp.task("typescript",
             .pipe(gulp.dest(paths.output));
     });
 
-//gulp.watch(paths.styles, gulp.parallel("less"));
+gulp.watch(paths.styles, gulp.parallel(lessTask));
+gulp.watch(paths.styles, gulp.parallel(typeScriptTask));
 
-gulp.task("default", gulp.series("clean", gulp.parallel("less", "typescript")));
+gulp.task("default", gulp.series(cleanTask, gulp.parallel(lessTask, typeScriptTask)));
