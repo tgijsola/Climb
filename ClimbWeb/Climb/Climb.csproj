@@ -9,6 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Content Remove="Views\Account\LogIn.cshtml" />
+      <Content Remove="Views\Account\Register.cshtml" />
       <Content Remove="Views\League\Home.cshtml" />
       <Content Remove="Views\User\Home.cshtml" />
     </ItemGroup>
@@ -37,6 +39,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Include="Views\Account\LogIn.cshtml" />
+      <None Include="Views\Account\Register.cshtml" />
       <None Include="Views\League\Home.cshtml" />
       <None Include="Views\User\Home.cshtml" />
     </ItemGroup>
@@ -50,6 +54,16 @@
       <Content Update="Views\Shared\Navbar.cshtml">
         <Pack>$(IncludeRazorContentInPack)</Pack>
       </Content>
+      <Content Update="Views\Shared\_Files.cshtml">
+        <Pack>$(IncludeRazorContentInPack)</Pack>
+      </Content>
+      <Content Update="Views\Shared\_LayoutWithNavbar.cshtml">
+        <Pack>$(IncludeRazorContentInPack)</Pack>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\images\logo\" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

@@ -3,8 +3,11 @@ using Climb.Data;
 using Climb.Exceptions;
 using Climb.Services;
 using Climb.Services.ModelServices;
+using Climb.Test.Fakes;
 using Climb.Test.Utilities;
+using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -25,8 +28,19 @@ namespace Climb.Test.Services.ModelServices
             dbContext = DbContextUtility.CreateMockDb();
             cdnService = Substitute.For<ICdnService>();
 
-            testObj = new ApplicationUserService(dbContext, cdnService);
+            var configuration = Substitute.For<IConfiguration>();
+            configuration["SecurityKey"].Returns("key");
+
+            IEmailSender emailSender = Substitute.For<IEmailSender>();
+            ITokenHelper tokenHelper= Substitute.For<ITokenHelper>();
+            IUrlUtility urlUtility= Substitute.For<IUrlUtility>();
+            var signInManager = new FakeSignInManager();
+
+            testObj = new ApplicationUserService(dbContext, cdnService, signInManager, emailSender, configuration, tokenHelper, urlUtility);
         }
+
+        // TODO: LogIn
+        // TODO: Register
 
         [Test]
         public async Task UploadImage_Valid_SetsUserProfilePicKey()

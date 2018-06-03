@@ -8,6 +8,7 @@ using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.ViewModels.Users;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -19,21 +20,31 @@ namespace Climb.Controllers
         private readonly ApplicationDbContext dbContext;
         private readonly IApplicationUserService applicationUserService;
         private readonly ICdnService cdnService;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public UserController(ApplicationDbContext dbContext, IApplicationUserService applicationUserService, ILogger<UserController> logger, ICdnService cdnService)
+        public UserController(ApplicationDbContext dbContext, IApplicationUserService applicationUserService, ILogger<UserController> logger, ICdnService cdnService, UserManager<ApplicationUser> userManager)
             : base(logger)
         {
             this.dbContext = dbContext;
             this.applicationUserService = applicationUserService;
             this.cdnService = cdnService;
+            this.userManager = userManager;
         }
 
-        [HttpGet("users/home/{userID}")]
+        [HttpGet("users/home/{userID?}")]
         public async Task<IActionResult> Home(string userID)
         {
+            var appUser = await userManager.GetUserAsync(User);
+            var id = userID ?? appUser?.Id;
+
             var user = await dbContext.Users
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == userID);
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if(user == null)
+            {
+                return NotFound();
+            }
 
             var viewModel = HomeViewModel.Create(user, cdnService);
 

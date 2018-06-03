@@ -1,30 +1,30 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using Climb.Controllers;
+using Climb.API;
 using Climb.Data;
 using Climb.Requests.Account;
 using Climb.Services;
+using Climb.Services.ModelServices;
 using Climb.Test.Fakes;
+using Climb.Test.Utilities;
 using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
-using ControllerUtility = Climb.Test.Utilities.ControllerUtility;
 
 namespace Climb.Test.Controllers
 {
     [TestFixture]
-    public class AccountControllerTest
+    public class AccountApiTest
     {
-        private class TestController : AccountController
+        private class TestController : AccountApi
         {
             public bool willValidateTrue = true;
 
-            public TestController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, ILogger<AccountController> logger)
-                : base(signInManager, userManager, emailSender, configuration, tokenHelper, urlUtility, logger)
+            public TestController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender emailSender, ITokenHelper tokenHelper, IUrlUtility urlUtility, ILogger<AccountApi> logger, IApplicationUserService applicationUserService)
+                : base(signInManager, userManager, emailSender, tokenHelper, urlUtility, logger, applicationUserService)
             {
             }
 
@@ -43,18 +43,19 @@ namespace Climb.Test.Controllers
         {
             userManager = Substitute.For<FakeUserManager>();
             signInManager = Substitute.For<FakeSignInManager>();
-            var logger = Substitute.For<ILogger<AccountController>>();
+            var logger = Substitute.For<ILogger<AccountApi>>();
             var emailSender = Substitute.For<IEmailSender>();
-            var configuration = Substitute.For<IConfiguration>();
-            configuration["SecurityKey"].Returns("key");
             var tokenHelper = Substitute.For<ITokenHelper>();
             var urlUtility = Substitute.For<IUrlUtility>();
+            var applicationUserService = Substitute.For<IApplicationUserService>();
 
-            testObj = new TestController(signInManager, userManager, emailSender, configuration, tokenHelper, urlUtility, logger)
+            testObj = new TestController(signInManager, userManager, emailSender, tokenHelper, urlUtility, logger, applicationUserService)
             {
                 ControllerContext = {HttpContext = new DefaultHttpContext()},
             };
         }
+
+        // TODO: LogIn
 
         [Test]
         public async Task Register_Valid_Created()
