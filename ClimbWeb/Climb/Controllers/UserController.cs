@@ -35,7 +35,7 @@ namespace Climb.Controllers
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == userID);
 
-            var viewModel = new HomeViewModel(user);
+            var viewModel = HomeViewModel.Create(user, cdnService);
 
             return View(viewModel);
         }
