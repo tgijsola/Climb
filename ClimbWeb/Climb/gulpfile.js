@@ -1,34 +1,52 @@
 ﻿"use strict";
 
-var gulp = require("gulp"),
+const gulp = require("gulp"),
     fs = require("fs"),
     del = require("del"),
     ts = require("gulp-typescript"),
-    less = require("gulp-less");
+    less = require("gulp-less"),
+    concatCss = require("gulp-concat-css");
 
-const cleanTask = "clean";
+const prepareTask = "clean:prepare";
+const postTask = "clean:post";
 const lessTask = "less";
+const cssConcatTask = "css:concat";
 const typeScriptTask = "typescript";
 
-var paths = {
-    styles: "ClientApp/styles/**/*.less",
-    scripts: "ClientApp/scripts/**/*.ts",
-    output: "wwwroot/dist"
+const paths = {
+    less: "ClientApp/styles/**/*.less",
+    ts: "ClientApp/scripts/**/*.ts",
+    output: "wwwroot/dist",
+    css: "wwwroot/dist/temp/*.css"
 };
 
-gulp.task(cleanTask, function () {
-    return del("wwwroot/dist/**/*");
-});
+gulp.task(prepareTask,
+    function() {
+        return del("wwwroot/dist/**/*");
+    });
 
-gulp.task(lessTask, function () {
-    return gulp.src(paths.styles)
-        .pipe(less())
-        .pipe(gulp.dest(paths.output));
-});
+gulp.task(postTask,
+    function() {
+        return del("wwwroot/dist/temp/**/*");
+    });
+
+gulp.task(lessTask,
+    function() {
+        return gulp.src(paths.less)
+            .pipe(less())
+            .pipe(gulp.dest(paths.output + "/temp"));
+    });
+
+gulp.task(cssConcatTask,
+    function() {
+        return gulp.src(paths.css)
+            .pipe(concatCss("bundle.css"))
+            .pipe(gulp.dest(paths.output));
+    });
 
 gulp.task(typeScriptTask,
     function() {
-        return gulp.src(paths.scripts)
+        return gulp.src(paths.ts)
             .pipe(ts({
                 noImplicitAny: true,
                 outFile: "script.js"
@@ -36,7 +54,11 @@ gulp.task(typeScriptTask,
             .pipe(gulp.dest(paths.output));
     });
 
-gulp.watch(paths.styles, gulp.parallel(lessTask));
-gulp.watch(paths.styles, gulp.parallel(typeScriptTask));
+//gulp.watch(paths.styles, gulp.parallel(lessTask));
+//gulp.watch(paths.styles, gulp.parallel(typeScriptTask));
 
-gulp.task("default", gulp.series(cleanTask, gulp.parallel(lessTask, typeScriptTask)));
+gulp.task("default",
+    gulp.series(prepareTask,
+        gulp.parallel(gulp.series(lessTask, cssConcatTask),
+            typeScriptTask),
+        postTask));
