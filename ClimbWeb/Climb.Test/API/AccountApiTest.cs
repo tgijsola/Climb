@@ -24,7 +24,7 @@ namespace Climb.Test.Controllers
             public bool willValidateTrue = true;
 
             public TestController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender emailSender, ITokenHelper tokenHelper, IUrlUtility urlUtility, ILogger<AccountApi> logger, IApplicationUserService applicationUserService)
-                : base(signInManager, userManager, emailSender, tokenHelper, urlUtility, logger, applicationUserService)
+                : base(signInManager, tokenHelper, logger, applicationUserService)
             {
             }
 

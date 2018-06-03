@@ -7,8 +7,8 @@ using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
 using Climb.Responses.Models;
-using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
+using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -30,8 +30,9 @@ namespace Climb.Test.Controllers
         {
             leagueService = Substitute.For<ILeagueService>();
             dbContext = DbContextUtility.CreateMockDb();
+            var userManager = new FakeUserManager();
 
-            testObj = new LeagueController(leagueService, dbContext, Substitute.For<ILogger<LeagueController>>());
+            testObj = new LeagueController(leagueService, dbContext, Substitute.For<ILogger<LeagueController>>(), userManager);
         }
 
         [Test]

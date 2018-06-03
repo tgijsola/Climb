@@ -35,8 +35,9 @@ namespace Climb.Test.Services.ModelServices
             ITokenHelper tokenHelper= Substitute.For<ITokenHelper>();
             IUrlUtility urlUtility= Substitute.For<IUrlUtility>();
             var signInManager = new FakeSignInManager();
+            var userManager = new FakeUserManager();
 
-            testObj = new ApplicationUserService(dbContext, cdnService, signInManager, emailSender, configuration, tokenHelper, urlUtility);
+            testObj = new ApplicationUserService(dbContext, cdnService, signInManager, emailSender, configuration, tokenHelper, urlUtility, userManager);
         }
 
         // TODO: LogIn

@@ -8,6 +8,7 @@ using Climb.Models;
 using Climb.Requests.Sets;
 using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
+using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -28,8 +29,9 @@ namespace Climb.Test.Controllers
             setService = Substitute.For<ISetService>();
             dbContext = DbContextUtility.CreateMockDb();
             var logger = Substitute.For<ILogger<SetController>>();
+            var userManager = new FakeUserManager();
 
-            testObj = new SetController(dbContext, setService, logger);
+            testObj = new SetController(dbContext, setService, logger, userManager);
         }
 
         [Test]

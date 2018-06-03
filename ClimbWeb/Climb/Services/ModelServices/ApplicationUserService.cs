@@ -7,6 +7,7 @@ using Climb.Requests.Account;
 using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -21,8 +22,9 @@ namespace Climb.Services.ModelServices
         private readonly IConfiguration configuration;
         private readonly ITokenHelper tokenHelper;
         private readonly IUrlUtility urlUtility;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public ApplicationUserService(ApplicationDbContext dbContext, ICdnService cdnService, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility)
+        public ApplicationUserService(ApplicationDbContext dbContext, ICdnService cdnService, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, UserManager<ApplicationUser> userManager)
         {
             this.dbContext = dbContext;
             this.cdnService = cdnService;
@@ -31,12 +33,28 @@ namespace Climb.Services.ModelServices
             this.configuration = configuration;
             this.tokenHelper = tokenHelper;
             this.urlUtility = urlUtility;
+            this.userManager = userManager;
         }
 
-        public Task<ApplicationUser> Register(RegisterRequest request)
+        public async Task<ApplicationUser> Register(RegisterRequest request, IUrlHelper urlHelper, string requestScheme)
         {
-            throw new NotImplementedException();
+            var user = new ApplicationUser
+            {
+                UserName = request.Email,
+                Email = request.Email
+            };
+            var result = await userManager.CreateAsync(user, request.Password);
+            if(result.Succeeded)
+            {
+                var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                var callbackUrl = urlUtility.EmailConfirmationLink(urlHelper, user.Id, code, requestScheme);
+                await emailSender.SendEmailConfirmationAsync(request.Email, callbackUrl);
 
+                await signInManager.SignInAsync(user, false);
+                return user;
+            }
+
+            throw new BadRequestException();
         }
 
         public async Task<string> LogIn(LoginRequest request)
@@ -59,13 +77,13 @@ namespace Climb.Services.ModelServices
             }
 
             var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userID);
+
             if(user == null)
             {
                 throw new NotFoundException(typeof(ApplicationUser), userID);
             }
 
             dbContext.Update(user);
-
             if(!string.IsNullOrWhiteSpace(user.ProfilePicKey))
             {
                 await cdnService.DeleteImageAsync(user.ProfilePicKey, ClimbImageRules.ProfilePic);
@@ -74,10 +92,8 @@ namespace Climb.Services.ModelServices
 
             var imageKey = await cdnService.UploadImageAsync(image, ClimbImageRules.ProfilePic);
             var imageUrl = cdnService.GetImageUrl(imageKey, ClimbImageRules.ProfilePic);
-
             user.ProfilePicKey = imageKey;
             await dbContext.SaveChangesAsync();
-
             return imageUrl;
         }
     }

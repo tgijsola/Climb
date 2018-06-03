@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Climb.Data;
 using Climb.Requests.Account;
 using Climb.Services.ModelServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -11,8 +13,8 @@ namespace Climb.Controllers
     {
         private readonly IApplicationUserService applicationUserService;
 
-        public AccountController(ILogger<AccountController> logger, IApplicationUserService applicationUserService)
-            : base(logger)
+        public AccountController(ILogger<AccountController> logger, IApplicationUserService applicationUserService, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext)
+            : base(logger, userManager, dbContext)
         {
             this.applicationUserService = applicationUserService;
         }
@@ -47,7 +49,7 @@ namespace Climb.Controllers
         {
             try
             {
-                await applicationUserService.Register(request);
+                await applicationUserService.Register(request, Url, Request.Scheme);
 
                 return RedirectToAction("Home", "User");
             }

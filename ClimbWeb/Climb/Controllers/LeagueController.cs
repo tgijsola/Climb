@@ -9,6 +9,7 @@ using Climb.Requests.Leagues;
 using Climb.Responses.Models;
 using Climb.Services.ModelServices;
 using Climb.ViewModels.Leagues;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,13 +19,11 @@ namespace Climb.Controllers
     public class LeagueController : BaseController<LeagueController>
     {
         private readonly ILeagueService leagueService;
-        private readonly ApplicationDbContext dbContext;
 
-        public LeagueController(ILeagueService leagueService, ApplicationDbContext dbContext, ILogger<LeagueController> logger)
-            : base(logger)
+        public LeagueController(ILeagueService leagueService, ApplicationDbContext dbContext, ILogger<LeagueController> logger, UserManager<ApplicationUser> userManager)
+            : base(logger, userManager, dbContext)
         {
             this.leagueService = leagueService;
-            this.dbContext = dbContext;
         }
 
         [HttpGet("leagues/home/{leagueID:int}")]

@@ -2,12 +2,13 @@
 using Climb.Data;
 using Climb.Requests.Account;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Climb.Services.ModelServices
 {
     public interface IApplicationUserService
     {
-        Task<ApplicationUser> Register(RegisterRequest request);
+        Task<ApplicationUser> Register(RegisterRequest request, IUrlHelper urlHelper, string requestScheme);
         Task<string> LogIn(LoginRequest request);
         Task<string> UploadProfilePic(string userID, IFormFile image);
     }

@@ -6,7 +6,6 @@ using Climb.Data;
 using Climb.Requests.Account;
 using Climb.Services;
 using Climb.Services.ModelServices;
-using Climb.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,21 +15,15 @@ namespace Climb.API
 {
     public class AccountApi : BaseApi<AccountApi>
     {
-        private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly IEmailSender emailSender;
         private readonly ITokenHelper tokenHelper;
-        private readonly IUrlUtility urlUtility;
         private readonly IApplicationUserService applicationUserService;
 
-        public AccountApi(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender emailSender, ITokenHelper tokenHelper, IUrlUtility urlUtility, ILogger<AccountApi> logger, IApplicationUserService applicationUserService)
+        public AccountApi(SignInManager<ApplicationUser> signInManager, ITokenHelper tokenHelper, ILogger<AccountApi> logger, IApplicationUserService applicationUserService)
             : base(logger)
         {
             this.signInManager = signInManager;
-            this.userManager = userManager;
-            this.emailSender = emailSender;
             this.tokenHelper = tokenHelper;
-            this.urlUtility = urlUtility;
             this.applicationUserService = applicationUserService;
         }
 
@@ -39,31 +32,15 @@ namespace Climb.API
         [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Email or password is not valid.")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            if(TryValidateModel(request))
+            try
             {
-                var user = new ApplicationUser
-                {
-                    UserName = request.Email,
-                    Email = request.Email
-                };
-                var result = await userManager.CreateAsync(user, request.Password);
-                if(result.Succeeded)
-                {
-                    var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = urlUtility.EmailConfirmationLink(Url, user.Id, code, Request.Scheme);
-                    await emailSender.SendEmailConfirmationAsync(request.Email, callbackUrl);
-
-                    await signInManager.SignInAsync(user, false);
-                    return CodeResultAndLog(HttpStatusCode.Created, user, "User created a new account with password.");
-                }
-
-                foreach(var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                var user = await applicationUserService.Register(request, Url, Request.Scheme);
+                return CodeResultAndLog(HttpStatusCode.Created, user, "Created user.");
             }
-
-            return CodeResultAndLog(HttpStatusCode.BadRequest, "Email or password is not valid.");
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
         }
 
         [HttpPost("/api/v1/account/logIn")]

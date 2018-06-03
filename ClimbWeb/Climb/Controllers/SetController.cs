@@ -6,6 +6,7 @@ using Climb.Data;
 using Climb.Requests.Sets;
 using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -14,14 +15,12 @@ namespace Climb.Controllers
 {
     public class SetController : BaseController<SetController>
     {
-        private readonly ApplicationDbContext dbContext;
         private readonly ISetService setService;
 
-        public SetController(ApplicationDbContext dbContext, ISetService setService, ILogger<SetController> logger)
-            : base(logger)
+        public SetController(ApplicationDbContext dbContext, ISetService setService, ILogger<SetController> logger, UserManager<ApplicationUser> userManager)
+            : base(logger, userManager, dbContext)
         {
             this.setService = setService;
-            this.dbContext = dbContext;
         }
 
         [HttpPost("/api/v1/sets/submit")]

@@ -7,6 +7,7 @@ using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services.ModelServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,13 +17,11 @@ namespace Climb.Controllers
     public class GameController : BaseController<GameController>
     {
         private readonly IGameService gameService;
-        private readonly ApplicationDbContext dbContext;
 
-        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger)
-            : base(logger)
+        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger, UserManager<ApplicationUser> userManager)
+            : base(logger, userManager, dbContext)
         {
             this.gameService = gameService;
-            this.dbContext = dbContext;
         }
 
         [HttpGet("/api/v1/games/{gameID:int}")]

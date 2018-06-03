@@ -17,24 +17,20 @@ namespace Climb.Controllers
 {
     public class UserController : BaseController<UserController>
     {
-        private readonly ApplicationDbContext dbContext;
         private readonly IApplicationUserService applicationUserService;
         private readonly ICdnService cdnService;
-        private readonly UserManager<ApplicationUser> userManager;
 
         public UserController(ApplicationDbContext dbContext, IApplicationUserService applicationUserService, ILogger<UserController> logger, ICdnService cdnService, UserManager<ApplicationUser> userManager)
-            : base(logger)
+            : base(logger, userManager, dbContext)
         {
-            this.dbContext = dbContext;
             this.applicationUserService = applicationUserService;
             this.cdnService = cdnService;
-            this.userManager = userManager;
         }
 
         [HttpGet("users/home/{userID?}")]
         public async Task<IActionResult> Home(string userID)
         {
-            var appUser = await userManager.GetUserAsync(User);
+            var appUser = await GetViewUserAsync();
             var id = userID ?? appUser?.Id;
 
             var user = await dbContext.Users
@@ -46,7 +42,7 @@ namespace Climb.Controllers
                 return NotFound();
             }
 
-            var viewModel = HomeViewModel.Create(user, cdnService);
+            var viewModel = HomeViewModel.Create(appUser, user, cdnService);
 
             return View(viewModel);
         }
