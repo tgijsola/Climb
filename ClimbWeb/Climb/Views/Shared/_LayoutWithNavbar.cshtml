@@ -8,8 +8,9 @@
     <partial name="./_Files"/>
 </head>
 <body class="text-center">
-    @RenderBody()
+<partial name="./Navbar" />
+@RenderBody()
 
-    @RenderSection("scripts", required: false)
+@RenderSection("scripts", required: false)
 </body>
 </html>
