@@ -1,0 +1,27 @@
+﻿@model Climb.ViewModels.Games.HomeViewModel
+
+@{
+    ViewBag.Title = "Games-Home";
+    Layout = "_LayoutWithNavbar";
+}
+
+<div>
+    <h1>@Model.Game.Name</h1>
+    <div>
+        <h3>Characters</h3>
+        @foreach(var character in Model.Game.Characters)
+        {
+            <div>@character.Name</div>
+        }
+    </div>
+    @if(Model.Game.Stages.Count > 0)
+    {
+        <div>
+            <h3>Stages</h3>
+            @foreach(var stage in Model.Game.Stages)
+            {
+                <div>@stage.Name</div>
+            }
+        </div>
+    }
+</div>

@@ -7,6 +7,7 @@ using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services.ModelServices;
+using Climb.ViewModels.Games;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,23 @@ namespace Climb.Controllers
             : base(logger, userManager, dbContext)
         {
             this.gameService = gameService;
+        }
+
+        [HttpGet("games/home/{gameID:int}")]
+        public async Task<IActionResult> Home(int gameID)
+        {
+            var user = await GetViewUserAsync();
+            var game = await dbContext.Games
+                .Include(g => g.Characters).AsNoTracking()
+                .Include(g => g.Stages).AsNoTracking()
+                .FirstOrDefaultAsync(g => g.ID == gameID);
+            if(game == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new HomeViewModel(user, game);
+            return View(viewModel);
         }
 
         [HttpGet("/api/v1/games/{gameID:int}")]
