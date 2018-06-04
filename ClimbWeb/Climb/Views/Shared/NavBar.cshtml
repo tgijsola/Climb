@@ -15,7 +15,12 @@
             <ul class="nav navbar-nav">
                 @if(Model.User == null)
                 {
-                    <li><a href="#">Log In</a></li>
+                    <li>
+                        <a asp-controller="Account" asp-action="LogIn">Log In</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Account" asp-action="Register">Register</a>
+                    </li>
                 }
                 else
                 {
