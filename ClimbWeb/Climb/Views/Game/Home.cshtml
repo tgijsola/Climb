@@ -5,11 +5,17 @@
     Layout = "_LayoutWithNavbar";
 }
 
+<link rel="stylesheet" href="~/dist/game/game-home.css"/>
+
 <div>
     <h1>@Model.Game.Name</h1>
+
     <div>
-        <h3>Characters</h3>
-        @foreach(var character in Model.Game.Characters)
+        <div class="game-header">
+            <h3>Characters</h3>
+            <a asp-action="CharacterAdd">Add</a>
+        </div>
+        @foreach (var character in Model.Game.Characters)
         {
             <div>@character.Name</div>
         }
@@ -17,7 +23,10 @@
     @if(Model.Game.Stages.Count > 0)
     {
         <div>
-            <h3>Stages</h3>
+            <div class="game-header">
+                <h3>Stages</h3>
+                <a>Add</a>
+            </div>
             @foreach(var stage in Model.Game.Stages)
             {
                 <div>@stage.Name</div>

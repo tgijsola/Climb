@@ -42,6 +42,35 @@ namespace Climb.Controllers
             return View(viewModel);
         }
 
+        [HttpGet("games/characters/add/{gameID:int}")]
+        public async Task<IActionResult> CharacterAdd(int gameID)
+        {
+            var user = await GetViewUserAsync();
+            var game = await dbContext.Games
+                .FirstOrDefaultAsync(g => g.ID == gameID);
+            if(game == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new CharacterAddViewModel(user, game);
+            return View(viewModel);
+        }
+
+        [HttpPost("games/characters/add")]
+        public async Task<IActionResult> CharacterAddPost(AddCharacterRequest request)
+        {
+            try
+            {
+                var character = await gameService.AddCharacter(request);
+                return CodeResultAndLog(HttpStatusCode.Created, character, $"New character {character.Name} created.");
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
+        }
+
         [HttpGet("/api/v1/games/{gameID:int}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(Game))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
