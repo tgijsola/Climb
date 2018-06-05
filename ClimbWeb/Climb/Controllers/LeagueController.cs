@@ -34,8 +34,9 @@ namespace Climb.Controllers
                 .Include(l => l.Members).AsNoTracking()
                 .Include(l => l.Game).AsNoTracking()
                 .ToArrayAsync();
+            var games = await dbContext.Games.ToArrayAsync();
 
-            var viewModel = new IndexViewModel(user, leagues);
+            var viewModel = new IndexViewModel(user, leagues, games);
             return View(viewModel);
         }
 
