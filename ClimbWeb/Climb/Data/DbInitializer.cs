@@ -43,7 +43,7 @@ namespace Climb.Data
             var users = new List<ApplicationUser>();
             for(var i = 0; i < count; i++)
             {
-                users.Add(new ApplicationUser());
+                users.Add(new ApplicationUser{UserName = $"User_{i}"});
             }
 
             dbContext.Users.AddRange(users);
