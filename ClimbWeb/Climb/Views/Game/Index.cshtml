@@ -28,7 +28,7 @@
         @foreach(var game in Model.Games)
         {
             <tr>
-                <td>@game.Name</td>
+                <td><a asp-action="Home" asp-route-gameID="@game.ID">@game.Name</a></td>
                 <td>@game.DateAdded.ToShortDateString()</td>
                 <td>@game.Leagues.Count</td>
                 <td>@game.Leagues.Sum(l => l.Members.Count)</td>
