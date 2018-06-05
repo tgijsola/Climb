@@ -31,6 +31,7 @@ namespace Climb.Controllers
         {
             var user = await GetViewUserAsync();
             var leagues = await dbContext.Leagues
+                .Include(l => l.Admin).AsNoTracking()
                 .Include(l => l.Members).AsNoTracking()
                 .Include(l => l.Game).AsNoTracking()
                 .ToArrayAsync();
@@ -56,7 +57,7 @@ namespace Climb.Controllers
         {
             try
             {
-                var league = await leagueService.Create(request.Name, request.GameID);
+                var league = await leagueService.Create(request.Name, request.GameID, request.AdminID);
                 logger.LogInformation($"League {league.ID} created.");
                 
                 return RedirectToAction("Home", new {leagueID = league.ID});
@@ -98,7 +99,7 @@ namespace Climb.Controllers
         {
             try
             {
-                var league = await leagueService.Create(request.Name, request.GameID);
+                var league = await leagueService.Create(request.Name, request.GameID, request.AdminID);
                 return CodeResult(HttpStatusCode.Created, league);
             }
             catch(Exception exception)

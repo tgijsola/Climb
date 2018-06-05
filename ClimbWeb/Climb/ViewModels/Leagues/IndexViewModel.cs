@@ -6,13 +6,13 @@ namespace Climb.ViewModels.Leagues
 {
     public class IndexViewModel : BaseViewModel
     {
-        public IReadOnlyList<League> Leagues { get; }
+        public IReadOnlyList<League> AllLeagues { get; }
         public IReadOnlyList<Game> Games { get; }
 
-        public IndexViewModel(ApplicationUser user, IReadOnlyList<League> leagues, IReadOnlyList<Game> games)
+        public IndexViewModel(ApplicationUser user, IReadOnlyList<League> allLeagues, IReadOnlyList<Game> games)
             : base(user)
         {
-            Leagues = leagues;
+            AllLeagues = allLeagues;
             Games = games;
         }
     }

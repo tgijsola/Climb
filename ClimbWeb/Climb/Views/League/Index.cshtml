@@ -9,6 +9,7 @@
     <h1>All Leagues</h1>
 
     <form asp-action="Create">
+        <input name="adminID" type="hidden" value="@Model.User.Id"/>
         <input type="text" name="name" placeholder="Name"/>
         <select name="gameID">
             @foreach(var game in Model.Games)
@@ -23,22 +24,24 @@
         <thead>
         <tr>
             <th scope="col">Name</th>
-            <th scope="col">Date Created</th>
             <th scope="col">Game</th>
+            <th scope="col">Admin</th>
+            <th scope="col">Date Created</th>
             <th scope="col">Members</th>
         </tr>
         </thead>
         <tbody>
-        @foreach(var league in Model.Leagues)
+        @foreach(var league in Model.AllLeagues)
         {
             <tr>
                 <td>
                     <a asp-action="Home" asp-route-leagueID="@league.ID">@league.Name</a>
                 </td>
-                <td>@league.DateCreated.ToShortDateString()</td>
                 <td>
                     <a asp-controller="Game" asp-action="Home" asp-route-gameID="@league.GameID">@league.Game.Name</a>
                 </td>
+                <td>@league.Admin.UserName</td>
+                <td>@league.DateCreated.ToShortDateString()</td>
                 <td>@league.Members.Count</td>
             </tr>
         }

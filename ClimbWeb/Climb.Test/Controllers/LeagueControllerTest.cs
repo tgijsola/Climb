@@ -41,7 +41,7 @@ namespace Climb.Test.Controllers
             var gameID = DbContextUtility.AddNew<Game>(dbContext).ID;
             var request = new CreateRequest {Name = LeagueName, GameID = gameID};
 
-            leagueService.Create(LeagueName, gameID).Returns(new League {Name = LeagueName, GameID = gameID});
+            leagueService.Create(LeagueName, gameID, "").Returns(new League {Name = LeagueName, GameID = gameID});
 
             var result = await testObj.Create(request);
 

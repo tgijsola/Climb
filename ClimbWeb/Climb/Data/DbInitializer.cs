@@ -17,8 +17,8 @@ namespace Climb.Data
         private static void CreateTestData(ApplicationDbContext dbContext)
         {
             var game = CreateTestGame(dbContext);
-            var league = CreateTestLeague(dbContext, game);
             var users = CreateTestUsers(dbContext, 8);
+            var league = CreateTestLeague(dbContext, game, users[0]);
             CreateTestMembers(dbContext, league, users);
         }
 
@@ -30,15 +30,15 @@ namespace Climb.Data
             return game;
         }
 
-        private static League CreateTestLeague(ApplicationDbContext dbContext, Game game)
+        private static League CreateTestLeague(ApplicationDbContext dbContext, Game game, ApplicationUser admin)
         {
-            var league = new League(game.ID, "Fun Smash Friends");
+            var league = new League(game.ID, "Fun Smash Friends", admin.Id);
             dbContext.Leagues.Add(league);
             dbContext.SaveChanges();
             return league;
         }
 
-        private static ICollection<ApplicationUser> CreateTestUsers(ApplicationDbContext dbContext, int count)
+        private static List<ApplicationUser> CreateTestUsers(ApplicationDbContext dbContext, int count)
         {
             var users = new List<ApplicationUser>();
             for(var i = 0; i < count; i++)
