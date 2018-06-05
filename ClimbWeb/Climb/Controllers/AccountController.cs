@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Requests.Account;
+using Climb.Services;
 using Climb.Services.ModelServices;
+using Climb.ViewModels.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,12 +15,14 @@ namespace Climb.Controllers
     {
         private readonly IApplicationUserService applicationUserService;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly ICdnService cdnService;
 
-        public AccountController(ILogger<AccountController> logger, IApplicationUserService applicationUserService, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext, SignInManager<ApplicationUser> signInManager)
+        public AccountController(ILogger<AccountController> logger, IApplicationUserService applicationUserService, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext, SignInManager<ApplicationUser> signInManager, ICdnService cdnService)
             : base(logger, userManager, dbContext)
         {
             this.applicationUserService = applicationUserService;
             this.signInManager = signInManager;
+            this.cdnService = cdnService;
         }
 
         public IActionResult Register()
@@ -31,7 +35,7 @@ namespace Climb.Controllers
             return View();
         }
 
-        [HttpPost("[controller]/LogIn")]
+        [HttpPost("account/login")]
         public async Task<IActionResult> LogInPost(LoginRequest request)
         {
             try
@@ -45,8 +49,8 @@ namespace Climb.Controllers
                 return new BadRequestResult();
             }
         }
-        
-        [HttpPost("[controller]/Register")]
+
+        [HttpPost("account/register")]
         public async Task<IActionResult> RegisterPost(RegisterRequest request)
         {
             try
@@ -61,12 +65,40 @@ namespace Climb.Controllers
             }
         }
 
-        [HttpPost("[controller]/logout")]
+        [HttpPost("account/logout")]
         public async Task<IActionResult> LogOut()
         {
             await signInManager.SignOutAsync();
 
             return RedirectToAction("Home", "Site");
+        }
+
+        [HttpGet("account/settings")]
+        public async Task<IActionResult> Settings()
+        {
+            var user = await GetViewUserAsync();
+
+            var viewModel = SettingsViewModel.Create(user, cdnService);
+            return View(viewModel);
+        }
+
+        // TODO: Move to service.
+        [HttpPost("account/updatesettings")]
+        public async Task<IActionResult> UpdateSettings(UpdateSettingsRequest request)
+        {
+            var user = await userManager.GetUserAsync(User);
+            dbContext.Update(user);
+
+            user.UserName = request.Username;
+
+            if(request.ProfilePic != null)
+            {
+                await applicationUserService.UploadProfilePic(user.Id, request.ProfilePic);
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return RedirectToAction("Settings");
         }
     }
 }

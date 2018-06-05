@@ -13,7 +13,7 @@ namespace Climb.Controllers
     public abstract class BaseController<T> : Controller where T : Controller
     {
         protected readonly ILogger<T> logger;
-        private readonly UserManager<ApplicationUser> userManager;
+        protected readonly UserManager<ApplicationUser> userManager;
         protected readonly ApplicationDbContext dbContext;
 
         protected BaseController(ILogger<T> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext)

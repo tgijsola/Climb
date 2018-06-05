@@ -5,13 +5,13 @@ using Climb.Models;
 
 namespace Climb.ViewModels
 {
-    public abstract class BaseViewModel
+    public class BaseViewModel
     {
         public ApplicationUser User { get; }
         public IReadOnlyList<League> Leagues { get; }
         //public IReadOnlyList<Season> Seasons { get; }
 
-        protected BaseViewModel(ApplicationUser user)
+        public BaseViewModel(ApplicationUser user)
         {
             User = user;
 
