@@ -5,5 +5,21 @@
     Layout = "_LayoutWithNavbar";
 }
 
-<h2>Leagues-Home</h2>
-<h3>Welcome to @Model.League.Name</h3>
+<div>
+    <h1>Welcome to @Model.League.Name</h1>
+
+    @if(!Model.IsMember)
+    {
+        <form asp-action="Join">
+            <input type="hidden" name="leagueID" value="@Model.League.ID"/>
+            <input type="hidden" name="userID" value="@Model.User.Id"/>
+            <button>Join</button>
+        </form>
+    }
+
+    <h3>Members</h3>
+    @foreach(var member in Model.League.Members)
+    {
+        <div>@member.User.UserName</div>
+    }
+</div>

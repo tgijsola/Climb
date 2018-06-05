@@ -45,7 +45,9 @@ namespace Climb.Controllers
         public async Task<IActionResult> Home(int leagueID)
         {
             var user = await GetViewUserAsync();
-            var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ID == leagueID);
+            var league = await dbContext.Leagues
+                .Include(l => l.Members).ThenInclude(lu => lu.User).AsNoTracking()
+                .FirstOrDefaultAsync(l => l.ID == leagueID);
 
             var viewModel = new HomeViewModel(user, league);
 
@@ -61,6 +63,22 @@ namespace Climb.Controllers
                 logger.LogInformation($"League {league.ID} created.");
                 
                 return RedirectToAction("Home", new {leagueID = league.ID});
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
+        }
+
+        [HttpPost("leagues/join")]
+        public async Task<IActionResult> Join(JoinRequest request)
+        {
+            try
+            {
+                var leagueUser = await leagueService.Join(request.LeagueID, request.UserID);
+                logger.LogInformation($"User {request.UserID} joined league {request.LeagueID} as league user {leagueUser.ID}.");
+
+                return RedirectToAction("Home", new {leagueID = request.LeagueID});
             }
             catch(Exception exception)
             {
@@ -112,7 +130,7 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.Created, typeof(LeagueUser))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find user.")]
-        public async Task<IActionResult> Join(JoinRequest request)
+        public async Task<IActionResult> Join_API(JoinRequest request)
         {
             try
             {
