@@ -25,6 +25,18 @@ namespace Climb.Controllers
             this.gameService = gameService;
         }
 
+        [HttpGet("games")]
+        public async Task<IActionResult> Index()
+        {
+            var user = await GetViewUserAsync();
+            var games = await dbContext.Games
+                .Include(g => g.Leagues).ThenInclude(l => l.Members).AsNoTracking()
+                .ToArrayAsync();
+
+            var viewModel = new IndexViewModel(user, games);
+            return View(viewModel);
+        }
+
         [HttpGet("games/home/{gameID:int}")]
         public async Task<IActionResult> Home(int gameID)
         {
@@ -71,6 +83,22 @@ namespace Climb.Controllers
             }
         }
 
+        [HttpPost("games/create")]
+        public async Task<IActionResult> Create(CreateRequest request)
+        {
+            try
+            {
+                var game = await gameService.Create(request);
+                logger.LogInformation($"Game {game.ID} created");
+
+                return RedirectToAction("Home", new {gameID=game.ID});
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
+        }
+
         [HttpGet("/api/v1/games/{gameID:int}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(Game))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
@@ -91,7 +119,7 @@ namespace Climb.Controllers
         [HttpPost("/api/v1/games/create")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(Game))]
         [SwaggerResponse(HttpStatusCode.Conflict, typeof(string), "Game name is taken.")]
-        public async Task<IActionResult> Create(CreateRequest request)
+        public async Task<IActionResult> Create_API(CreateRequest request)
         {
             try
             {
