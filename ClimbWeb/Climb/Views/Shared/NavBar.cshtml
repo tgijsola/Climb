@@ -13,7 +13,7 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                @if(Model.User == null)
+                @if (Model.User == null)
                 {
                     <li>
                         <a asp-controller="Account" asp-action="LogIn">Log In</a>
@@ -38,6 +38,16 @@
                                 <div class="dropdown-divider"></div>
                             }
                             <a asp-controller="League" asp-action="Index">Search</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.User.UserName
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <form asp-controller="Account" asp-action="LogOut">
+                                <button>Log Out</button>
+                            </form>
                         </div>
                     </li>
                 }
