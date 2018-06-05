@@ -24,12 +24,22 @@
                 }
                 else
                 {
-                    foreach(var league in Model.Leagues)
-                    {
-                        <li>
-                            <a asp-controller="League" asp-action="Home" asp-route-leagueID="@league.ID">@league.Name</a>
-                        </li>
-                    }
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Leagues
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            @foreach (var league in Model.Leagues)
+                            {
+                                <a class="dropdown-item" asp-controller="League" asp-action="Home" asp-route-leagueID="@league.ID">@league.Name</a>
+                            }
+                            @if (Model.Leagues.Count > 0)
+                            {
+                                <div class="dropdown-divider"></div>
+                            }
+                            <a asp-controller="League" asp-action="Index">Search</a>
+                        </div>
+                    </li>
                 }
             </ul>
         </div>

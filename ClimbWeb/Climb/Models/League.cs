@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
@@ -11,6 +12,7 @@ namespace Climb.Models
         [Required]
         public string Name { get; set; } = "";
         public int SetsTillRank { get; set; } = 4;
+        public DateTime DateCreated { get; set; }
 
         [JsonIgnore]
         public Game Game { get; set; }
@@ -29,6 +31,7 @@ namespace Climb.Models
         {
             GameID = gameID;
             Name = name;
+            DateCreated = DateTime.Today;
         }
 
         public bool IsMemberNew(LeagueUser member) => member.SetCount >= SetsTillRank;

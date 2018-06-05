@@ -26,14 +26,44 @@ namespace Climb.Controllers
             this.leagueService = leagueService;
         }
 
+        [HttpGet("leagues")]
+        public async Task<IActionResult> Index()
+        {
+            var user = await GetViewUserAsync();
+            var leagues = await dbContext.Leagues
+                .Include(l => l.Members).AsNoTracking()
+                .Include(l => l.Game).AsNoTracking()
+                .ToArrayAsync();
+
+            var viewModel = new IndexViewModel(user, leagues);
+            return View(viewModel);
+        }
+
         [HttpGet("leagues/home/{leagueID:int}")]
         public async Task<IActionResult> Home(int leagueID)
         {
+            var user = await GetViewUserAsync();
             var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ID == leagueID);
 
-            var viewModel = new HomeViewModel(null, league);
+            var viewModel = new HomeViewModel(user, league);
 
             return View(viewModel);
+        }
+
+        [HttpPost("leagues/create")]
+        public async Task<IActionResult> Create(CreateRequest request)
+        {
+            try
+            {
+                var league = await leagueService.Create(request.Name, request.GameID);
+                logger.LogInformation($"League {league.ID} created.");
+                
+                return RedirectToAction("Home", new {leagueID = league.ID});
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
         }
 
         [HttpGet("/api/v1/leagues")]
@@ -63,7 +93,7 @@ namespace Climb.Controllers
         [SwaggerResponse(HttpStatusCode.Created, typeof(League))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find game.")]
         [SwaggerResponse(HttpStatusCode.Conflict, typeof(string), "League name taken.")]
-        public async Task<IActionResult> Create(CreateRequest request)
+        public async Task<IActionResult> Create_API(CreateRequest request)
         {
             try
             {
