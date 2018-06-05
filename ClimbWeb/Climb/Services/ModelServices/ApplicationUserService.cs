@@ -40,8 +40,8 @@ namespace Climb.Services.ModelServices
         {
             var user = new ApplicationUser
             {
-                UserName = request.Email,
-                Email = request.Email
+                UserName = request.Username,
+                Email = request.Email,
             };
             var result = await userManager.CreateAsync(user, request.Password);
             if(result.Succeeded)
