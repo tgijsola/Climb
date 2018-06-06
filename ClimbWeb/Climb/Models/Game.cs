@@ -9,9 +9,10 @@ namespace Climb.Models
         public int ID { get; set; }
         [Required]
         public string Name { get; set; } = "";
+        public DateTime DateAdded { get; set; }
         public int CharactersPerMatch { get; set; }
         public int MaxMatchPoints { get; set; }
-        public DateTime DateAdded { get; set; }
+        public bool HasStages { get; set; }
 
         [Required]
         public List<Character> Characters { get; set; }
@@ -23,12 +24,13 @@ namespace Climb.Models
         {
         }
 
-        public Game(string name, int charactersPerMatch, int maxMatchPoints)
+        public Game(string name, int charactersPerMatch, int maxMatchPoints, bool hasStages)
         {
             Name = name;
+            DateAdded = DateTime.Today;
             CharactersPerMatch = charactersPerMatch;
             MaxMatchPoints = maxMatchPoints;
-            DateAdded = DateTime.Today;
+            HasStages = hasStages;
         }
     }
 }

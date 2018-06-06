@@ -39,7 +39,7 @@ namespace Climb.Services.ModelServices
                 throw new ConflictException(typeof(Game), nameof(Game.Name), request.Name);
             }
 
-            var game = new Game(request.Name, request.CharactersPerMatch, request.MaxMatchPoints);
+            var game = new Game(request.Name, request.CharactersPerMatch, request.MaxMatchPoints, request.HasStages);
 
             dbContext.Add(game);
             await dbContext.SaveChangesAsync();
