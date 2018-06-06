@@ -1,27 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Climb.Controllers;
+using Climb.API;
 using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Leagues;
 using Climb.Responses.Models;
 using Climb.Services.ModelServices;
-using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Climb.Test.Controllers
+namespace Climb.Test.Api
 {
     [TestFixture]
-    public class LeagueControllerTest
+    public class LeagueApiTest
     {
         private const string LeagueName = "NewLeague";
 
-        private LeagueController testObj;
+        private LeagueApi testObj;
         private ILeagueService leagueService;
         private ApplicationDbContext dbContext;
 
@@ -30,18 +29,26 @@ namespace Climb.Test.Controllers
         {
             leagueService = Substitute.For<ILeagueService>();
             dbContext = DbContextUtility.CreateMockDb();
-            var userManager = new FakeUserManager();
+            var logger = Substitute.For<ILogger<LeagueApi>>();
 
-            testObj = new LeagueController(leagueService, dbContext, Substitute.For<ILogger<LeagueController>>(), userManager);
+            testObj = new LeagueApi(logger, dbContext, leagueService);
         }
 
         [Test]
         public async Task Create_Valid_CreatedResult()
         {
             var gameID = DbContextUtility.AddNew<Game>(dbContext).ID;
-            var request = new CreateRequest {Name = LeagueName, GameID = gameID};
+            var request = new CreateRequest
+            {
+                Name = LeagueName,
+                GameID = gameID
+            };
 
-            leagueService.Create(LeagueName, gameID, "").Returns(new League {Name = LeagueName, GameID = gameID});
+            leagueService.Create(LeagueName, gameID, "").Returns(new League
+            {
+                Name = LeagueName,
+                GameID = gameID
+            });
 
             var result = await testObj.Create(request);
 
