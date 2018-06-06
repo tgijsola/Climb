@@ -1,0 +1,25 @@
+﻿@model Climb.ViewModels.Leagues.HomeViewModel
+
+@{
+    ViewBag.Title = "Leagues-Home";
+    Layout = "_LayoutWithNavbar";
+}
+
+<div>
+    <h1>Welcome to @Model.League.Name</h1>
+
+    @if(!Model.IsMember)
+    {
+        <form asp-action="Join">
+            <input type="hidden" name="leagueID" value="@Model.League.ID"/>
+            <input type="hidden" name="userID" value="@Model.User.Id"/>
+            <button>Join</button>
+        </form>
+    }
+
+    <h3>Members</h3>
+    @foreach(var member in Model.League.Members)
+    {
+        <div>@member.User.UserName</div>
+    }
+</div>

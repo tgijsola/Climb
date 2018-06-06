@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Net;
 using Climb.Controllers;
+using Climb.Data;
 using Climb.Exceptions;
+using Climb.Test.Fakes;
 using Climb.Test.Utilities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -12,8 +15,8 @@ namespace Climb.Test.Controllers
 {
     public class FakeBaseController : BaseController<FakeBaseController>
     {
-        public FakeBaseController(ILogger<FakeBaseController> logger)
-            : base(logger)
+        public FakeBaseController(ILogger<FakeBaseController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext)
+            : base(logger, userManager, dbContext)
         {
         }
 
@@ -32,8 +35,10 @@ namespace Climb.Test.Controllers
         public void SetUp()
         {
             var logger = Substitute.For<ILogger<FakeBaseController>>();
+            var userManager = new FakeUserManager();
+            var dbContext = DbContextUtility.CreateMockDb();
 
-            testObj = new FakeBaseController(logger);
+            testObj = new FakeBaseController(logger, userManager, dbContext);
         }
 
         [TestCase(typeof(NotFoundException), HttpStatusCode.NotFound)]

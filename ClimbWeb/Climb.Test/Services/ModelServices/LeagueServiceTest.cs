@@ -34,7 +34,7 @@ namespace Climb.Test.Services.ModelServices
         {
             var game = DbContextUtility.AddNew<Game>(dbContext);
 
-            var league = await testObj.Create("", game.ID);
+            var league = await testObj.Create("", game.ID, "");
 
             Assert.IsNotNull(league);
         }
@@ -42,7 +42,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public void Create_NoGame_NotFound()
         {
-            Assert.ThrowsAsync<NotFoundException>(() => testObj.Create("", 0));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Create("", 0, ""));
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace Climb.Test.Services.ModelServices
         {
             var league = LeagueUtility.CreateLeague(dbContext);
 
-            Assert.ThrowsAsync<ConflictException>(() => testObj.Create(league.Name, league.GameID));
+            Assert.ThrowsAsync<ConflictException>(() => testObj.Create(league.Name, league.GameID, ""));
         }
 
         [Test]

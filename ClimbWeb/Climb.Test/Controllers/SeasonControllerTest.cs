@@ -9,6 +9,7 @@ using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
+using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -33,8 +34,9 @@ namespace Climb.Test.Controllers
             gameID = game.ID;
 
             seasonService = Substitute.For<ISeasonService>();
+            var userManager = new FakeUserManager();
 
-            testObj = new SeasonController(seasonService, dbContext, Substitute.For<ILogger<SeasonController>>());
+            testObj = new SeasonController(seasonService, dbContext, Substitute.For<ILogger<SeasonController>>(), userManager);
         }
 
         [Test]

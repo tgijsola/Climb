@@ -1,8 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
+using Climb.Extensions;
+using Climb.Requests.Account;
+using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Climb.Services.ModelServices
 {
@@ -10,11 +17,56 @@ namespace Climb.Services.ModelServices
     {
         private readonly ApplicationDbContext dbContext;
         private readonly ICdnService cdnService;
+        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly IEmailSender emailSender;
+        private readonly IConfiguration configuration;
+        private readonly ITokenHelper tokenHelper;
+        private readonly IUrlUtility urlUtility;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public ApplicationUserService(ApplicationDbContext dbContext, ICdnService cdnService)
+        public ApplicationUserService(ApplicationDbContext dbContext, ICdnService cdnService, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, UserManager<ApplicationUser> userManager)
         {
             this.dbContext = dbContext;
             this.cdnService = cdnService;
+            this.signInManager = signInManager;
+            this.emailSender = emailSender;
+            this.configuration = configuration;
+            this.tokenHelper = tokenHelper;
+            this.urlUtility = urlUtility;
+            this.userManager = userManager;
+        }
+
+        public async Task<ApplicationUser> Register(RegisterRequest request, IUrlHelper urlHelper, string requestScheme)
+        {
+            var user = new ApplicationUser
+            {
+                UserName = request.Username,
+                Email = request.Email,
+            };
+            var result = await userManager.CreateAsync(user, request.Password);
+            if(result.Succeeded)
+            {
+                var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                var callbackUrl = urlUtility.EmailConfirmationLink(urlHelper, user.Id, code, requestScheme);
+                await emailSender.SendEmailConfirmationAsync(request.Email, callbackUrl);
+
+                await signInManager.SignInAsync(user, false);
+                return user;
+            }
+
+            throw new BadRequestException();
+        }
+
+        public async Task<string> LogIn(LoginRequest request)
+        {
+            var result = await signInManager.PasswordSignInAsync(request.Email, request.Password, true, false);
+            if(result.Succeeded)
+            {
+                var token = tokenHelper.CreateUserToken(configuration.GetSecurityKey(), DateTime.Now.AddMinutes(30), request.Email);
+                return token;
+            }
+
+            throw new BadRequestException();
         }
 
         public async Task<string> UploadProfilePic(string userID, IFormFile image)
@@ -25,13 +77,13 @@ namespace Climb.Services.ModelServices
             }
 
             var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userID);
+
             if(user == null)
             {
                 throw new NotFoundException(typeof(ApplicationUser), userID);
             }
 
             dbContext.Update(user);
-
             if(!string.IsNullOrWhiteSpace(user.ProfilePicKey))
             {
                 await cdnService.DeleteImageAsync(user.ProfilePicKey, ClimbImageRules.ProfilePic);
@@ -40,10 +92,8 @@ namespace Climb.Services.ModelServices
 
             var imageKey = await cdnService.UploadImageAsync(image, ClimbImageRules.ProfilePic);
             var imageUrl = cdnService.GetImageUrl(imageKey, ClimbImageRules.ProfilePic);
-
             user.ProfilePicKey = imageKey;
             await dbContext.SaveChangesAsync();
-
             return imageUrl;
         }
     }

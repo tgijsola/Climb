@@ -7,6 +7,7 @@ using Climb.Data;
 using Climb.Models;
 using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,22 +17,11 @@ namespace Climb.Controllers
     public class SeasonController : BaseController<SeasonController>
     {
         private readonly ISeasonService seasonService;
-        private readonly ApplicationDbContext dbContext;
 
-        public SeasonController(ISeasonService seasonService, ApplicationDbContext dbContext, ILogger<SeasonController> logger)
-            : base(logger)
+        public SeasonController(ISeasonService seasonService, ApplicationDbContext dbContext, ILogger<SeasonController> logger, UserManager<ApplicationUser> userManager)
+            : base(logger, userManager, dbContext)
         {
-            this.dbContext = dbContext;
             this.seasonService = seasonService;
-        }
-
-        [HttpGet("/seasons/{*page}")]
-        [SwaggerIgnore]
-        public IActionResult Index()
-        {
-            ViewData["Title"] = "Season";
-            ViewData["Script"] = "seasons";
-            return View("~/Views/Page.cshtml");
         }
 
         [HttpGet("/api/v1/seasons/{seasonID:int}")]

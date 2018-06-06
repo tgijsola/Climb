@@ -98,6 +98,8 @@ namespace Climb.Migrations
 
                     b.Property<int>("CharactersPerMatch");
 
+                    b.Property<DateTime>("DateAdded");
+
                     b.Property<int>("MaxMatchPoints");
 
                     b.Property<string>("Name")
@@ -114,6 +116,10 @@ namespace Climb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("AdminID");
+
+                    b.Property<DateTime>("DateCreated");
+
                     b.Property<int>("GameID");
 
                     b.Property<string>("Name")
@@ -122,6 +128,8 @@ namespace Climb.Migrations
                     b.Property<int>("SetsTillRank");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("AdminID");
 
                     b.HasIndex("GameID");
 
@@ -434,8 +442,13 @@ namespace Climb.Migrations
 
             modelBuilder.Entity("Climb.Models.League", b =>
                 {
-                    b.HasOne("Climb.Models.Game", "Game")
+                    b.HasOne("Climb.Data.ApplicationUser", "Admin")
                         .WithMany()
+                        .HasForeignKey("AdminID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.Game", "Game")
+                        .WithMany("Leagues")
                         .HasForeignKey("GameID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
@@ -448,7 +461,7 @@ namespace Climb.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Climb.Data.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("LeagueUsers")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });

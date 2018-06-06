@@ -6,6 +6,7 @@ using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services.ModelServices;
+using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -21,8 +22,9 @@ namespace Climb.Test.Controllers
         {
             gameService = Substitute.For<IGameService>();
             dbContext = DbContextUtility.CreateMockDb();
+            var userManager = new FakeUserManager();
 
-            testObj = new GameController(gameService, dbContext, Substitute.For<ILogger<GameController>>());
+            testObj = new GameController(gameService, dbContext, Substitute.For<ILogger<GameController>>(), userManager);
         }
 
         private GameController testObj;

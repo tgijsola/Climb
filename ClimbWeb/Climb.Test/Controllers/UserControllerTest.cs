@@ -6,6 +6,7 @@ using Climb.Extensions;
 using Climb.Responses;
 using Climb.Services;
 using Climb.Services.ModelServices;
+using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -28,8 +29,9 @@ namespace Climb.Test.Controllers
             applicationUserService = Substitute.For<IApplicationUserService>();
             var logger = Substitute.For<ILogger<UserController>>();
             var cdnService = Substitute.For<ICdnService>();
+            var userManager = new FakeUserManager();
 
-            testObj = new UserController(dbContext, applicationUserService, logger, cdnService);
+            testObj = new UserController(dbContext, applicationUserService, logger, cdnService, userManager);
         }
 
         [Test]
