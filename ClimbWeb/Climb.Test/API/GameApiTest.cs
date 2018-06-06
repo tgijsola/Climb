@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using Climb.Controllers;
+using Climb.API;
 using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
@@ -12,24 +12,25 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Climb.Test.Controllers
+namespace Climb.Test.Api
 {
     [TestFixture]
-    public class GameControllerTest
+    public class GameApiTest
     {
+        private GameApi testObj;
+        private IGameService gameService;
+        private ApplicationDbContext dbContext;
+
         [SetUp]
         public void SetUp()
         {
             gameService = Substitute.For<IGameService>();
             dbContext = DbContextUtility.CreateMockDb();
             var userManager = new FakeUserManager();
+            var logger = Substitute.For<ILogger<GameApi>>();
 
-            testObj = new GameController(gameService, dbContext, Substitute.For<ILogger<GameController>>(), userManager);
+            testObj = new GameApi(logger, dbContext, gameService);
         }
-
-        private GameController testObj;
-        private IGameService gameService;
-        private ApplicationDbContext dbContext;
 
         [Test]
         public async Task Get_HasGame_Ok()
