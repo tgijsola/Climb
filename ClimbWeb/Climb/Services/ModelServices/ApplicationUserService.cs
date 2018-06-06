@@ -96,5 +96,24 @@ namespace Climb.Services.ModelServices
             await dbContext.SaveChangesAsync();
             return imageUrl;
         }
+
+        public async Task UpdateSettings(string userID, string username, IFormFile profilePic)
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userID);
+            if(user == null)
+            {
+                throw new NotFoundException(typeof(ApplicationUser), userID);
+            }
+            dbContext.Update(user);
+
+            user.UserName = username;
+
+            if(profilePic != null)
+            {
+                await UploadProfilePic(user.Id, profilePic);
+            }
+
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

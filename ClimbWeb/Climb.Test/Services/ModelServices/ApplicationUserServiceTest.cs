@@ -49,7 +49,7 @@ namespace Climb.Test.Services.ModelServices
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
             var file = PrepareCdnService();
 
-            var imageUrl = await testObj.UploadProfilePic(user.Id, file);
+            await testObj.UploadProfilePic(user.Id, file);
 
             Assert.AreEqual(ImageKey, user.ProfilePicKey);
         }
@@ -92,6 +92,51 @@ namespace Climb.Test.Services.ModelServices
 
 #pragma warning disable 4014
             cdnService.Received(1).DeleteImageAsync(firstKey, ClimbImageRules.ProfilePic);
+#pragma warning restore 4014
+        }
+
+        [Test]
+        public async Task UpdateSettings_NewUsername_UpdateUsername()
+        {
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
+            const string username = "bob";
+            var file = Substitute.For<IFormFile>();
+
+            await testObj.UpdateSettings(user.Id, username, file);
+
+            Assert.AreEqual(username, user.UserName);
+        }
+
+        [Test]
+        public void UpdateSettings_NoUser_NotFoundException()
+        {
+            var file = Substitute.For<IFormFile>();
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.UpdateSettings("", "bob", file));
+        }
+
+        [Test]
+        public async Task UpdateSettings_ProfilePic_UpdatePicture()
+        {
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
+            var file = Substitute.For<IFormFile>();
+
+            await testObj.UpdateSettings(user.Id, "bob", file);
+
+#pragma warning disable 4014
+            cdnService.Received(1).UploadImageAsync(file, ClimbImageRules.ProfilePic);
+#pragma warning restore 4014
+        }
+
+        [Test]
+        public async Task UpdateSettings_NoProfilePic_DontUpdatePicture()
+        {
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
+
+            await testObj.UpdateSettings(user.Id, "bob", null);
+
+#pragma warning disable 4014
+            cdnService.DidNotReceiveWithAnyArgs().UploadImageAsync(null, null);
 #pragma warning restore 4014
         }
 
