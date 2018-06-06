@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Climb.Controllers;
+using Climb.API;
 using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
-using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Climb.Test.Controllers
+namespace Climb.Test.Api
 {
     [TestFixture]
-    public class SeasonControllerTest
+    public class SeasonApiTest
     {
-        private SeasonController testObj;
+        private SeasonApi testObj;
         private ISeasonService seasonService;
         private ApplicationDbContext dbContext;
 
@@ -34,9 +33,9 @@ namespace Climb.Test.Controllers
             gameID = game.ID;
 
             seasonService = Substitute.For<ISeasonService>();
-            var userManager = new FakeUserManager();
+            var logger = Substitute.For<ILogger<SeasonApi>>();
 
-            testObj = new SeasonController(seasonService, dbContext, Substitute.For<ILogger<SeasonController>>(), userManager);
+            testObj = new SeasonApi(logger, dbContext, seasonService);
         }
 
         [Test]
