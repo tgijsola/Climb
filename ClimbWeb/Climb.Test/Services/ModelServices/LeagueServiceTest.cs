@@ -41,6 +41,17 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
+        public async Task Create_Valid_AdminAdded()
+        {
+            var admin = DbContextUtility.AddNew<ApplicationUser>(dbContext);
+            var game = DbContextUtility.AddNew<Game>(dbContext);
+
+            var league = await testObj.Create("", game.ID, admin.Id);
+
+            Assert.AreEqual(admin.Id, league.Members[0].UserID);
+        }
+
+        [Test]
         public void Create_NoAdmin_NotFound()
         {
             var game = DbContextUtility.AddNew<Game>(dbContext);
@@ -65,13 +76,15 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Join_NewUser_CreateLeagueUser()
         {
-            var game = DbContextUtility.AddNew<Game>(dbContext);
-            var league = DbContextUtility.AddNew<League>(dbContext, l => l.GameID = game.ID);
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
+            var league1 = LeagueUtility.CreateLeague(dbContext);
+            var league2 = LeagueUtility.CreateLeague(dbContext);
 
-            var leagueUser = await testObj.Join(league.ID, user.Id);
+            await testObj.Join(league1.ID, user.Id);
+            var leagueUser = await testObj.Join(league2.ID, user.Id);
 
-            Assert.IsNotNull(leagueUser);
+            Assert.AreEqual(user.Id, leagueUser.UserID);
+            Assert.AreEqual(league2.ID, leagueUser.LeagueID);
         }
 
         [Test]
