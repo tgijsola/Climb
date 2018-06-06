@@ -1,24 +1,23 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using Climb.Controllers;
+using Climb.API;
 using Climb.Data;
 using Climb.Extensions;
 using Climb.Responses;
 using Climb.Services;
 using Climb.Services.ModelServices;
-using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Climb.Test.Controllers
+namespace Climb.Test.Api
 {
     [TestFixture]
-    public class UserControllerTest
+    public class UserApiTest
     {
-        private UserController testObj;
+        private UserApi testObj;
         private IApplicationUserService applicationUserService;
         private ApplicationDbContext dbContext;
 
@@ -27,11 +26,10 @@ namespace Climb.Test.Controllers
         {
             dbContext = DbContextUtility.CreateMockDb();
             applicationUserService = Substitute.For<IApplicationUserService>();
-            var logger = Substitute.For<ILogger<UserController>>();
+            var logger = Substitute.For<ILogger<UserApi>>();
             var cdnService = Substitute.For<ICdnService>();
-            var userManager = new FakeUserManager();
 
-            testObj = new UserController(dbContext, applicationUserService, logger, cdnService, userManager);
+            testObj = new UserApi(logger, dbContext, cdnService, applicationUserService);
         }
 
         [Test]
