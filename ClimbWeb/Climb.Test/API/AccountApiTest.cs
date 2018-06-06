@@ -7,7 +7,6 @@ using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Fakes;
 using Climb.Test.Utilities;
-using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,7 @@ namespace Climb.Test.Controllers
         {
             public bool willValidateTrue = true;
 
-            public TestController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender emailSender, ITokenHelper tokenHelper, IUrlUtility urlUtility, ILogger<AccountApi> logger, IApplicationUserService applicationUserService)
+            public TestController(SignInManager<ApplicationUser> signInManager, ITokenHelper tokenHelper, ILogger<AccountApi> logger, IApplicationUserService applicationUserService)
                 : base(signInManager, tokenHelper, logger, applicationUserService)
             {
             }
@@ -44,12 +43,10 @@ namespace Climb.Test.Controllers
             userManager = Substitute.For<FakeUserManager>();
             signInManager = Substitute.For<FakeSignInManager>();
             var logger = Substitute.For<ILogger<AccountApi>>();
-            var emailSender = Substitute.For<IEmailSender>();
             var tokenHelper = Substitute.For<ITokenHelper>();
-            var urlUtility = Substitute.For<IUrlUtility>();
             var applicationUserService = Substitute.For<IApplicationUserService>();
 
-            testObj = new TestController(signInManager, userManager, emailSender, tokenHelper, urlUtility, logger, applicationUserService)
+            testObj = new TestController(signInManager, tokenHelper, logger, applicationUserService)
             {
                 ControllerContext = {HttpContext = new DefaultHttpContext()},
             };
