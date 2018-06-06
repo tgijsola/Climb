@@ -39,9 +39,10 @@ namespace Climb.Services.ModelServices
             }
 
             var league = new League(gameID, name, adminID);
-
             dbContext.Add(league);
             await dbContext.SaveChangesAsync();
+
+            await Join(league.ID, adminID);
 
             return league;
         }
@@ -60,7 +61,7 @@ namespace Climb.Services.ModelServices
 
             var leagueUser = await dbContext.LeagueUsers
                 .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(lu => lu.UserID == userID);
+                .FirstOrDefaultAsync(lu => lu.LeagueID == leagueID && lu.UserID == userID);
             if(leagueUser != null)
             {
                 leagueUser.HasLeft = false;

@@ -82,21 +82,11 @@ namespace Climb.Controllers
             return View(viewModel);
         }
 
-        // TODO: Move to service.
         [HttpPost("account/updatesettings")]
         public async Task<IActionResult> UpdateSettings(UpdateSettingsRequest request)
         {
-            var user = await userManager.GetUserAsync(User);
-            dbContext.Update(user);
-
-            user.UserName = request.Username;
-
-            if(request.ProfilePic != null)
-            {
-                await applicationUserService.UploadProfilePic(user.Id, request.ProfilePic);
-            }
-
-            await dbContext.SaveChangesAsync();
+            // TODO: Handle errors.
+            await applicationUserService.UpdateSettings(null, request.Username, request.ProfilePic);
 
             return RedirectToAction("Settings");
         }

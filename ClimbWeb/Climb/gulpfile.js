@@ -51,3 +51,9 @@ gulp.task("default",
         gulp.parallel(lessTask,
             typeScriptTask),
         postTask));
+
+gulp.task("watch",
+    function() {
+        gulp.watch(paths.less, gulp.series(lessTask));
+        gulp.watch(paths.ts, gulp.series(typeScriptTask));
+    });
