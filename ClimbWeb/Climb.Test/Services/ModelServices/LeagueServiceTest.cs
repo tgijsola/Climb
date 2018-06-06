@@ -32,11 +32,20 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Create_Valid_ReturnLeague()
         {
+            var admin = DbContextUtility.AddNew<ApplicationUser>(dbContext);
             var game = DbContextUtility.AddNew<Game>(dbContext);
 
-            var league = await testObj.Create("", game.ID, "");
+            var league = await testObj.Create("", game.ID, admin.Id);
 
             Assert.IsNotNull(league);
+        }
+
+        [Test]
+        public void Create_NoAdmin_NotFound()
+        {
+            var game = DbContextUtility.AddNew<Game>(dbContext);
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.Create("", game.ID, ""));
         }
 
         [Test]
