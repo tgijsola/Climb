@@ -1,25 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Climb.Controllers;
+using Climb.API;
 using Climb.Data;
 using Climb.Extensions;
 using Climb.Models;
 using Climb.Requests.Sets;
 using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
-using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Climb.Test.Controllers
+namespace Climb.Test.Api
 {
     [TestFixture]
-    public class SetControllerTest
+    public class SetApiTest
     {
-        private SetController testObj;
+        private SetApi testObj;
         private ISetService setService;
         private ApplicationDbContext dbContext;
 
@@ -28,10 +27,9 @@ namespace Climb.Test.Controllers
         {
             setService = Substitute.For<ISetService>();
             dbContext = DbContextUtility.CreateMockDb();
-            var logger = Substitute.For<ILogger<SetController>>();
-            var userManager = new FakeUserManager();
+            var logger = Substitute.For<ILogger<SetApi>>();
 
-            testObj = new SetController(dbContext, setService, logger, userManager);
+            testObj = new SetApi(logger, dbContext, setService);
         }
 
         [Test]
@@ -80,7 +78,10 @@ namespace Climb.Test.Controllers
             var set = SetUtility.Create(dbContext);
             set.Matches = new List<Match>();
             setService.Update(set.ID, Arg.Any<MatchForm[]>()).Returns(set);
-            var request = new SubmitRequest {SetID = set.ID};
+            var request = new SubmitRequest
+            {
+                SetID = set.ID
+            };
 
             return (set, request);
         }
