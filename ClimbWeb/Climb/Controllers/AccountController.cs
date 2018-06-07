@@ -85,8 +85,10 @@ namespace Climb.Controllers
         [HttpPost("account/updatesettings")]
         public async Task<IActionResult> UpdateSettings(UpdateSettingsRequest request)
         {
+            var user = await GetViewUserAsync();
+
             // TODO: Handle errors.
-            await applicationUserService.UpdateSettings(null, request.Username, request.ProfilePic);
+            await applicationUserService.UpdateSettings(user.Id, request.Username, request.ProfilePic);
 
             return RedirectToAction("Settings");
         }

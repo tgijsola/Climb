@@ -1,4 +1,7 @@
-﻿@model Climb.ViewModels.Leagues.HomeViewModel
+﻿@using Climb.Services
+@using Climb.ViewModels.Leagues
+@model HomeViewModel
+@inject ICdnService cdnService
 
 @{
     ViewBag.Title = "Leagues-Home";
@@ -20,6 +23,6 @@
     <h3>Members</h3>
     @foreach(var member in Model.League.Members)
     {
-        <div>@member.User.UserName</div>
+        <partial name="./Partials/LeagueUser" model="@LeagueUserViewModel.Create(member, cdnService)"/>
     }
 </div>
