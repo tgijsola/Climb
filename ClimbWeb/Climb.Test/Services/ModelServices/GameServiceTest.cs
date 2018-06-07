@@ -30,7 +30,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task Create_Valid_ReturnGame()
         {
-            var request = new CreateRequest("GameName", 1, 2);
+            var request = new CreateRequest("GameName", 1, 2, true);
 
             var game = await testObj.Create(request);
 
@@ -41,7 +41,7 @@ namespace Climb.Test.Services.ModelServices
         public void Create_NameTaken_BadRequestException()
         {
             var game = GameUtility.Create(dbContext, 1, 1);
-            var request = new CreateRequest(game.Name, 1, 2);
+            var request = new CreateRequest(game.Name, 1, 2, true);
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(request));
         }
@@ -50,7 +50,7 @@ namespace Climb.Test.Services.ModelServices
         [TestCase(-1)]
         public void Create_InvalidMaxCharacters_BadRequestException(int maxCharacters)
         {
-            var request = new CreateRequest("GameName", maxCharacters, 2);
+            var request = new CreateRequest("GameName", maxCharacters, 2, true);
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(request));
         }
@@ -59,7 +59,7 @@ namespace Climb.Test.Services.ModelServices
         [TestCase(-1)]
         public void Create_InvalidMaxMatchPoints_BadRequestException(int maxPoints)
         {
-            var request = new CreateRequest("GameName", 1, maxPoints);
+            var request = new CreateRequest("GameName", 1, maxPoints, true);
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(request));
         }
@@ -68,7 +68,7 @@ namespace Climb.Test.Services.ModelServices
         public void Create_NameTaken_BadRequest()
         {
             var game = GameUtility.Create(dbContext, 0, 0);
-            var request = new CreateRequest(game.Name, 1, 1);
+            var request = new CreateRequest(game.Name, 1, 1, true);
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.Create(request));
         }

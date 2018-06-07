@@ -74,6 +74,34 @@ namespace Climb.Controllers
             }
         }
 
+        [HttpGet("games/stages/add/{gameID:int}")]
+        public async Task<IActionResult> StageAdd(int gameID)
+        {
+            var user = await GetViewUserAsync();
+            var game = await dbContext.Games.FirstOrDefaultAsync(g => g.ID == gameID);
+            if(game == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new StageAddViewModel(user, game);
+            return View(viewModel);
+        }
+
+        [HttpPost("games/stages/add")]
+        public async Task<IActionResult> StageAddPost(AddStageRequest request)
+        {
+            try
+            {
+                var stage = await gameService.AddStage(request);
+                return CodeResultAndLog(HttpStatusCode.Created, stage, $"New stage {stage.Name} created.");
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, request);
+            }
+        }
+
         [HttpPost("games/create")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
