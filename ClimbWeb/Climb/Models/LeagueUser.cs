@@ -46,7 +46,7 @@ namespace Climb.Models
 
         public int CompareTo(LeagueUser other)
         {
-            return Points.CompareTo(other.Points);
+            return other.Points.CompareTo(Points);
         }
     }
 }
