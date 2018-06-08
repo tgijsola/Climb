@@ -9,7 +9,7 @@ namespace Climb.ViewModels
     {
         public ApplicationUser User { get; }
         public IReadOnlyList<League> Leagues { get; }
-        //public IReadOnlyList<Season> Seasons { get; }
+        public IReadOnlyList<Season> Seasons { get; }
 
         public BaseViewModel(ApplicationUser user)
         {
@@ -27,10 +27,10 @@ namespace Climb.ViewModels
                     .ToArray();
                 Leagues = leagues;
             }
-            
 
-            //var seasons = user.LeagueUsers
-            //    .Select(lu => lu.Seasons.FirstOrDefault(slu => slu.Season.st))
+
+            var seasons = user?.LeagueUsers
+                .Select(lu => lu.Seasons.FirstOrDefault(slu => slu.Season.IsActive)).ToArray();
         }
     }
 }
