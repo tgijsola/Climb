@@ -8,10 +8,11 @@ namespace Climb.ViewModels.Seasons
     public class HomeViewModel : BaseViewModel
     {
         public Season Season { get; }
-        public IReadOnlyList<SeasonLeagueUser> Participants { get; }
         public int SeasonNumber { get; }
         public bool IsParticipant { get; }
         public bool CanStartSeason { get; }
+        
+        public IReadOnlyList<SeasonLeagueUser> Participants => Season.Participants;
 
         private HomeViewModel(ApplicationUser user, Season season, bool isParticipant, bool canStartSeason)
             : base(user)
