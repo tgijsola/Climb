@@ -19,6 +19,16 @@
             <button>Join</button>
         </form>
     }
+    
+    @if(Model.CanStartSeason)
+    {
+        <form asp-controller="Season" asp-action="Create">
+            <input type="hidden" name="LeagueID" value="@Model.League.ID" />
+            <input type="date" name="StartDate" />
+            <input type="date" name="EndDate" />
+            <button>Create Season</button>
+        </form>
+    }
 
     <h3>Members</h3>
     @foreach(var member in Model.Members)

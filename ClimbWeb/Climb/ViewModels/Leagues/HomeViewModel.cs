@@ -10,6 +10,7 @@ namespace Climb.ViewModels.Leagues
         public League League { get; }
         public bool IsMember { get; }
         public IReadOnlyList<LeagueUser> Members { get; }
+        public bool CanStartSeason { get;  }
 
         public HomeViewModel(ApplicationUser user, League league)
             : base(user)
@@ -19,6 +20,8 @@ namespace Climb.ViewModels.Leagues
             league.Members.Sort();
             Members = league.Members;
             IsMember = league.Members.Any(lu => lu.UserID == user?.Id);
+
+            CanStartSeason = league.AdminID == user.Id;
         }
     }
 }
