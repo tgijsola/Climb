@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
-using Climb.Attributes;
 using Climb.Data;
-using Climb.Models;
 using Climb.Requests.Leagues;
-using Climb.Responses.Models;
 using Climb.Services.ModelServices;
 using Climb.ViewModels.Leagues;
 using Microsoft.AspNetCore.Identity;
@@ -61,7 +56,7 @@ namespace Climb.Controllers
             {
                 var league = await leagueService.Create(request.Name, request.GameID, request.AdminID);
                 logger.LogInformation($"League {league.ID} created.");
-                
+
                 return RedirectToAction("Home", new {leagueID = league.ID});
             }
             catch(Exception exception)
