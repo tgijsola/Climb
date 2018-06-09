@@ -5,7 +5,10 @@
         <LangVersion>latest</LangVersion>
         <UserSecretsId>aspnet-Climb-85A66353-818A-4252-A419-4BAAFDBE37A1</UserSecretsId>
         <RootNamespace>Climb</RootNamespace>
-        <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+        <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
+        <ApplicationIcon />
+        <OutputType>Exe</OutputType>
+        <StartupObject />
     </PropertyGroup>
 
     <ItemGroup>
@@ -93,6 +96,7 @@
       <TypeScriptSourceMap>True</TypeScriptSourceMap>
       <TypeScriptMapRoot />
       <TypeScriptSourceRoot />
+      <TypeScriptOutFile />
     </PropertyGroup>
 
     <Target Name="MyPreCompileTarget" BeforeTargets="Build">
