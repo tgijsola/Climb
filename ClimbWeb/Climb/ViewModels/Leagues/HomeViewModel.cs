@@ -21,7 +21,11 @@ namespace Climb.ViewModels.Leagues
             Members = league.Members;
             IsMember = league.Members.Any(lu => lu.UserID == user?.Id);
 
+#if DEBUG
+            CanStartSeason = true;
+#else
             CanStartSeason = league.AdminID == user.Id;
+#endif
         }
     }
 }
