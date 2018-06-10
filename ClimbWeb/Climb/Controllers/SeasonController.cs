@@ -28,6 +28,9 @@ namespace Climb.Controllers
             var user = await GetViewUserAsync();
 
             var season = await dbContext.Seasons
+                .Include(s => s.Sets).AsNoTracking()
+                .Include(s => s.Sets).ThenInclude(s => s.Player1).ThenInclude(lu => lu.User).AsNoTracking()
+                .Include(s => s.Sets).ThenInclude(s => s.Player2).ThenInclude(lu => lu.User).AsNoTracking()
                 .Include(s => s.Participants).ThenInclude(slu => slu.LeagueUser).ThenInclude(lu => lu.User).AsNoTracking()
                 .Include(s => s.League).AsNoTracking()
                 .FirstOrDefaultAsync(s => s.ID == seasonID);
@@ -51,7 +54,23 @@ namespace Climb.Controllers
             }
             catch(Exception exception)
             {
-                throw exception;
+                Console.WriteLine(exception);
+                throw;
+            }
+        }
+
+        [HttpPost("seasons/start")]
+        public async Task<IActionResult> Start(int seasonID)
+        {
+            try
+            {
+                await seasonService.GenerateSchedule(seasonID);
+                return RedirectToAction("Home", new {seasonID = seasonID});
+            }
+            catch(Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
             }
         }
     }

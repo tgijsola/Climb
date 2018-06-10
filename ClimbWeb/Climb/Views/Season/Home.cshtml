@@ -18,17 +18,29 @@
 
     @if (Model.CanStartSeason)
     {
-        <form asp-controller="Season" asp-action="Create">
-            <input type="hidden" name="LeagueID" value="@Model.Season.ID" />
-            <input type="date" name="StartDate" />
-            <input type="date" name="EndDate" />
-            <button>Create Season</button>
+        <form asp-controller="Season" asp-action="Start">
+            <input type="hidden" name="SeasonID" value="@Model.Season.ID" />
+            <button class="btn btn-primary">Start Season</button>
         </form>
     }
 
     <h3>Participants</h3>
     @foreach (var participant in Model.Participants)
     {
-        <partial name="./Partials/SeasonParticipant" model="@SeasonParticipantViewModel.Create(participant, cdnService)"/>
+        <partial name="./Partials/SeasonParticipant" model="@SeasonParticipantViewModel.Create(participant, cdnService)" />
     }
+
+    @if (Model.Season.Sets.Count > 0)
+    {
+        <h3>Sets</h3>
+        foreach(var set in Model.Season.Sets)
+        {
+            <div>
+                <div>Set @set.ID</div>
+                <div>@set.Player1.User.UserName v @set.Player2.User.UserName</div>
+                <a class="btn btn-sm btn-primary">Fight</a>
+            </div>
+        }
+    }
+
 </div>
