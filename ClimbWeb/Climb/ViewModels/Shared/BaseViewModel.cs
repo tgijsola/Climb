@@ -18,6 +18,7 @@ namespace Climb.ViewModels
             if(user == null)
             {
                 Leagues = new League[0];
+                Seasons = new Season[0];
             }
             else
             {
@@ -26,11 +27,12 @@ namespace Climb.ViewModels
                     .OrderBy(l => l.Name)
                     .ToArray();
                 Leagues = leagues;
+
+                Seasons = user.LeagueUsers
+                    .Select(lu => lu.Seasons.FirstOrDefault(slu => slu.Season.IsActive))
+                    .Where(slu => slu != null)
+                    .Select(slu => slu.Season).ToArray();
             }
-
-
-            var seasons = user?.LeagueUsers
-                .Select(lu => lu.Seasons.FirstOrDefault(slu => slu.Season.IsActive)).ToArray();
         }
     }
 }
