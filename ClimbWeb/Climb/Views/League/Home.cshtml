@@ -35,4 +35,10 @@
     {
         <partial name="./Partials/LeagueUser" model="@LeagueUserViewModel.Create(member, cdnService)"/>
     }
+    
+    <h3>Seasons</h3>
+    @foreach(var season in Model.League.Seasons)
+    {
+        <a asp-controller="Season" asp-action="Home" asp-route-seasonID="@season.ID">Season @(season.Index + 1)</a>
+    }
 </div>

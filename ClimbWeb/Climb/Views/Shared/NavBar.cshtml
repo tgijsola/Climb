@@ -29,11 +29,11 @@
                             Leagues
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            @foreach (var league in Model.Leagues)
+                            @foreach (var league in Model.UserActiveLeagues)
                             {
                                 <a class="dropdown-item" asp-controller="League" asp-action="Home" asp-route-leagueID="@league.ID">@league.Name</a>
                             }
-                            @if (Model.Leagues.Count > 0)
+                            @if (Model.UserActiveLeagues.Count > 0)
                             {
                                 <div class="dropdown-divider"></div>
                             }
@@ -41,14 +41,14 @@
                         </div>
                     </li>
 
-                    @if (Model.Seasons.Count > 0)
+                    if (Model.UserActiveSeasons.Count > 0)
                     {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Seasons
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                @foreach (var season in Model.Seasons)
+                                @foreach (var season in Model.UserActiveSeasons)
                                 {
                                     <a class="dropdown-item" asp-controller="Season" asp-action="Home" asp-route-seasonID="@season.ID">@season.League.Name @(season.Index + 1)</a>
                                 }
