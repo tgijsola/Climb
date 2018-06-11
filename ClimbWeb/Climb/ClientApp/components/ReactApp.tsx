@@ -4,7 +4,6 @@ import { AppContainer } from "react-hot-loader";
 import { SetPage } from "./SetPage";
 
 function renderApp() {
-    console.log("here");
     ReactDOM.render(
         <AppContainer>
             <SetPage />

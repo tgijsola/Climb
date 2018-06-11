@@ -2,6 +2,6 @@
 
 export class SetPage extends React.Component {
     render() {
-        return <div>Hello World!</div>;
+        return <div>Hi uposd!!!</div>;
     }
 }

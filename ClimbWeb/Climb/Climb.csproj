@@ -112,8 +112,4 @@
       <TypeScriptOutFile />
     </PropertyGroup>
 
-    <Target Name="MyPreCompileTarget" BeforeTargets="Build">
-        <Exec Command="node_modules\.bin\gulp default" />
-    </Target>
-
 </Project>
