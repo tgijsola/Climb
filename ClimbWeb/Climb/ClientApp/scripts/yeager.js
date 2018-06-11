@@ -1,3 +1,4 @@
+"use strict";
 function anotherMethod() {
     const compiler = document.getElementById("compiler").value;
     const framework = document.getElementById("framework").value;

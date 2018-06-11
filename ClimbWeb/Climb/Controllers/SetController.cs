@@ -1,6 +1,7 @@
 ﻿using Climb.Data;
 using Climb.Services.ModelServices;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
@@ -13,6 +14,12 @@ namespace Climb.Controllers
             : base(logger, userManager, dbContext)
         {
             this.setService = setService;
+        }
+
+        [HttpGet("sets/fight")]
+        public IActionResult Fight()
+        {
+            return View();
         }
     }
 }

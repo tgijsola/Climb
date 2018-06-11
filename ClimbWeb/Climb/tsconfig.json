@@ -1,0 +1,16 @@
+﻿{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "system",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "jsx": "react",
+    "sourceMap": true,
+    "skipDefaultLibCheck": true,
+    "strict": true
+  },
+  "exclude": [
+    "bin",
+    "node_modules"
+  ]
+}

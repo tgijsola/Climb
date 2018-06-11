@@ -27,6 +27,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="ClientApp\components\ReactApp.tsx" />
+      <None Remove="ClientApp\components\SetPage.tsx" />
       <None Remove="ClientApp\scripts\yeager.ts" />
       <None Remove="ClientApp\test.ts" />
     </ItemGroup>
@@ -62,9 +64,12 @@
       <None Include="Views\League\Home.cshtml" />
       <None Include="Views\Game\Home.cshtml" />
       <None Include="Views\User\Home.cshtml" />
+      <None Include="wwwroot\output.js" />
     </ItemGroup>
 
     <ItemGroup>
+      <TypeScriptCompile Include="ClientApp\components\ReactApp.tsx" />
+      <TypeScriptCompile Include="ClientApp\components\SetPage.tsx" />
       <TypeScriptCompile Include="ClientApp\scripts\yeager.ts" />
       <TypeScriptCompile Include="ClientApp\scripts\test.ts" />
     </ItemGroup>
@@ -88,9 +93,15 @@
       <Folder Include="wwwroot\images\logo\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="ClientApp\components\ReactApp.js">
+        <DependentUpon>ReactApp.tsx</DependentUpon>
+      </None>
+    </ItemGroup>
+
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
       <TypeScriptTarget>ESNext</TypeScriptTarget>
-      <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+      <TypeScriptJSXEmit>React</TypeScriptJSXEmit>
       <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
       <TypeScriptCompileOnSaveEnabled>False</TypeScriptCompileOnSaveEnabled>
       <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
