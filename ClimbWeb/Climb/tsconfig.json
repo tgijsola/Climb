@@ -1,16 +1,16 @@
 ﻿{
   "compilerOptions": {
-    "baseUrl": ".",
-    "module": "system",
-    "moduleResolution": "node",
+    "module": "esnext",
     "target": "esnext",
     "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "preserveConstEnums": true,
     "sourceMap": true,
-    "skipDefaultLibCheck": true,
-    "strict": true
-  },
-  "exclude": [
-    "bin",
-    "node_modules"
-  ]
+    "baseUrl": ".",
+    "types": [
+      "react"
+    ]
+  }
 }

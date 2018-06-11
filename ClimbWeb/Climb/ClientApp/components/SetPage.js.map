@@ -1,1 +1,1 @@
-{"version":3,"file":"SetPage.js","sourceRoot":"","sources":["SetPage.tsx"],"names":[],"mappings":";;;;;;;;;;;YAEA,UAAA,aAAqB,SAAQ,KAAK,CAAC,SAAS;gBACxC,MAAM;oBACF,OAAO,gDAAuB,CAAC;gBACnC,CAAC;aACJ,CAAA"}
+{"version":3,"file":"SetPage.js","sourceRoot":"","sources":["SetPage.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,KAAK,MAAM,OAAO,CAAC;AAE/B,MAAM,cAAe,SAAQ,KAAK,CAAC,SAAS;IACxC,MAAM;QACF,OAAO,gDAAuB,CAAC;IACnC,CAAC;CACJ"}
