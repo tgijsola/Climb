@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NSwag.Annotations;
 
 namespace Climb.Controllers
 {
+    [SwaggerIgnore]
     public abstract class BaseController<T> : Controller where T : Controller
     {
         protected readonly ILogger<T> logger;
