@@ -1,4 +1,74 @@
-﻿@using Climb.ViewModels
-@model BaseViewModel
+@model Climb.ViewModels.BaseViewModel
 
-<div id="navbar">Navbar</div>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <a class="navbar-brand" asp-controller="Site" asp-action="Home">Climb</a>
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                @if (Model.User == null)
+                {
+                    <li>
+                        <a asp-controller="Account" asp-action="LogIn">Log In</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Account" asp-action="Register">Register</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Leagues
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            @foreach (var league in Model.UserActiveLeagues)
+                            {
+                                <a class="dropdown-item" asp-controller="League" asp-action="Home" asp-route-leagueID="@league.ID">@league.Name</a>
+                            }
+                            @if (Model.UserActiveLeagues.Count > 0)
+                            {
+                                <div class="dropdown-divider"></div>
+                            }
+                            <a asp-controller="League" asp-action="Index">Search</a>
+                        </div>
+                    </li>
+
+                    if (Model.UserActiveSeasons.Count > 0)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Seasons
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                @foreach (var season in Model.UserActiveSeasons)
+                                {
+                                    <a class="dropdown-item" asp-controller="Season" asp-action="Home" asp-route-seasonID="@season.ID">@season.League.Name @(season.Index + 1)</a>
+                                }
+                            </div>
+                        </li>
+                    }
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.User.UserName
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" asp-controller="Account" asp-action="Settings">Settings</a>
+                            <form asp-controller="Account" asp-action="LogOut">
+                                <button>Log Out</button>
+                            </form>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>

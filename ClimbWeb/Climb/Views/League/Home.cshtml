@@ -1,0 +1,44 @@
+﻿@using Climb.Services
+@using Climb.ViewModels.Leagues
+@model HomeViewModel
+@inject ICdnService cdnService
+
+@{
+    ViewBag.Title = "Leagues-Home";
+    Layout = "_LayoutWithNavbar";
+}
+
+<div>
+    <h1>Welcome to @Model.League.Name</h1>
+
+    @if(!Model.IsMember)
+    {
+        <form asp-action="Join">
+            <input type="hidden" name="leagueID" value="@Model.League.ID"/>
+            <input type="hidden" name="userID" value="@Model.User.Id"/>
+            <button>Join</button>
+        </form>
+    }
+    
+    @if(Model.CanStartSeason)
+    {
+        <form asp-controller="Season" asp-action="Create">
+            <input type="hidden" name="LeagueID" value="@Model.League.ID" />
+            <input type="date" name="StartDate" />
+            <input type="date" name="EndDate" />
+            <button>Create Season</button>
+        </form>
+    }
+
+    <h3>Members</h3>
+    @foreach(var member in Model.Members)
+    {
+        <partial name="./Partials/LeagueUser" model="@LeagueUserViewModel.Create(member, cdnService)"/>
+    }
+    
+    <h3>Seasons</h3>
+    @foreach(var season in Model.League.Seasons)
+    {
+        <a asp-controller="Season" asp-action="Home" asp-route-seasonID="@season.ID">Season @(season.Index + 1)</a>
+    }
+</div>

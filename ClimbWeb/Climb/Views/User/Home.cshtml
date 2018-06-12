@@ -1,0 +1,13 @@
+﻿@model Climb.ViewModels.Users.HomeViewModel
+
+@{
+    ViewBag.Title = "Users-Home";
+    Layout = "_LayoutWithNavbar";
+}
+
+<div>
+    <h3>@(Model.IsViewingUserHome ? "Welcome " : "Home of ") @Model.HomeUser.UserName</h3>
+</div>
+<div>
+    <img src="@Model.ProfilePic" />
+</div>

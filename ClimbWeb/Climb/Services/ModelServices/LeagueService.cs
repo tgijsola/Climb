@@ -21,7 +21,7 @@ namespace Climb.Services.ModelServices
             this.pointService = pointService;
         }
 
-        public async Task<League> Create(string name, int gameID)
+        public async Task<League> Create(string name, int gameID, string adminID)
         {
             if(!await dbContext.Games.AnyAsync(g => g.ID == gameID))
             {
@@ -33,10 +33,16 @@ namespace Climb.Services.ModelServices
                 throw new ConflictException(typeof(League), nameof(League.Name), name);
             }
 
-            var league = new League(gameID, name);
+            if(!await dbContext.Users.AnyAsync(u => u.Id == adminID))
+            {
+                throw new NotFoundException(typeof(ApplicationUser), adminID);
+            }
 
+            var league = new League(gameID, name, adminID);
             dbContext.Add(league);
             await dbContext.SaveChangesAsync();
+
+            await Join(league.ID, adminID);
 
             return league;
         }
@@ -55,7 +61,7 @@ namespace Climb.Services.ModelServices
 
             var leagueUser = await dbContext.LeagueUsers
                 .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(lu => lu.UserID == userID);
+                .FirstOrDefaultAsync(lu => lu.LeagueID == leagueID && lu.UserID == userID);
             if(leagueUser != null)
             {
                 leagueUser.HasLeft = false;

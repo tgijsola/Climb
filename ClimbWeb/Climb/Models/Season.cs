@@ -11,11 +11,12 @@ namespace Climb.Models
         public int Index { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public bool IsActive { get; set; }
 
         [JsonIgnore]
         public League League { get; set; }
         [JsonIgnore]
-        public HashSet<SeasonLeagueUser> Participants { get; set; }
+        public List<SeasonLeagueUser> Participants { get; set; }
         [JsonIgnore]
         public HashSet<Set> Sets { get; set; }
 

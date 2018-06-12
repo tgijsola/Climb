@@ -5,20 +5,34 @@ using Climb.Models;
 
 namespace Climb.ViewModels
 {
-    public abstract class BaseViewModel
+    public class BaseViewModel
     {
         public ApplicationUser User { get; }
-        public IReadOnlyList<League> Leagues { get; }
+        public IReadOnlyList<League> UserActiveLeagues { get; }
+        public IReadOnlyList<Season> UserActiveSeasons { get; }
 
-        protected BaseViewModel(ApplicationUser user)
+        public BaseViewModel(ApplicationUser user)
         {
             User = user;
 
-            var leagues = user.LeagueUsers
-                .Select(lu => lu.League)
-                .OrderBy(l => l.Name)
-                .ToArray();
-            Leagues = leagues;
+            if(user == null)
+            {
+                UserActiveLeagues = new League[0];
+                UserActiveSeasons = new Season[0];
+            }
+            else
+            {
+                var leagues = user.LeagueUsers
+                    .Select(lu => lu.League)
+                    .OrderBy(l => l.Name)
+                    .ToArray();
+                UserActiveLeagues = leagues;
+
+                UserActiveSeasons = user.LeagueUsers
+                    .Select(lu => lu.Seasons.FirstOrDefault(slu => slu.Season.IsActive))
+                    .Where(slu => slu != null)
+                    .Select(slu => slu.Season).ToArray();
+            }
         }
     }
 }

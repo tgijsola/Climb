@@ -8,7 +8,7 @@ namespace Climb.Test.Utilities
     {
         public static Game Create(ApplicationDbContext dbContext, int characterCount, int stageCount)
         {
-            var game = new Game("Test Game", characterCount, stageCount)
+            var game = new Game("Test Game", characterCount, stageCount, stageCount > 0)
             {
                 Characters = new List<Character>(characterCount),
                 Stages = new List<Stage>(stageCount),

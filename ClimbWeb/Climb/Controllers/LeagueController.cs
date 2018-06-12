@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using Climb.Attributes;
 using Climb.Data;
-using Climb.Exceptions;
-using Climb.Models;
 using Climb.Requests.Leagues;
-using Climb.Responses.Models;
-using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
+using Climb.ViewModels.Leagues;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -20,57 +14,51 @@ namespace Climb.Controllers
     public class LeagueController : BaseController<LeagueController>
     {
         private readonly ILeagueService leagueService;
-        private readonly ApplicationDbContext dbContext;
 
-        public LeagueController(ILeagueService leagueService, ApplicationDbContext dbContext, ILogger<LeagueController> logger)
-            : base(logger)
+        public LeagueController(ILeagueService leagueService, ApplicationDbContext dbContext, ILogger<LeagueController> logger, UserManager<ApplicationUser> userManager)
+            : base(logger, userManager, dbContext)
         {
             this.leagueService = leagueService;
-            this.dbContext = dbContext;
         }
 
-        [HttpGet("/leagues/{*page}")]
-        [SwaggerIgnore]
-        public IActionResult Index()
+        [HttpGet("leagues")]
+        public async Task<IActionResult> Index()
         {
-            ViewData["Title"] = "League";
-            ViewData["Script"] = "leagues";
-            return View("~/Views/Page.cshtml");
+            var user = await GetViewUserAsync();
+            var leagues = await dbContext.Leagues
+                .Include(l => l.Admin).AsNoTracking()
+                .Include(l => l.Members).AsNoTracking()
+                .Include(l => l.Game).AsNoTracking()
+                .ToArrayAsync();
+            var games = await dbContext.Games.ToArrayAsync();
+
+            var viewModel = new IndexViewModel(user, leagues, games);
+            return View(viewModel);
         }
 
-        [HttpGet("/api/v1/leagues")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(List<League>))]
-        public async Task<IActionResult> ListAll()
+        [HttpGet("leagues/home/{leagueID:int}")]
+        public async Task<IActionResult> Home(int leagueID)
         {
-            var leagues = await dbContext.Leagues.ToListAsync();
+            var user = await GetViewUserAsync();
+            var league = await dbContext.Leagues
+                .Include(l => l.Seasons).AsNoTracking()
+                .Include(l => l.Members).ThenInclude(lu => lu.User).AsNoTracking()
+                .FirstOrDefaultAsync(l => l.ID == leagueID);
 
-            return CodeResult(HttpStatusCode.OK, leagues);
+            var viewModel = new HomeViewModel(user, league);
+
+            return View(viewModel);
         }
 
-        [HttpGet("/api/v1/leagues/{leagueID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(League))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
-        public async Task<IActionResult> Get(int leagueID)
-        {
-            var league = await dbContext.Leagues.FirstOrDefaultAsync(l => l.ID == leagueID);
-            if(league == null)
-            {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.");
-            }
-
-            return CodeResult(HttpStatusCode.OK, league);
-        }
-
-        [HttpPost("/api/v1/leagues/create")]
-        [SwaggerResponse(HttpStatusCode.Created, typeof(League))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find game.")]
-        [SwaggerResponse(HttpStatusCode.Conflict, typeof(string), "League name taken.")]
+        [HttpPost("leagues/create")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
             try
             {
-                var league = await leagueService.Create(request.Name, request.GameID);
-                return CodeResult(HttpStatusCode.Created, league);
+                var league = await leagueService.Create(request.Name, request.GameID, request.AdminID);
+                logger.LogInformation($"League {league.ID} created.");
+
+                return RedirectToAction("Home", new {leagueID = league.ID});
             }
             catch(Exception exception)
             {
@@ -78,73 +66,20 @@ namespace Climb.Controllers
             }
         }
 
-        [HttpPost("/api/v1/leagues/join")]
-        [SwaggerResponse(HttpStatusCode.Created, typeof(LeagueUser))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find user.")]
+        [HttpPost("leagues/join")]
         public async Task<IActionResult> Join(JoinRequest request)
         {
             try
             {
                 var leagueUser = await leagueService.Join(request.LeagueID, request.UserID);
-                return CodeResultAndLog(HttpStatusCode.Created, leagueUser, "User joined league.");
+                logger.LogInformation($"User {request.UserID} joined league {request.LeagueID} as league user {leagueUser.ID}.");
+
+                return RedirectToAction("Home", new {leagueID = request.LeagueID});
             }
             catch(Exception exception)
             {
                 return GetExceptionResult(exception, request);
             }
-        }
-
-        [HttpGet("/api/v1/leagues/user/{userID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(LeagueUserDto))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
-        public async Task<IActionResult> GetUser(int userID)
-        {
-            var leagueUser = await dbContext.LeagueUsers
-                .Include(lu => lu.User).AsNoTracking()
-                .FirstOrDefaultAsync(lu => lu.ID == userID);
-            if(leagueUser == null)
-            {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"Could not find League User with ID '{userID}'.");
-            }
-
-            var response = new LeagueUserDto(leagueUser);
-            return CodeResult(HttpStatusCode.OK, response);
-        }
-
-        [HttpGet("/api/v1/leagues/seasons/{leagueID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Season[]))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
-        public async Task<IActionResult> GetSeasons(int leagueID)
-        {
-            var league = await dbContext.Leagues
-                .Include(l => l.Seasons).AsNoTracking()
-                .FirstOrDefaultAsync(l => l.ID == leagueID);
-            if(league == null)
-            {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.");
-            }
-
-            return CodeResult(HttpStatusCode.OK, league.Seasons);
-        }
-
-        [HttpGet("/api/v1/leagues/sets/{leagueUserID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(SetDto[]))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "No league user found.")]
-        public async Task<IActionResult> GetSets(int leagueUserID)
-        {
-            var leagueUser = await dbContext.LeagueUsers
-                .Include(lu => lu.League).AsNoTracking()
-                .Include(lu => lu.P1Sets).ThenInclude(s => s.Matches).AsNoTracking()
-                .Include(lu => lu.P2Sets).ThenInclude(s => s.Matches).AsNoTracking()
-                .FirstOrDefaultAsync(lu => lu.ID == leagueUserID);
-            if(leagueUser == null)
-            {
-                return GetExceptionResult(new NotFoundException(typeof(LeagueUser), leagueUserID), leagueUserID);
-            }
-
-            var sets = leagueUser.GetAllSets().Select(s => SetDto.Create(s, leagueUser.League.GameID)).ToArray();
-            return CodeResult(HttpStatusCode.OK, sets);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.ComponentModel.DataAnnotations.Schema;
 using Climb.Data;
 using Newtonsoft.Json;
 
@@ -24,6 +24,7 @@ namespace Climb.Models
         [JsonIgnore]
         public ApplicationUser User { get; set; }
         [JsonIgnore]
+        [InverseProperty("LeagueUser")]
         public HashSet<SeasonLeagueUser> Seasons { get; set; }
         [JsonIgnore]
         public List<RankSnapshot> RankSnapshots { get; set; }
@@ -45,14 +46,9 @@ namespace Climb.Models
             UserID = userID;
         }
 
-        public IReadOnlyList<Set> GetAllSets()
-        {
-            return P1Sets.Concat(P2Sets).ToArray();
-        }
-
         public int CompareTo(LeagueUser other)
         {
-            return Points.CompareTo(other.Points);
+            return other.Points.CompareTo(Points);
         }
     }
 }
