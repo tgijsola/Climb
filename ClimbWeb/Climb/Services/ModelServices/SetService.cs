@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Climb.Data;
@@ -16,6 +17,29 @@ namespace Climb.Services.ModelServices
         public SetService(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
+        }
+
+        public async Task<SetRequest> RequestSetAsync(int requesterID, int challengedID)
+        {
+            if (!await dbContext.LeagueUsers.AnyAsync(lu => lu.ID == requesterID))
+            {
+                throw new NotFoundException(typeof(LeagueUser), requesterID);
+            }
+            if (!await dbContext.LeagueUsers.AnyAsync(lu => lu.ID == challengedID))
+            {
+                throw new NotFoundException(typeof(LeagueUser), challengedID);
+            }
+
+            var setRequest = new SetRequest
+            {
+                RequesterID = requesterID,
+                ChallengedID = challengedID,
+                DateCreated = DateTime.Now
+            };
+            dbContext.Add(setRequest);
+            await dbContext.SaveChangesAsync();
+
+            return setRequest;
         }
 
         public async Task<Set> Update(int setID, IReadOnlyList<MatchForm> matchForms)

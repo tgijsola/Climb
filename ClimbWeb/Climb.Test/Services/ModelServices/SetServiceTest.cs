@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
@@ -9,6 +10,8 @@ using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
 {
+    // TODO: Tied scores.
+    // TODO: Not matching character counts.
     [TestFixture]
     public class SetServiceTest
     {
@@ -78,9 +81,38 @@ namespace Climb.Test.Services.ModelServices
             Assert.AreEqual(2, set.Player2Score);
         }
 
-        // TODO: Tied scores.
+        [Test]
+        public void RequestSet_NoRequester_NotFoundException()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var challenged = LeagueUtility.AddUsersToLeague(league, 1, dbContext)[0];
 
-        // TODO: Not matching character counts.
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.RequestSetAsync(0, challenged.ID));
+        }
+
+        [Test]
+        public void RequestSet_NoChallenged_NotFoundException()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var requester = LeagueUtility.AddUsersToLeague(league, 1, dbContext)[0];
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.RequestSetAsync(requester.ID, 0));
+        }
+
+        [Test]
+        public async Task RequestSet_Valid_DateSet()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            LeagueUtility.AddUsersToLeague(league, 2, dbContext);
+            var requester = league.Members[0];
+            var challenged = league.Members[1];
+
+            var request = await testObj.RequestSetAsync(requester.ID, challenged.ID);
+
+            Assert.AreEqual(DateTime.Today.ToShortDateString(), request.DateCreated.ToShortDateString());
+        }
+
+        // TODO: Already have an open set request.
 
         private static List<MatchForm> CreateMatchFormsWithScores(int count, int p1Score, int p2Score)
         {
