@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
+using Climb.Requests.Account;
 using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Fakes;
@@ -13,6 +14,7 @@ using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
 {
+    // TODO: Register
     [TestFixture]
     public class ApplicationUserServiceTest
     {
@@ -31,17 +33,32 @@ namespace Climb.Test.Services.ModelServices
             var configuration = Substitute.For<IConfiguration>();
             configuration["SecurityKey"].Returns("key");
 
-            IEmailSender emailSender = Substitute.For<IEmailSender>();
-            ITokenHelper tokenHelper= Substitute.For<ITokenHelper>();
-            IUrlUtility urlUtility= Substitute.For<IUrlUtility>();
+            var emailSender = Substitute.For<IEmailSender>();
+            var tokenHelper = Substitute.For<ITokenHelper>();
+            var urlUtility = Substitute.For<IUrlUtility>();
             var signInManager = new FakeSignInManager();
             var userManager = new FakeUserManager();
 
             testObj = new ApplicationUserService(dbContext, cdnService, signInManager, emailSender, configuration, tokenHelper, urlUtility, userManager);
         }
 
-        // TODO: LogIn
-        // TODO: Register
+        [Test]
+        public void LogIn_NoUser_NotFoundException()
+        {
+            var request = new LoginRequest();
+
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.LogIn(request));
+        }
+
+        [Test]
+        public void LogIn_WrongPassword_NotFoundException()
+        {
+            const string email = "user@test.com";
+            DbContextUtility.AddNew<ApplicationUser>(dbContext, u => u.Email = email);
+            var request = new LoginRequest {Email = email};
+
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.LogIn(request));
+        }
 
         [Test]
         public async Task UploadImage_Valid_SetsUserProfilePicKey()

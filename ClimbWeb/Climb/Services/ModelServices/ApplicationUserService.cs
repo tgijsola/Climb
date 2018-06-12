@@ -59,7 +59,9 @@ namespace Climb.Services.ModelServices
 
         public async Task<string> LogIn(LoginRequest request)
         {
-            var result = await signInManager.PasswordSignInAsync(request.Email, request.Password, true, false);
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            
+            var result = await signInManager.PasswordSignInAsync(user?.UserName, request.Password, request.RememberMe, false);
             if(result.Succeeded)
             {
                 var token = tokenHelper.CreateUserToken(configuration.GetSecurityKey(), DateTime.Now.AddMinutes(30), request.Email);
