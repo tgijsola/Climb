@@ -10,14 +10,28 @@
         <h3>@(Model.IsViewingUserHome ? "Welcome " : "Home of ") @Model.HomeUser.UserName</h3>
     </div>
     <div>
-        <img src="@Model.ProfilePic" />
+        <img src="@Model.ProfilePic"/>
     </div>
     <div>
-        <div>
+        <div class="col-sm-4">
             <h3>Leagues</h3>
-            @foreach(var leagueUser in Model.HomeUser.LeagueUsers)
+            @foreach (var leagueUser in Model.HomeUser.LeagueUsers)
             {
-                <partial name="./Partials/LeagueUser" model="@leagueUser"/>
+                <partial name="./Partials/LeagueUser" model="@leagueUser" />
+            }
+        </div>
+        <div class="col-sm-4">
+            <h3>Recent</h3>
+            @foreach(var set in Model.RecentSets)
+            {
+                <div>@set.ID</div>
+            }
+        </div>
+        <div class="col-sm-4">
+            <h3>Sets</h3>
+            @foreach(var set in Model.AvailableSets)
+            {
+                <div>@set.ID</div>
             }
         </div>
     </div>

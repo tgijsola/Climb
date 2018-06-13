@@ -25,7 +25,12 @@ namespace Climb.Controllers
             var appUser = await GetViewUserAsync();
             var id = userID ?? appUser?.Id;
 
-            var user = await dbContext.Users.Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+            var user = await dbContext.Users
+                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).AsNoTracking()
+                // TODO: Optimize?
+                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P1Sets).ThenInclude(s => s.Matches).ThenInclude(m => m.MatchCharacters).AsNoTracking()
+                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P2Sets).ThenInclude(s => s.Matches).ThenInclude(m => m.MatchCharacters).AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if(user == null)
             {
