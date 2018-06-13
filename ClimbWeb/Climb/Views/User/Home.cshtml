@@ -6,8 +6,19 @@
 }
 
 <div>
-    <h3>@(Model.IsViewingUserHome ? "Welcome " : "Home of ") @Model.HomeUser.UserName</h3>
-</div>
-<div>
-    <img src="@Model.ProfilePic" />
+    <div>
+        <h3>@(Model.IsViewingUserHome ? "Welcome " : "Home of ") @Model.HomeUser.UserName</h3>
+    </div>
+    <div>
+        <img src="@Model.ProfilePic" />
+    </div>
+    <div>
+        <div>
+            <h3>Leagues</h3>
+            @foreach(var leagueUser in Model.HomeUser.LeagueUsers)
+            {
+                <partial name="./Partials/LeagueUser" model="@leagueUser"/>
+            }
+        </div>
+    </div>
 </div>

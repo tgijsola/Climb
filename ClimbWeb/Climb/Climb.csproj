@@ -24,6 +24,7 @@
       <Content Remove="Views\League\Home.cshtml" />
       <Content Remove="Views\Game\Home.cshtml" />
       <Content Remove="Views\User\Home.cshtml" />
+      <Content Remove="Views\User\Partials\LeagueUser.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -62,6 +63,7 @@
       <None Include="Views\League\Home.cshtml" />
       <None Include="Views\Game\Home.cshtml" />
       <None Include="Views\User\Home.cshtml" />
+      <None Include="Views\User\Partials\LeagueUser.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
