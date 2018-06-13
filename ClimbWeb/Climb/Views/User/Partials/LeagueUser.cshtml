@@ -1,7 +1,7 @@
 ﻿@model Climb.Models.LeagueUser
 
 <div>
-    <b>@Model.League.Name</b>
+    <b><a asp-controller="League" asp-action="Home" asp-route-leagueID="@Model.LeagueID">@Model.League.Name</a></b>
     <div>Rank: @Model.Rank</div>
     <div>Points: @Model.Points</div>
 </div>
