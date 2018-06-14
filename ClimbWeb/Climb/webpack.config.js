@@ -5,21 +5,24 @@ const CheckerPlugin = require("awesome-typescript-loader").CheckerPlugin;
 const bundleOutputDir = "./wwwroot/dist";
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
+var glob_entries = require('webpack-glob-entries');
+
 module.exports = (env) => {
+    console.log(env);
     const isDevBuild = !(env && env.prod);
     return [
         {
             stats: { modules: false },
-            //entry: {main:"./ClientApp/components/ReactApp.tsx"},
-            resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+            entry: glob_entries("./ClientApp/scripts/**/*.ts"),
+            resolve: { extensions: [".ts", ".tsx"] },
             output: {
                 path: path.join(__dirname, bundleOutputDir),
-                filename: "app.js",
+                filename: "[name].js",
                 publicPath: "dist/"
             },
             module: {
                 rules: [
-                    { test: /\.tsx?$/, include: /ClientApp/, use: "awesome-typescript-loader?silent=true" },
+                    { test: /\.tsx?$/, include: /ClientApp/, use: "awesome-typescript-loader" },
                     { test: /\.less?$/, include: /ClientApp/, use: ["style-loader", "css-loader", "less-loader"] }
                 ]
             },
