@@ -1,4 +1,7 @@
-﻿@model Climb.ViewModels.Users.HomeViewModel
+﻿@using Climb.Services
+@using Climb.ViewModels.Sets
+@model Climb.ViewModels.Users.HomeViewModel
+@inject ICdnService cdnService
 
 @{
     ViewBag.Title = "Users-Home";
@@ -31,7 +34,7 @@
             <h3>Sets</h3>
             @foreach(var set in Model.AvailableSets)
             {
-                <div>@set.ID</div>
+                <partial name="../Set/Partials/Details" model="@DetailsViewModel.Create(Model.User, set, cdnService)"/>
             }
         </div>
     </div>

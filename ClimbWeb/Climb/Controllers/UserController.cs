@@ -29,10 +29,14 @@ namespace Climb.Controllers
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).AsNoTracking()
                 // TODO: Optimize?
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P1Sets).ThenInclude(s => s.Matches).ThenInclude(m => m.MatchCharacters).AsNoTracking()
+                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P1Sets).ThenInclude(s => s.Player1).ThenInclude(lu => lu.User).AsNoTracking()
+                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P1Sets).ThenInclude(s => s.Player2).ThenInclude(lu => lu.User).AsNoTracking()
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P2Sets).ThenInclude(s => s.Matches).ThenInclude(m => m.MatchCharacters).AsNoTracking()
+                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P2Sets).ThenInclude(s => s.Player1).ThenInclude(lu => lu.User).AsNoTracking()
+                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P2Sets).ThenInclude(s => s.Player2).ThenInclude(lu => lu.User).AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == id);
 
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
