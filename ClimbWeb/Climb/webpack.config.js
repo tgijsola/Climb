@@ -1,4 +1,5 @@
 ﻿module.exports = {
+    mode: "development",
     entry: { main: "./ClientApp/components/ReactApp.tsx" },
     output: {
         filename: "bundle.js",

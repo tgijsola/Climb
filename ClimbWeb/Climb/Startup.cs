@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using Climb.Data;
 using Climb.Services;
 using Climb.Services.ModelServices;
@@ -82,7 +83,8 @@ namespace Climb
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true
+                    ReactHotModuleReplacement = true,
+                    EnvironmentVariables = new Dictionary<string, string>{{"mode", "development"}},
                 });
             }
             else
