@@ -1,0 +1,17 @@
+﻿{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react",
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true,
+    "outDir": "./dist/",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "./src/app/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

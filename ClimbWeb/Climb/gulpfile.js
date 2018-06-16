@@ -1,59 +1,21 @@
-﻿"use strict";
+﻿const gulp = require("gulp");
+const ts = require("gulp-typescript");
+const less = require("gulp-less");
+const path = require("path");
 
-const gulp = require("gulp"),
-    fs = require("fs"),
-    del = require("del"),
-    ts = require("gulp-typescript"),
-    less = require("gulp-less");
+var tsProject = ts.createProject('tsconfig.gulp.json');
+gulp.task("ts", function () {
+    return gulp.src('ClientApp/scripts/**/*.ts')
+        .pipe(tsProject())
+        .pipe(gulp.dest('wwwroot/dist/scripts'));
+});
 
-const prepareTask = "clean:prepare";
-const postTask = "clean:post";
-const lessTask = "less";
-const cssConcatTask = "css:concat";
-const typeScriptTask = "typescript";
+gulp.task("less", () => {
+    return gulp.src("ClientApp/styles/**/*.less")
+        .pipe(less({
+            paths: [path.join(__dirname, "ClientApp", "styles")]
+        }))
+        .pipe(gulp.dest("wwwroot/dist/styles"));
+});
 
-const paths = {
-    less: "ClientApp/styles/**/*.less",
-    ts: "ClientApp/scripts/**/*.ts",
-    output: "wwwroot/dist",
-    css: "wwwroot/dist/temp/*.css"
-};
-
-gulp.task(prepareTask,
-    function() {
-        return del("wwwroot/dist/**/*");
-    });
-
-gulp.task(postTask,
-    function() {
-        return del("wwwroot/dist/temp/**/*");
-    });
-
-gulp.task(lessTask,
-    function() {
-        return gulp.src(paths.less)
-            .pipe(less())
-            .pipe(gulp.dest(paths.output));
-    });
-
-gulp.task(typeScriptTask,
-    function() {
-        return gulp.src(paths.ts)
-            .pipe(ts({
-                noImplicitAny: true,
-                outFile: "script.js"
-            }))
-            .pipe(gulp.dest(paths.output));
-    });
-
-gulp.task("default",
-    gulp.series(prepareTask,
-        gulp.parallel(lessTask,
-            typeScriptTask),
-        postTask));
-
-gulp.task("watch",
-    function() {
-        gulp.watch(paths.less, gulp.series(lessTask));
-        gulp.watch(paths.ts, gulp.series(typeScriptTask));
-    });
+gulp.task("default", gulp.parallel("less", "ts"));
