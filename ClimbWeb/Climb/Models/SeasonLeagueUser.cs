@@ -1,11 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Climb.Models
 {
-    public class SeasonLeagueUser
+    public class SeasonLeagueUser : IComparable<SeasonLeagueUser>
     {
         public int SeasonID { get; set; }
         public int LeagueUserID { get; set; }
+        public int Standing { get; set; }
+        public int Points { get; set; }
 
         [JsonIgnore]
         public Season Season { get; set; }
@@ -20,6 +23,11 @@ namespace Climb.Models
         {
             SeasonID = seasonID;
             LeagueUserID = leagueUserID;
+        }
+
+        public int CompareTo(SeasonLeagueUser other)
+        {
+            return Points.CompareTo(other.Points);
         }
     }
 }

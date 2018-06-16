@@ -1,0 +1,13 @@
+﻿{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "./src/scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

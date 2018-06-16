@@ -1,17 +1,19 @@
-{
+﻿{
   "compilerOptions": {
-    "baseUrl": ".",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "target": "esnext",
-    "jsx": "react",
-    "sourceMap": true,
-    "skipDefaultLibCheck": true,
     "strict": true,
-    "types": ["webpack-env"]
+    "noImplicitAny": true,
+    "jsx": "react",
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true,
+    "outDir": "./dist/",
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
+  "include": [
+    "./src/app/**/*"
+  ],
   "exclude": [
-      "bin",
-      "node_modules"
+    "node_modules"
   ]
 }

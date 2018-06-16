@@ -1,18 +1,18 @@
+﻿using System.Collections.Generic;
 using System.Reflection;
 using Climb.Data;
-using Climb.Extensions;
 using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Utilities;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using NJsonSchema;
 using NSwag.AspNetCore;
 
@@ -25,46 +25,25 @@ namespace Climb
             Configuration = configuration;
         }
 
-        private IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration.GetConnectionString("defaultConnection");
-            if(string.IsNullOrWhiteSpace(connectionString))
+            services.Configure<CookiePolicyOptions>(options =>
             {
-                services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("Test"));
-            }
-            else
-            {
-                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-            }
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            ConfigureDB(services);
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = "climb.com",
-                        ValidateAudience = true,
-                        ValidAudience = "climb",
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = Configuration.GetSecurityKey(),
-                        ValidateLifetime = true,
-                    };
-                    options.SaveToken = true;
-                });
+            services.AddAuthentication();
 
-            services.AddMvc();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddTransient<IApplicationUserService, ApplicationUserService>();
             services.AddTransient<IGameService, GameService>();
@@ -77,6 +56,20 @@ namespace Climb
             services.AddTransient<IUrlUtility, UrlUtility>();
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
             services.AddTransient<ICdnService, FileStorageCdn>();
+            services.AddTransient<IPointService, EloPointService>();
+        }
+
+        private void ConfigureDB(IServiceCollection services)
+        {
+            var connectionString = Configuration.GetConnectionString("defaultConnection");
+            if(string.IsNullOrWhiteSpace(connectionString))
+            {
+                services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("Test"));
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            }
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -85,19 +78,37 @@ namespace Climb
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true
+                    ReactHotModuleReplacement = true,
+                    EnvironmentVariables = new Dictionary<string, string>{{"mode", "development"}},
                 });
-                app.UseDatabaseErrorPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
 
-            app.UseAuthentication();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseCookiePolicy();
+
             app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly,
                 settings => settings.GeneratorSettings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase);
-            app.UseMvc();
+
+            app.UseAuthentication();
+
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }

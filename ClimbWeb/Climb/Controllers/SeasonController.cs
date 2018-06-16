@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Climb.Attributes;
 using Climb.Data;
-using Climb.Models;
 using Climb.Requests.Seasons;
 using Climb.Services.ModelServices;
+using Climb.ViewModels.Seasons;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,120 +15,62 @@ namespace Climb.Controllers
     public class SeasonController : BaseController<SeasonController>
     {
         private readonly ISeasonService seasonService;
-        private readonly ApplicationDbContext dbContext;
 
-        public SeasonController(ISeasonService seasonService, ApplicationDbContext dbContext, ILogger<SeasonController> logger)
-            : base(logger)
+        public SeasonController(ISeasonService seasonService, ApplicationDbContext dbContext, ILogger<SeasonController> logger, UserManager<ApplicationUser> userManager)
+            : base(logger, userManager, dbContext)
         {
-            this.dbContext = dbContext;
             this.seasonService = seasonService;
         }
 
-        [HttpGet("/seasons/{*page}")]
-        [SwaggerIgnore]
-        public IActionResult Index()
+        [HttpGet("seasons/home/{seasonID:int}")]
+        public async Task<IActionResult> Home(int seasonID)
         {
-            ViewData["Title"] = "Season";
-            ViewData["Script"] = "seasons";
-            return View("~/Views/Page.cshtml");
-        }
+            var user = await GetViewUserAsync();
 
-        [HttpGet("/api/v1/seasons/{seasonID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Season))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
-        public async Task<IActionResult> Get(int seasonID)
-        {
             var season = await dbContext.Seasons
-                .Include(s => s.Participants).ThenInclude(slu => slu.LeagueUser).AsNoTracking()
                 .Include(s => s.Sets).AsNoTracking()
+                .Include(s => s.Sets).ThenInclude(s => s.Player1).ThenInclude(lu => lu.User).AsNoTracking()
+                .Include(s => s.Sets).ThenInclude(s => s.Player2).ThenInclude(lu => lu.User).AsNoTracking()
+                .Include(s => s.Participants).ThenInclude(slu => slu.LeagueUser).ThenInclude(lu => lu.User).AsNoTracking()
                 .Include(s => s.League).AsNoTracking()
                 .FirstOrDefaultAsync(s => s.ID == seasonID);
             if(season == null)
             {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.");
+                return CodeResultAndLog(HttpStatusCode.NotFound, $"No season with ID {seasonID} found.");
             }
 
-            return CodeResult(HttpStatusCode.OK, season);
+            var viewModel = HomeViewModel.Create(user, season);
+            return View(viewModel);
         }
-
-        [HttpGet("/api/v1/seasons/sets/{seasonID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Set[]))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
-        public async Task<IActionResult> Sets(int seasonID)
-        {
-            var season = await dbContext.Seasons
-                .Include(s => s.Sets).AsNoTracking()
-                .FirstOrDefaultAsync(s => s.ID == seasonID);
-            if(season == null)
-            {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.");
-            }
-
-            return CodeResult(HttpStatusCode.OK, season.Sets);
-        }
-
-        [HttpGet("/api/v1/seasons/participants/{seasonID:int}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(LeagueUser[]))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string))]
-        public async Task<IActionResult> Participants(int seasonID)
-        {
-            var season = await dbContext.Seasons
-                .Include(s => s.Participants).ThenInclude(slu => slu.LeagueUser).AsNoTracking()
-                .FirstOrDefaultAsync(s => s.ID == seasonID);
-            if(season == null)
-            {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"No Season with ID '{seasonID}' found.");
-            }
-
-            var participants = season.Participants.Select(slu => slu.LeagueUser);
-            return CodeResult(HttpStatusCode.OK, participants);
-        }
-
-        [HttpGet("/api/v1/seasons")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Season[]))]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
-        public async Task<IActionResult> ListForLeague(int leagueID)
-        {
-            var league = await dbContext.Leagues
-                .Include(l => l.Seasons).AsNoTracking()
-                .FirstOrDefaultAsync(l => l.ID == leagueID);
-            if(league == null)
-            {
-                return CodeResultAndLog(HttpStatusCode.NotFound, $"No League with ID '{leagueID}' found.");
-            }
-
-            return CodeResult(HttpStatusCode.OK, league.Seasons);
-        }
-
-        [HttpPost("/api/v1/seasons/create")]
-        [SwaggerResponse(HttpStatusCode.Created, typeof(Season))]
-        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Start and end date issues.")]
-        [SwaggerResponse(HttpStatusCode.NotFound, typeof(string), "Can't find league.")]
+        
+        [HttpPost("seasons/create")]
         public async Task<IActionResult> Create(CreateRequest request)
         {
             try
             {
                 var season = await seasonService.Create(request.LeagueID, request.StartDate, request.EndDate);
-                return CodeResultAndLog(HttpStatusCode.Created, season, "Season created.");
+                logger.LogInformation($"Season {season.ID} created for League {season.LeagueID}.");
+                return RedirectToAction("Home", new {seasonID = season.ID});
             }
             catch(Exception exception)
             {
-                return GetExceptionResult(exception, request);
+                Console.WriteLine(exception);
+                throw;
             }
         }
 
-        [HttpPost("/api/v1/seasons/start")]
-        [SwaggerResponse(HttpStatusCode.Created, typeof(Set[]))]
+        [HttpPost("seasons/start")]
         public async Task<IActionResult> Start(int seasonID)
         {
             try
             {
-                var sets = await seasonService.GenerateSchedule(seasonID);
-                return CodeResultAndLog(HttpStatusCode.Created, sets, "Schedule created.");
+                await seasonService.GenerateSchedule(seasonID);
+                return RedirectToAction("Home", new {seasonID = seasonID});
             }
             catch(Exception exception)
             {
-                return GetExceptionResult(exception, seasonID);
+                Console.WriteLine(exception);
+                throw;
             }
         }
     }

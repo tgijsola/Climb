@@ -1,0 +1,41 @@
+﻿@using Climb.Services
+@using Climb.ViewModels.Sets
+@model Climb.ViewModels.Users.HomeViewModel
+@inject ICdnService cdnService
+
+@{
+    ViewBag.Title = "Users-Home";
+    Layout = "_LayoutWithNavbar";
+}
+
+<div>
+    <div>
+        <h3>@(Model.IsViewingUserHome ? "Welcome " : "Home of ") @Model.HomeUser.UserName</h3>
+    </div>
+    <div>
+        <img src="@Model.ProfilePic"/>
+    </div>
+    <div>
+        <div class="col-sm-4">
+            <h3>Leagues</h3>
+            @foreach (var leagueUser in Model.HomeUser.LeagueUsers)
+            {
+                <partial name="./Partials/LeagueUser" model="@leagueUser" />
+            }
+        </div>
+        <div class="col-sm-4">
+            <h3>Recent</h3>
+            @foreach(var set in Model.RecentSets)
+            {
+                <div>@set.ID</div>
+            }
+        </div>
+        <div class="col-sm-4">
+            <h3>Sets</h3>
+            @foreach(var set in Model.AvailableSets)
+            {
+                <partial name="../Set/Partials/Details" model="@DetailsViewModel.Create(Model.User, set, cdnService)"/>
+            }
+        </div>
+    </div>
+</div>

@@ -1,122 +1,96 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
-using Climb.Attributes;
 using Climb.Data;
-using Climb.Extensions;
 using Climb.Requests.Account;
-using Climb.Responses;
 using Climb.Services;
-using Climb.Utilities;
-using Microsoft.AspNetCore.Authorization;
+using Climb.Services.ModelServices;
+using Climb.ViewModels.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Climb.Controllers
 {
     public class AccountController : BaseController<AccountController>
     {
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly IApplicationUserService applicationUserService;
         private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly IEmailSender emailSender;
-        private readonly IConfiguration configuration;
-        private readonly ITokenHelper tokenHelper;
-        private readonly IUrlUtility urlUtility;
+        private readonly ICdnService cdnService;
 
-        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, ILogger<AccountController> logger)
-            : base(logger)
+        public AccountController(ILogger<AccountController> logger, IApplicationUserService applicationUserService, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext, SignInManager<ApplicationUser> signInManager, ICdnService cdnService)
+            : base(logger, userManager, dbContext)
         {
+            this.applicationUserService = applicationUserService;
             this.signInManager = signInManager;
-            this.userManager = userManager;
-            this.emailSender = emailSender;
-            this.configuration = configuration;
-            this.tokenHelper = tokenHelper;
-            this.urlUtility = urlUtility;
+            this.cdnService = cdnService;
         }
 
-        [HttpGet("/account/{*page}")]
-        [SwaggerIgnore]
-        public IActionResult Index()
+        public IActionResult Register()
         {
-            ViewData["Title"] = "Account";
-            ViewData["Script"] = "account";
-            return View("~/Views/Page.cshtml");
+            return View();
         }
 
-        [HttpPost("/api/v1/account/register")]
-        [SwaggerResponse(HttpStatusCode.Created, typeof(ApplicationUser))]
-        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Email or password is not valid.")]
-        public async Task<IActionResult> Register(RegisterRequest request)
+        public IActionResult LogIn()
         {
-            if(TryValidateModel(request))
+            return View();
+        }
+
+        [HttpPost("account/login")]
+        public async Task<IActionResult> LogInPost(LoginRequest request)
+        {
+            try
             {
-                var user = new ApplicationUser
-                {
-                    UserName = request.Email,
-                    Email = request.Email
-                };
-                var result = await userManager.CreateAsync(user, request.Password);
-                if(result.Succeeded)
-                {
-                    var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = urlUtility.EmailConfirmationLink(Url, user.Id, code, Request.Scheme);
-                    await emailSender.SendEmailConfirmationAsync(request.Email, callbackUrl);
+                await applicationUserService.LogIn(request);
 
-                    await signInManager.SignInAsync(user, false);
-                    return CodeResultAndLog(HttpStatusCode.Created, user, "User created a new account with password.");
-                }
-
-                foreach(var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                return RedirectToAction("Home", "User");
             }
-
-            return CodeResultAndLog(HttpStatusCode.BadRequest, "Email or password is not valid.");
-        }
-
-        [HttpPost("/api/v1/account/logIn")]
-        [AllowAnonymous]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(LoginResponse))]
-        [SwaggerResponse(HttpStatusCode.BadRequest, typeof(string), "Email or password is incorrect.")]
-        public async Task<IActionResult> LogIn(LoginRequest request)
-        {
-            var result = await signInManager.PasswordSignInAsync(request.Email, request.Password, true, false);
-            if(result.Succeeded)
+            catch(Exception exception)
             {
-                var token = tokenHelper.CreateUserToken(configuration.GetSecurityKey(), DateTime.Now.AddMinutes(30), request.Email);
-                var response = new LoginResponse(token);
-
-                return CodeResultAndLog(HttpStatusCode.OK, response, "User logged in.");
+                return new BadRequestResult();
             }
-
-            return CodeResultAndLog(HttpStatusCode.BadRequest, "Email or password is incorrect.", "User login failed.");
         }
 
-        [HttpGet("/api/v1/account/test")]
-        [Authorize]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(string))]
-        public async Task<IActionResult> Test([UserToken] string auth, string userID)
+        [HttpPost("account/register")]
+        public async Task<IActionResult> RegisterPost(RegisterRequest request)
         {
-            var authorizedId = await tokenHelper.GetAuthorizedUserID(auth);
-
-            if(userID == authorizedId || string.IsNullOrWhiteSpace(userID))
+            try
             {
-                return Ok("Authorized!");
-            }
+                await applicationUserService.Register(request, Url, Request.Scheme);
 
-            return BadRequest("Not the same user!");
+                return RedirectToAction("Home", "User");
+            }
+            catch(Exception exception)
+            {
+                return new BadRequestResult();
+            }
         }
 
-        [HttpPost("/api/v1/account/logOut")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(string))]
-        public async Task<IActionResult> Logout([UserToken] string auth)
+        [HttpPost("account/logout")]
+        public async Task<IActionResult> LogOut()
         {
             await signInManager.SignOutAsync();
-            logger.LogInformation("User logged out.");
-            return RedirectToPage("/Index");
+
+            return RedirectToAction("Home", "Site");
+        }
+
+        [HttpGet("account/settings")]
+        public async Task<IActionResult> Settings()
+        {
+            var user = await GetViewUserAsync();
+
+            var viewModel = SettingsViewModel.Create(user, cdnService);
+            return View(viewModel);
+        }
+
+        [HttpPost("account/updatesettings")]
+        public async Task<IActionResult> UpdateSettings(UpdateSettingsRequest request)
+        {
+            var user = await GetViewUserAsync();
+
+            // TODO: Handle errors.
+            await applicationUserService.UpdateSettings(user.Id, request.Username, request.ProfilePic);
+
+            return RedirectToAction("Settings");
         }
     }
 }

@@ -16,13 +16,8 @@ namespace Climb.Services
 
         protected override async Task UploadImageInternalAsync(IFormFile image, string folder, string fileKey)
         {
-            var folderPath = Path.Combine(localCdnPath, folder);
+            var folderPath = GetFolderPath(folder);
             var filePath = Path.Combine(folderPath, fileKey);
-
-            if(!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
 
             using(var fileStream = new FileStream(filePath, FileMode.Create))
             {
@@ -30,14 +25,27 @@ namespace Climb.Services
             }
         }
 
+        protected override void EnsureFolder(string folder)
+        {
+            var folderPath = GetFolderPath(folder);
+            if(!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+        }
+
         public override Task DeleteImageAsync(string fileKey, ImageRules rules)
         {
-            var folder = rules.Folder;
-            var folderPath = Path.Combine(localCdnPath, folder);
+            var folderPath = GetFolderPath(rules.Folder);
             var filePath = Path.Combine(folderPath, fileKey);
 
-            File.Delete(filePath);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath); 
+            }
             return Task.CompletedTask;
         }
+
+        private string GetFolderPath(string folder) => Path.Combine(localCdnPath, folder);
     }
 }

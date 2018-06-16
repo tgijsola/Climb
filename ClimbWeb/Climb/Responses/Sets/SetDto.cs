@@ -6,32 +6,34 @@ namespace Climb.Responses.Sets
 {
     public class SetDto
     {
-        public readonly int id;
-        public readonly int leagueID;
-        public readonly int? seasonID;
-        public readonly int gameID;
-        public readonly int player1ID;
-        public readonly int player2ID;
-        public readonly int? player1Score;
-        public readonly int? player2Score;
-        public readonly DateTime dueDate;
-        public readonly DateTime? updatedDate;
+        public int ID { get; }
+        public int LeagueID { get; }
+        public int? SeasonID { get; }
+        public int GameID { get; }
+        public int Player1ID { get; }
+        public int Player2ID { get; }
+        public int? Player1Score { get; }
+        public int? Player2Score { get; }
+        public DateTime DueDate { get; }
+        public DateTime? UpdatedDate { get; }
         [Required]
-        public readonly MatchDto[] matches;
+        public MatchDto[] Matches { get; }
+        public bool IsLocked { get; set; }
+        public bool IsComplete { get; set; }
 
         private SetDto(Set set, MatchDto[] matches, int gameID)
         {
-            id = set.ID;
-            leagueID = set.LeagueID;
-            seasonID = set.SeasonID;
-            player1ID = set.Player1ID;
-            player2ID = set.Player2ID;
-            player1Score = set.Player1Score;
-            player2Score = set.Player2Score;
-            dueDate = set.DueDate;
-            updatedDate = set.UpdatedDate;
-            this.matches = matches;
-            this.gameID = gameID;
+            ID = set.ID;
+            LeagueID = set.LeagueID;
+            SeasonID = set.SeasonID;
+            Player1ID = set.Player1ID;
+            Player2ID = set.Player2ID;
+            Player1Score = set.Player1Score;
+            Player2Score = set.Player2Score;
+            DueDate = set.DueDate;
+            UpdatedDate = set.UpdatedDate;
+            Matches = matches;
+            GameID = gameID;
         }
 
         public static SetDto Create(Set set, int gameID)
