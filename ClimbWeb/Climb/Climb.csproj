@@ -33,7 +33,7 @@
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.0" />
     <PackageReference Include="morelinq" Version="2.10.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="11.17.12" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.17.15" />
   </ItemGroup>
 
   <ItemGroup>
@@ -103,5 +103,7 @@
     <TypeScriptSourceRoot />
     <TypeScriptOutFile />
   </PropertyGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties package_1json__JSONSchema="http://json.schemastore.org/project" /></VisualStudio></ProjectExtensions>
 
 </Project>

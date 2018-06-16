@@ -1,12 +1,12 @@
 ﻿import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { AppContainer } from "react-hot-loader";
-import { SetPage } from "./SetPage";
+import { Submit } from "./Submit";
 
 function renderApp() {
     ReactDOM.render(
         <AppContainer>
-            <SetPage />
+            <Submit />
         </AppContainer>,
         document.getElementById("react-app")
     );
