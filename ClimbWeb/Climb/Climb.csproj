@@ -27,14 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\components\ReactApp.tsx" />
-    <None Remove="ClientApp\components\SetPage.tsx" />
-    <None Remove="ClientApp\scripts\alerter.ts" />
-    <None Remove="ClientApp\scripts\greeter.ts" />
-    <None Remove="ClientApp\test.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
