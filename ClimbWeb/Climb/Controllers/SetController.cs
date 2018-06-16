@@ -1,5 +1,7 @@
-﻿using Climb.Data;
+﻿using System.Threading.Tasks;
+using Climb.Data;
 using Climb.Services.ModelServices;
+using Climb.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,9 +19,12 @@ namespace Climb.Controllers
         }
 
         [HttpGet("sets/fight")]
-        public IActionResult Fight()
+        public async Task<IActionResult> Fight()
         {
-            return View();
+            var user = await GetViewUserAsync();
+
+            var viewModel = new BaseViewModel(user);
+            return View(viewModel);
         }
     }
 }
