@@ -1,0 +1,11 @@
+﻿{
+  "compilerOptions": {
+    "noImplicitAny": true
+  },
+  "include": [
+    "./src/scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

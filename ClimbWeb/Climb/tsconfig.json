@@ -1,14 +1,15 @@
 ﻿{
   "compilerOptions": {
-    "baseUrl": ".",
-    "module": "esnext",
-    "target": "esnext",
+    "noImplicitAny": true,
     "jsx": "react",
+    "module": "commonjs",
+    "target": "es5",
     "sourceMap": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "types": ["webpack-env"]
+    "outDir": "./dist/"
   },
+  "include": [
+    "./src/app/**/*"
+  ],
   "exclude": [
     "node_modules"
   ]
