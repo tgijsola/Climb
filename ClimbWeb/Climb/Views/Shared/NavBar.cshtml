@@ -61,6 +61,7 @@
                             @Model.User.UserName
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" asp-controller="User" asp-action="Home">Home</a>
                             <a class="dropdown-item" asp-controller="Account" asp-action="Settings">Settings</a>
                             <form asp-controller="Account" asp-action="LogOut">
                                 <button>Log Out</button>
