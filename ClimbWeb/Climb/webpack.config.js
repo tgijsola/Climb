@@ -2,7 +2,8 @@
     entry: { main: "./ClientApp/components/ReactApp.tsx" },
     output: {
         filename: "bundle.js",
-        path: __dirname + "/wwwroot/dist/app"
+        path: __dirname + "/wwwroot/dist/app",
+        publicPath: "/dist/app/"
     },
 
     // Enable sourcemaps for debugging webpack's output.
