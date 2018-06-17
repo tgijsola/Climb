@@ -8,13 +8,14 @@ using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
 {
-    // TODO: Register
     [TestFixture]
     public class ApplicationUserServiceTest
     {
@@ -23,6 +24,7 @@ namespace Climb.Test.Services.ModelServices
         private ApplicationUserService testObj;
         private ApplicationDbContext dbContext;
         private ICdnService cdnService;
+        private FakeUserManager userManager;
 
         [SetUp]
         public void SetUp()
@@ -37,7 +39,7 @@ namespace Climb.Test.Services.ModelServices
             var tokenHelper = Substitute.For<ITokenHelper>();
             var urlUtility = Substitute.For<IUrlUtility>();
             var signInManager = new FakeSignInManager();
-            var userManager = new FakeUserManager();
+            userManager = Substitute.For<FakeUserManager>();
 
             testObj = new ApplicationUserService(dbContext, cdnService, signInManager, emailSender, configuration, tokenHelper, urlUtility, userManager);
         }
@@ -58,6 +60,16 @@ namespace Climb.Test.Services.ModelServices
             var request = new LoginRequest {Email = email};
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.LogIn(request));
+        }
+
+        [Test]
+        public void Register_Fail_BadRequestException()
+        {
+            userManager.CreateAsync(null, null).ReturnsForAnyArgs(IdentityResult.Failed());
+            var request = new RegisterRequest();
+            var urlHelper = Substitute.For<IUrlHelper>();
+
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.Register(request, urlHelper, ""));
         }
 
         [Test]
