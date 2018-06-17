@@ -1,58 +1,37 @@
-// ReSharper disable UseOfImplicitGlobalInFunctionScope
-const path = require("path");
-const webpack = require("webpack");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const CheckerPlugin = require("awesome-typescript-loader").CheckerPlugin;
-const bundleOutputDir = "./wwwroot/dist";
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+﻿module.exports = {
+    mode: "development",
+    entry: { main: "./ClientApp/components/ReactApp.tsx" },
+    output: {
+        filename: "bundle.js",
+        path: __dirname + "/wwwroot/dist/app",
+        publicPath: "/dist/app/"
+    },
 
-module.exports = (env) => {
-    const isDevBuild = !(env && env.prod);
-    return [
-        {
-            stats: { modules: false },
-            entry: {
-                "pages/account": "./ClientApp/pages/account.tsx",
-                "pages/user": "./ClientApp/pages/user.tsx",
-                "pages/games": "./ClientApp/pages/games.tsx",
-                "pages/leagues": "./ClientApp/pages/leagues.tsx",
-                "pages/sets": "./ClientApp/pages/sets.tsx",
-                "pages/seasons": "./ClientApp/pages/seasons.tsx"
-            },
-            resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
-            output: {
-                path: path.join(__dirname, bundleOutputDir),
-                filename: "[name].js",
-                publicPath: "dist/"
-            },
-            module: {
-                rules: [
-                    { test: /\.tsx?$/, include: /ClientApp/, use: "awesome-typescript-loader?silent=true" },
-                    { test: /\.less?$/, include: /ClientApp/, use: ["style-loader", "css-loader", "less-loader"] },
-                    { test: /\.(png|jpg|jpeg|gif|svg)$/, use: "url-loader?limit=25000" }
-                ]
-            },
-            plugins: [
-                new CheckerPlugin(),
-                new webpack.DllReferencePlugin({
-                    context: __dirname,
-                    manifest: require("./wwwroot/dist/vendor-manifest.json")
-                })
-            ].concat(isDevBuild
-                ? [
-                    // Plugins that apply in development builds only
-                    new webpack.SourceMapDevToolPlugin({
-                        filename: "[file].map", // Remove this line if you prefer inline source maps
-                        moduleFilenameTemplate:
-                            path.relative(bundleOutputDir,
-                                "[resourcePath]") // Point sourcemap entries to the original file locations on disk
-                    })
-                ]
-                : [
-                    // Plugins that apply in production builds only
-                    new UglifyJsPlugin(),
-                    new ExtractTextPlugin("site.css")
-                ])
-        }
-    ];
+    // Enable sourcemaps for debugging webpack's output.
+    devtool: "source-map",
+
+    resolve: {
+        // Add '.ts' and '.tsx' as resolvable extensions.
+        extensions: [".ts", ".tsx", ".js", ".json"]
+    },
+
+    module: {
+        rules: [
+            // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+            { test: /\.tsx?$/, loader: "awesome-typescript-loader", exclude: /node_modules/ },
+
+            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+            { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+        ]
+    },
+
+    // When importing a module whose path matches one of the following, just
+    // assume a corresponding global variable exists and use that instead.
+    // This is important because it allows us to avoid bundling all of our
+    // dependencies, which allows browsers to cache those libraries between builds.
+    externals: {
+        "react": "React",
+        "react-dom": "ReactDOM",
+        "react-spinners": "RingLoader"
+    }
 };

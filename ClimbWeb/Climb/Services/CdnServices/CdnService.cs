@@ -26,10 +26,14 @@ namespace Climb.Services
                 throw new ArgumentException($"Image size {image.Length:N0}B exceeds limit {rules.MaxSize:N0}B.");
             }
 
+            EnsureFolder(rules.Folder);
+
             var fileKey = GenerateFileKey(image);
             await UploadImageInternalAsync(image, rules.Folder, fileKey);
             return fileKey;
         }
+
+        protected abstract void EnsureFolder(string rulesFolder);
 
         public abstract Task DeleteImageAsync(string fileKey, ImageRules rules);
 

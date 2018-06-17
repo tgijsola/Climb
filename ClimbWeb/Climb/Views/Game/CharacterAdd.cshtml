@@ -1,0 +1,19 @@
+﻿@model Climb.ViewModels.Games.CharacterAddViewModel
+
+@{
+    ViewBag.Title = "Games-Home";
+    Layout = "_LayoutWithNavbar";
+}
+
+<link rel="stylesheet" href="~/dist/game/game-home.css"/>
+
+<div>
+    <h1>@Model.Game.Name</h1>
+    <h3>Add Character</h3>
+
+    <form asp-action="CharacterAddPost">
+        <input name="gameID" value="@Model.Game.ID" type="hidden"/>
+        <input name="name" type="text"/>
+        <button>Add</button>
+    </form>
+</div>
