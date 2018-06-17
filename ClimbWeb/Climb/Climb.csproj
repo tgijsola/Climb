@@ -20,7 +20,6 @@
       <Content Remove="Views\Game\StageAdd.cshtml" />
       <Content Remove="Views\League\Index.cshtml" />
       <Content Remove="Views\Season\Home.cshtml" />
-      <Content Remove="Views\Set\Partials\Details.cshtml" />
       <Content Remove="Views\Site\Home.cshtml" />
       <Content Remove="Views\League\Home.cshtml" />
       <Content Remove="Views\Game\Home.cshtml" />
