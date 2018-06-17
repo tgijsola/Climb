@@ -57,6 +57,7 @@ namespace Climb
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
             services.AddTransient<ICdnService, FileStorageCdn>();
             services.AddTransient<IPointService, EloPointService>();
+            services.AddTransient<ISeasonPointCalculator, ParticipationSeasonPointCalculator>();
         }
 
         private void ConfigureDB(IServiceCollection services)
