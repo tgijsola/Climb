@@ -1,4 +1,16 @@
 ﻿@color-primary: #ff3700;
+@color-accent: #ff9900;
+@color-almostwhite: #f1f1fd;
+@color-light: #e7e7f3;
+@color-med: #d6d7e1;
+@color-dark: #c2c3cd;
+@color-darker: #9a9baf;
+@color-darkest: #4c4c4c;
+
+* {
+    margin: 0;
+    padding: 0;
+}
 
 body {
     display: -ms-flexbox;
@@ -15,7 +27,117 @@ body {
     background-color: #f5f5f5;
 }
 
+p {
+    margin: 0;
+}
+
+h3 {
+    margin: 0;
+}
+
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+}
+
+.brand, .navbar-brand.brand {
+    color: @color-accent;
+    font-family: "Righteous", sans-serif;
+}
+
+.btn-fight {
+    color: #FFF;
+    text-transform: uppercase;
+    font-weight: 700;
+    background: linear-gradient(@color-accent, red);
+    border: 1px solid #A00;
+    border-radius: 5px;
+    box-shadow: 0 0 5px @color-dark;
+}
+
+.content-user-home {
+    margin-top: 25px;
+}
+
+.detail-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border-bottom: 1px solid @color-dark;
+}
+
+.detail-card:nth-of-type(2n-1) {
+    background-color: @color-light;
+}
+
+.header-user {
+    background-image: url(/images/bg-test.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: repeat;
+    background-attachment: fixed;
+    padding: 25px;
+}
+
+.home-section {
+    box-shadow: 0 5px 10px @color-light;
+}
+
+.home-section-head {
+    color: #fff;
+    background-color: @color-dark;
+    border-radius: 3px 3px 0 0;
+    padding: 10px;
+    border-bottom: 1px solid @color-darker;
+}
+
+.home-section-body {
+    background-color: @color-med;
+    border-radius: 0 0 3px 3px;
+    padding-bottom: 10px;
+}
+
+.page-title {
+    min-width: 400px;
+    max-width: 500px;
+    font-size: 2em;
+    color: #fff;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0));
+    padding: 10px;
+    margin-bottom: 25px;
+}
+
+//helpers
+
+.align-center-i {
+    align-items: center;
+}
+
+.col {
+    flex-direction: column;
+}
+
+.flex {
+    display: flex;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.margin-left-10 {
+    margin-left: 10px;
+}
+
+.padding-left-10 {
+    padding-left: 10px;
+}
+
+.width-100 {
+    width: 100%;
+}
+
+.wrap {
+    flex-wrap: wrap;
 }

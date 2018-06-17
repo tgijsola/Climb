@@ -1,4 +1,27 @@
-﻿.leagueUser-container {
-    display: flex;
-    flex-direction: row;
+﻿@league-user-padding: 5px;
+@color-almostwhite: #f1f1fd;
+@color-light: #e7e7f3;
+@color-med: #d6d7e1;
+@color-dark: #c2c3cd;
+@color-darker: #9a9baf;
+@color-darkest: #4c4c4c;
+
+.points {
+    font-size: 1.5em;
+    color: @color-darker;
+    padding-left: @league-user-padding;
 }
+
+.rank {
+    font-size: 3em;
+    font-weight: 700;
+    padding-left: @league-user-padding;
+}
+
+.username {
+    font-size: 1.25em;
+    overflow-wrap: break-word;
+    min-width: 20px;
+    padding-left: @league-user-padding;
+}
+
