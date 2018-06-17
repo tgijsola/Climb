@@ -11,20 +11,21 @@
     <StartupObject />
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Remove="Views\Account\LogIn.cshtml" />
-    <Content Remove="Views\Account\Register.cshtml" />
-    <Content Remove="Views\Account\Settings.cshtml" />
-    <Content Remove="Views\Game\CharacterAdd.cshtml" />
-    <Content Remove="Views\Game\Index.cshtml" />
-    <Content Remove="Views\Game\StageAdd.cshtml" />
-    <Content Remove="Views\League\Index.cshtml" />
-    <Content Remove="Views\Season\Home.cshtml" />
-    <Content Remove="Views\Site\Home.cshtml" />
-    <Content Remove="Views\League\Home.cshtml" />
-    <Content Remove="Views\Game\Home.cshtml" />
-    <Content Remove="Views\User\Home.cshtml" />
-  </ItemGroup>
+    <ItemGroup>
+      <Content Remove="Views\Account\LogIn.cshtml" />
+      <Content Remove="Views\Account\Register.cshtml" />
+      <Content Remove="Views\Account\Settings.cshtml" />
+      <Content Remove="Views\Game\CharacterAdd.cshtml" />
+      <Content Remove="Views\Game\Index.cshtml" />
+      <Content Remove="Views\Game\StageAdd.cshtml" />
+      <Content Remove="Views\League\Index.cshtml" />
+      <Content Remove="Views\Season\Home.cshtml" />
+      <Content Remove="Views\Site\Home.cshtml" />
+      <Content Remove="Views\League\Home.cshtml" />
+      <Content Remove="Views\Game\Home.cshtml" />
+      <Content Remove="Views\User\Home.cshtml" />
+      <Content Remove="Views\User\Partials\LeagueUser.cshtml" />
+    </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />

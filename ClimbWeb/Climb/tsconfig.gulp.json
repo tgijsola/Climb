@@ -1,6 +1,8 @@
 ﻿{
   "compilerOptions": {
-    "noImplicitAny": true
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true
   },
   "include": [
     "./src/scripts/**/*"

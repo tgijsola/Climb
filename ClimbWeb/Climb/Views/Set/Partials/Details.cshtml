@@ -1,0 +1,16 @@
+﻿@model Climb.ViewModels.Sets.DetailsViewModel
+
+<div>
+    @if(Model.UserIsPlaying)
+    {
+        <img src="@Model.OpponentProfilePic" width="64" height="64"/>
+    }
+    else
+    {
+        <img src="@Model.P1ProfilePic" width="64" height="64"/>
+        <div>@Model.Set.Player1.User.UserName v @Model.Set.Player2.User.UserName</div>
+        <img src="@Model.P2ProfilePic" width="64" height="64"/>
+    }
+
+    <button class="btn btn-primary">Fight</button>
+</div>

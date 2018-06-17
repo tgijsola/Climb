@@ -1,12 +1,14 @@
 ﻿{
   "compilerOptions": {
+    "strict": true,
     "noImplicitAny": true,
     "jsx": "react",
     "module": "commonjs",
     "target": "es6",
     "sourceMap": true,
     "outDir": "./dist/",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "include": [
     "./src/app/**/*"
