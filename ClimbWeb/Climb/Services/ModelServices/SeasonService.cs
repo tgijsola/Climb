@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Climb.Data;
@@ -55,7 +54,7 @@ namespace Climb.Services.ModelServices
             return season;
         }
 
-        public async Task<HashSet<Set>> GenerateSchedule(int seasonID)
+        public async Task<Season> GenerateSchedule(int seasonID)
         {
             var season = await dbContext.Seasons
                 .Include(s => s.Sets)
@@ -66,9 +65,9 @@ namespace Climb.Services.ModelServices
                 throw new NotFoundException(typeof(Season), seasonID);
             }
 
-            var sets = await scheduleFactory.GenerateScheduleAsync(season, dbContext);
+            await scheduleFactory.GenerateScheduleAsync(season, dbContext);
 
-            return sets;
+            return season;
         }
     }
 }

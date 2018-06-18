@@ -64,8 +64,12 @@ namespace Climb.Controllers
         {
             try
             {
-                await seasonService.GenerateSchedule(seasonID);
-                return RedirectToAction("Home", new {seasonID = seasonID});
+                var season = await seasonService.GenerateSchedule(seasonID);
+                dbContext.Update(season);
+                season.IsActive = true;
+                await dbContext.SaveChangesAsync();
+
+                return RedirectToAction("Home", new {seasonID});
             }
             catch(Exception exception)
             {
