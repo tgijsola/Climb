@@ -9,5 +9,6 @@ namespace Climb.Services.ModelServices
     {
         Task<Season> Create(int leagueID, DateTime start, DateTime end);
         Task<HashSet<Set>> GenerateSchedule(int seasonID);
+        Task<Season> UpdateStandings(int setID);
     }
 }
