@@ -16,7 +16,7 @@ namespace Climb.ViewModels.Leagues
 
         public static LeagueUserViewModel Create(LeagueUser leagueUser, ICdnService cdnService)
         {
-            var profilePic = cdnService.GetImageUrl(leagueUser.User.ProfilePicKey, ClimbImageRules.ProfilePic);
+            var profilePic = leagueUser.User.GetProfilePicUrl(cdnService);
             return new LeagueUserViewModel(leagueUser, profilePic);
         }
     }
