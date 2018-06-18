@@ -12,7 +12,7 @@
 <div class="width-100">
     <div class="header-user flex col align-center-i">
         <h3 class="page-title">@(Model.IsViewingUserHome ? "Welcome " : "Home of ") @Model.HomeUser.UserName</h3>
-        <img src="@Model.ProfilePic"/>
+        <img src="@Model.ProfilePic" />
     </div>
     <div class="content-user-home">
         <div class="col-md-4">
@@ -36,9 +36,9 @@
                 <div class="home-section-body">
                     @if (Model.RecentSets.Count == 0)
                     {
-                    <div class="detail-card justify-center">
-                        <em> No recent activity</em>
-                    </div>
+                        <div class="detail-card justify-center">
+                            <em> No recent activity</em>
+                        </div>
                     }
                     else
                     {
