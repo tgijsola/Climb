@@ -3,8 +3,11 @@
 <link rel="stylesheet" href="~/dist/styles/league/leagueuser.css"/>
 
 <div class="detail-card">
-    <img src="@Model.ProfilePic" width="64" height="64"/>
-    <div class="username">@Model.LeagueUser.User.UserName @*WWWWWWWWWWWW*@</div>
-    <div class="rank">@Model.LeagueUser.Rank @*000*@</div>
-    <div class="points">(@Model.LeagueUser.Points) @*(0000)*@</div>
+    <img src="@Model.ProfilePic" width="64" height="64" />
+    <div class="username">@Model.LeagueUser.User.UserName</div>
+    @*<div class="username">WWWWWWWWWWWW</div>*@
+    <div class="rank">@Model.LeagueUser.Rank</div>
+    @*<div class="rank"><p>890</p></div>*@
+    <div class="points">(@Model.LeagueUser.Points)</div>
+    @*<div class="points">(1234)</div>*@
 </div>
