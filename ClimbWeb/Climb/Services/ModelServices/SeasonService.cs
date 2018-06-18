@@ -78,9 +78,18 @@ namespace Climb.Services.ModelServices
                 .FirstOrDefaultAsync(s => s.ID == setID);
             dbContext.Update(set);
 
-            var winner = set.Season.Participants.First(slu => slu.LeagueUserID == set.WinnerID);
+            UpdatePoints(set);
+
+            await dbContext.SaveChangesAsync();
+
+            return set.Season;
+        }
+
+        private void UpdatePoints(Set set)
+        {
+            var winner = set.WinnerID == set.Player1ID ? set.SeasonPlayer1 : set.SeasonPlayer2;
             dbContext.Update(winner);
-            var loser = set.Season.Participants.First(slu => slu.LeagueUserID == set.LoserID);
+            var loser = set.LoserID == set.Player1ID ? set.SeasonPlayer1 : set.SeasonPlayer2;
             dbContext.Update(loser);
 
             var (winnerPointDelta, loserPointDelta) = pointCalculator.CalculatePointDeltas(winner, loser);
@@ -89,10 +98,7 @@ namespace Climb.Services.ModelServices
             set.Player2SeasonPoints = set.WinnerID == set.Player2ID ? winnerPointDelta : loserPointDelta;
             winner.Points += winnerPointDelta;
             loser.Points += loserPointDelta;
-
-            await dbContext.SaveChangesAsync();
-
-            return set.Season;
+        }
         }
     }
 }

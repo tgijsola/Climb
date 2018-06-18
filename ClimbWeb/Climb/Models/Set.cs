@@ -13,6 +13,8 @@ namespace Climb.Models
         public int? SeasonID { get; set; }
         public int Player1ID { get; set; }
         public int Player2ID { get; set; }
+        public int? SeasonPlayer1ID { get; set; }
+        public int? SeasonPlayer2ID { get; set; }
         public int? Player1Score { get; set; }
         public int? Player2Score { get; set; }
         public DateTime DueDate { get; set; }
@@ -34,6 +36,15 @@ namespace Climb.Models
         [InverseProperty("P2Sets")]
         [ForeignKey("Player2ID")]
         public LeagueUser Player2 { get; set; }
+        [JsonIgnore]
+        [InverseProperty("P1Sets")]
+        [ForeignKey("SeasonPlayer1ID")]
+        public SeasonLeagueUser SeasonPlayer1 { get; set; }
+        [JsonIgnore]
+        [InverseProperty("P2Sets")]
+        [ForeignKey("SeasonPlayer2ID")]
+        public SeasonLeagueUser SeasonPlayer2 { get; set; }
+
         [Required]
         public List<Match> Matches { get; set; }
         [JsonIgnore]
@@ -43,15 +54,6 @@ namespace Climb.Models
 
         public Set()
         {
-        }
-
-        public Set(int leagueID, int seasonID, int player1ID, int player2ID, DateTime dueDate)
-        {
-            LeagueID = leagueID;
-            SeasonID = seasonID;
-            Player1ID = player1ID;
-            Player2ID = player2ID;
-            DueDate = dueDate;
         }
 
         public bool IsPlaying(int leagueUserID)
