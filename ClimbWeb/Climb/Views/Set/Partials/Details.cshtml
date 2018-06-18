@@ -5,19 +5,18 @@
     {
         <div class="flex align-center-i justify-center">
             <img src="@Model.OpponentProfilePic" width="64" height="64" />
-            <div class="flex">
+            <div class="flex wrap">
                 <p class="padding-left-10">@Model.Set.Player1.User.UserName</p> 
                 <p class="padding-left-10"><em>vs</em></p>
                 <p class="padding-left-10">@Model.Set.Player2.User.UserName</p>
             </div>
-            <img class="padding-left-10" src="~/images/profile_empty.jpg"/>
         </div>
     }
     else
     {
         <div class="flex align-center-i justify-center">
             <img src="@Model.P1ProfilePic" width="64" height="64" />
-            <div class="flex">
+            <div class="flex wrap">
                 <p class="padding-left-10">@Model.Set.Player1.User.UserName</p>
                 <p class="padding-left-10"><em>vs</em></p>
                 <p class="padding-left-10">@Model.Set.Player2.User.UserName</p>
