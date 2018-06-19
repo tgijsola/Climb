@@ -84,12 +84,12 @@ namespace Climb
                 {
                     HotModuleReplacement = true,
                     ReactHotModuleReplacement = true,
-                    EnvironmentVariables = new Dictionary<string, string>{{"mode", "development"}},
+                    EnvironmentVariables = new Dictionary<string, string> {{"mode", "development"}},
                 });
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseStatusCodePagesWithReExecute("/Site/Error", "?statusCode={0}");
                 app.UseHsts();
             }
 
@@ -101,7 +101,6 @@ namespace Climb
                 settings => settings.GeneratorSettings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase);
 
             app.UseAuthentication();
-
 
             app.UseMvc(routes =>
             {

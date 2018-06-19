@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Climb.Data;
 using Climb.ViewModels.Site;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -21,6 +23,24 @@ namespace Climb.Controllers
 
             var viewModel = await HomeViewModel.Create(user, dbContext);
             return View(viewModel);
+        }
+
+        public IActionResult Error(int? statusCode = null)
+        {
+            var feature = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
+            ViewData["ErrorUrl"] = feature?.OriginalPath;
+            ViewData["ErrorQuerystring"] = feature?.OriginalQueryString;
+
+            if (statusCode.HasValue)
+            {
+                if (statusCode == 404 || statusCode == 500)
+                {
+                    var viewName = statusCode.ToString();
+                    return View($"Error{viewName}");
+                }
+            }
+
+            return View("Error500");
         }
     }
 }
