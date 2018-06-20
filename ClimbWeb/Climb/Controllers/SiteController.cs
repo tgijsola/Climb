@@ -49,7 +49,7 @@ namespace Climb.Controllers
         {
             var user = await GetViewUserAsync();
             
-            ViewData["Success"] = TempData.ContainsKey("success");
+            ViewData["Success"] = TempData.TryGetValue("success", out _);
 
             var viewModel = new BaseViewModel(user);
             return View(viewModel);
@@ -58,7 +58,7 @@ namespace Climb.Controllers
         [HttpPost("SendSupportTicket")]
         public IActionResult SendSupportTicket(string summary, string description)
         {
-            TempData["success"] = "here";
+            TempData["success"] = true;
 
             return RedirectToAction("Support");
         }
