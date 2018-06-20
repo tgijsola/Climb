@@ -1,11 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Climb.Data;
+using Climb.ViewModels;
 using Climb.ViewModels.Site;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace Climb.Controllers
 {
@@ -41,6 +42,25 @@ namespace Climb.Controllers
             }
 
             return View("Error500");
+        }
+
+        [HttpGet("Support")]
+        public async Task<IActionResult> Support()
+        {
+            var user = await GetViewUserAsync();
+            
+            ViewData["Success"] = TempData.ContainsKey("success");
+
+            var viewModel = new BaseViewModel(user);
+            return View(viewModel);
+        }
+
+        [HttpPost("SendSupportTicket")]
+        public IActionResult SendSupportTicket(string summary, string description)
+        {
+            TempData["success"] = "here";
+
+            return RedirectToAction("Support");
         }
     }
 }

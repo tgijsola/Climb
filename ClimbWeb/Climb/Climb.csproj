@@ -23,6 +23,7 @@
       <Content Remove="Views\Site\Home.cshtml" />
       <Content Remove="Views\League\Home.cshtml" />
       <Content Remove="Views\Game\Home.cshtml" />
+      <Content Remove="Views\Site\Support.cshtml" />
       <Content Remove="Views\User\Home.cshtml" />
       <Content Remove="Views\User\Partials\LeagueUser.cshtml" />
     </ItemGroup>
@@ -54,6 +55,7 @@
     <None Include="Views\Game\Index.cshtml" />
     <None Include="Views\League\Index.cshtml" />
     <None Include="Views\Season\Home.cshtml" />
+    <None Include="Views\Site\Support.cshtml" />
     <None Include="Views\Site\Home.cshtml" />
     <None Include="Views\League\Home.cshtml" />
     <None Include="Views\Game\Home.cshtml" />
