@@ -1,14 +1,13 @@
 ﻿@model Climb.ViewModels.Leagues.LeagueUserViewModel
 
-<link rel="stylesheet" href="~/dist/league/leagueuser.css"/>
+<link rel="stylesheet" href="~/dist/styles/league/leagueuser.css"/>
 
-<div class="leagueUser-container">
-    <img src="@Model.ProfilePic" width="64" height="64"/>
-    <div>
-        <div>@Model.LeagueUser.User.UserName</div>
-        <div>
-            <div>Rank=@Model.LeagueUser.Rank</div>
-            <div>Points=@Model.LeagueUser.Points</div>
-        </div>
-    </div>
+<div class="detail-card">
+    <img src="@Model.ProfilePic" width="64" height="64" />
+    <div class="username">@Model.LeagueUser.User.UserName</div>
+    @*<div class="username">WWWWWWWWWWWW</div>*@
+    <div class="rank">@Model.LeagueUser.Rank</div>
+    @*<div class="rank"><p>890</p></div>*@
+    <div class="points">(@Model.LeagueUser.Points)</div>
+    @*<div class="points">(1234)</div>*@
 </div>
