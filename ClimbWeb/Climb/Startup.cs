@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using Climb.Data;
 using Climb.Services;
@@ -7,10 +6,8 @@ using Climb.Services.ModelServices;
 using Climb.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,16 +24,10 @@ namespace Climb
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
             ConfigureDB(services);
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -47,8 +38,7 @@ namespace Climb
 
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddSessionStateTempDataProvider();
-            services.AddSession();
+                .AddCookieTempDataProvider();
 
             services.AddTransient<IApplicationUserService, ApplicationUserService>();
             services.AddTransient<IGameService, GameService>();
@@ -100,14 +90,12 @@ namespace Climb
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
 
             app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly,
                 settings => settings.GeneratorSettings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase);
 
             app.UseAuthentication();
 
-            app.UseSession();
             app.UseMvcWithDefaultRoute();
         }
     }
