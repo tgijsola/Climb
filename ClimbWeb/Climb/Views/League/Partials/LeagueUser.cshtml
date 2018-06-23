@@ -4,7 +4,7 @@
 
 <div class="detail-card">
     <img src="@Model.ProfilePic" width="64" height="64" />
-    <div class="username">@Model.LeagueUser.User.UserName</div>
+    <a asp-controller="User" asp-action="Home" asp-route-userId="@Model.LeagueUser.UserID" class="username">@Model.LeagueUser.User.UserName</a>
     @*<div class="username">WWWWWWWWWWWW</div>*@
     <div class="rank">@Model.LeagueUser.Rank</div>
     @*<div class="rank"><p>890</p></div>*@
