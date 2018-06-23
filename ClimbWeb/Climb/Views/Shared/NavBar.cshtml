@@ -2,7 +2,7 @@
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
-        <a class="navbar-brand" asp-controller="Site" asp-action="Home">Climb</a>
+        <a class="navbar-brand brand" asp-controller="Site" asp-action="Home">Climb</a>
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -61,6 +61,7 @@
                             @Model.User.UserName
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" asp-controller="User" asp-action="Home">Home</a>
                             <a class="dropdown-item" asp-controller="Account" asp-action="Settings">Settings</a>
                             <form asp-controller="Account" asp-action="LogOut">
                                 <button>Log Out</button>

@@ -150,23 +150,5 @@ namespace Climb.Test.Api
 
             ControllerUtility.AssertStatusCode(result, HttpStatusCode.Created);
         }
-
-        [Test]
-        public async Task Start_Valid_ReturnsSets()
-        {
-            var (season, participants) = SeasonUtility.CreateSeason(dbContext, 2);
-            var sets = new HashSet<Set>();
-            for(var i = 0; i < 3; i++)
-            {
-                sets.Add(SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season.LeagueID));
-            }
-
-            seasonService.GenerateSchedule(season.ID).ReturnsForAnyArgs(info => sets);
-
-            var result = await testObj.Start(season.ID);
-            var setResults = result.GetObject<ICollection<Set>>();
-
-            Assert.IsTrue(setResults.Count == sets.Count);
-        }
     }
 }

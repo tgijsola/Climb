@@ -8,10 +8,10 @@
   },
   "codeGenerators": {
     "swaggerToTypeScriptClient": {
-      "className": "{controller}Client",
+      "className": "{controller}",
       "moduleName": "ClimbClient",
       "namespace": "",
-      "typeScriptVersion": 2.4,
+      "typeScriptVersion": 2.7,
       "template": "Fetch",
       "promiseType": "Promise",
       "httpClass": "Http",
@@ -35,7 +35,7 @@
       "markOptionalProperties": true,
       "generateCloneMethod": false,
       "typeStyle": "Class",
-      "extensionCode": "../Climb/ClientApp/BaseClass.ts",
+      "extensionCode": "../Climb/ClientApp/components/BaseClass.ts",
       "generateDefaultValues": true,
       "excludedTypeNames": [],
       "handleReferences": false,

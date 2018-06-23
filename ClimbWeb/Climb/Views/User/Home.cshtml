@@ -1,13 +1,67 @@
-﻿@model Climb.ViewModels.Users.HomeViewModel
+﻿@using Climb.Services
+@using Climb.ViewModels.Sets
+@using Climb.ViewModels.Leagues
+@model Climb.ViewModels.Users.HomeViewModel
+@inject ICdnService cdnService
 
 @{
     ViewBag.Title = "Users-Home";
     Layout = "_LayoutWithNavbar";
 }
 
-<div>
-    <h3>@(Model.IsViewingUserHome ? "Welcome " : "Home of ") @Model.HomeUser.UserName</h3>
-</div>
-<div>
-    <img src="@Model.ProfilePic" />
+<div class="width-100">
+    <div class="header-user flex col align-center-i">
+        <h3 class="page-title">@(Model.IsViewingUserHome ? "Welcome " : "Home of ") @Model.HomeUser.UserName</h3>
+        <img src="@Model.ProfilePic" />
+    </div>
+    <div class="content-user-home">
+        <div class="col-md-4">
+            <div class="home-section">
+                <div class="home-section-head">
+                    <h3>Leagues</h3>
+                </div>
+                <div class="home-section-body">
+                    @foreach (var leagueUser in Model.HomeUser.LeagueUsers)
+                    {
+                        <partial name="../League/Partials/LeagueUser" model="@LeagueUserViewModel.Create(leagueUser, cdnService)" />
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="home-section">
+                <div class="home-section-head">
+                    <h3>Recent</h3>
+                </div>
+                <div class="home-section-body">
+                    @if (Model.RecentSets.Count == 0)
+                    {
+                        <div class="detail-card justify-center">
+                            <em> No recent activity</em>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var set in Model.RecentSets)
+                        {
+                            <div>@set.ID</div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="home-section">
+                <div class="home-section-head">
+                    <h3>Sets</h3>
+                </div>
+                <div class="home-section-body">
+                    @foreach (var set in Model.AvailableSets)
+                    {
+                        <partial name="../Set/Partials/Details" model="@DetailsViewModel.Create(Model.User, set, cdnService)" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
