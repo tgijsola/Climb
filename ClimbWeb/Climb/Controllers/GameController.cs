@@ -65,8 +65,8 @@ namespace Climb.Controllers
         {
             try
             {
-                var character = await gameService.AddCharacter(request);
-                return CodeResultAndLog(HttpStatusCode.Created, character, $"New character {character.Name} created.");
+                await gameService.AddCharacter(request);
+                return RedirectToAction("Home", new {request.GameID});
             }
             catch(Exception exception)
             {
