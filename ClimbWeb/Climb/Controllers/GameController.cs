@@ -93,8 +93,8 @@ namespace Climb.Controllers
         {
             try
             {
-                var stage = await gameService.AddStage(request);
-                return CodeResultAndLog(HttpStatusCode.Created, stage, $"New stage {stage.Name} created.");
+                await gameService.AddStage(request);
+                return RedirectToAction("Home", new {request.GameID});
             }
             catch(Exception exception)
             {
