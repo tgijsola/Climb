@@ -1,39 +1,26 @@
-﻿using Climb.Attributes;
+﻿using System.Threading.Tasks;
 using Climb.Data;
-using Climb.Models;
-using Climb.Services.ModelServices;
+using Climb.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace Climb.Controllers
 {
     public class SetController : BaseController<SetController>
     {
-        private readonly ISetService setService;
-
-        public SetController(ApplicationDbContext dbContext, ISetService setService, ILogger<SetController> logger, UserManager<ApplicationUser> userManager)
+        public SetController(ApplicationDbContext dbContext, ILogger<SetController> logger, UserManager<ApplicationUser> userManager)
             : base(logger, userManager, dbContext)
         {
-            this.setService = setService;
         }
 
-        [HttpPost("api/v1/sets/challenge")]
-        [SwaggerResponse(HttpStatusCode.Created, typeof(SetRequest))]
-        public async Task<IActionResult> ChallengeUser(int requesterID, int challengedID)
+        [HttpGet("sets/fight")]
+        public async Task<IActionResult> Fight()
         {
-            try
-            {
-                var request = await setService.RequestSetAsync(requesterID, challengedID);
-                return CodeResultAndLog(HttpStatusCode.Created, request, $"Member {requesterID} challenged {challengedID}.");
-            }
-            catch(Exception exception)
-            {
-                return GetExceptionResult(exception, new { requesterID, challengedID });
-            }
+            var user = await GetViewUserAsync();
+
+            var viewModel = new BaseViewModel(user);
+            return View(viewModel);
         }
     }
 }

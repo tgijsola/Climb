@@ -10,6 +10,13 @@ gulp.task("ts", function () {
         .pipe(gulp.dest('wwwroot/dist/scripts'));
 });
 
+var tsClimbProject = ts.createProject('tsconfig.gulp.json');
+gulp.task("ts-climb", function () {
+    return gulp.src('ClientApp/gen/climbClient.ts')
+        .pipe(tsClimbProject())
+        .pipe(gulp.dest('wwwroot/dist/scripts'));
+});
+
 gulp.task("less", () => {
     return gulp.src("ClientApp/styles/**/*.less")
         .pipe(less({
@@ -18,4 +25,4 @@ gulp.task("less", () => {
         .pipe(gulp.dest("wwwroot/dist/styles"));
 });
 
-gulp.task("default", gulp.parallel("less", "ts"));
+gulp.task("default", gulp.parallel("less", "ts", "ts-climb"));

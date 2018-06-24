@@ -10,12 +10,24 @@ namespace Climb.ViewModels.Users
 {
     public class HomeViewModel : BaseViewModel
     {
+        public class SharedLeagueUsers
+        {
+            public LeagueUser Requester { get; }
+            public LeagueUser Challenged { get; }
+
+            public SharedLeagueUsers(LeagueUser requester, LeagueUser challenged)
+            {
+                Requester = requester;
+                Challenged = challenged;
+            }
+        }
+
         public ApplicationUser HomeUser { get; }
         public string ProfilePic { get; }
         public bool IsViewingUserHome => User.Id == HomeUser.Id;
         public IReadOnlyList<Set> RecentSets { get; }
         public IReadOnlyList<Set> AvailableSets { get; }
-        public IReadOnlyList<LeagueUser> SharedLeagues { get; }
+        public IReadOnlyList<SharedLeagueUsers> SharedLeagues { get; }
         public IReadOnlyList<SetRequest> SetRequests { get; }
         public bool ShowSetRequests { get; }
 
@@ -29,7 +41,16 @@ namespace Climb.ViewModels.Users
             SetRequests = setRequests;
             ShowSetRequests = showSetRequests;
 
-            SharedLeagues = homeUser.LeagueUsers.Where(lu => user.LeagueUsers.Any(lu2 => lu2.LeagueID == lu.LeagueID)).ToArray();
+            var sharedLeagues = new List<SharedLeagueUsers>();
+            foreach(var requester in user.LeagueUsers)
+            {
+                var challenged = homeUser.LeagueUsers.FirstOrDefault(lu => lu.LeagueID == requester.LeagueID);
+                if(challenged != null)
+                {
+                    sharedLeagues.Add(new SharedLeagueUsers(requester, challenged));
+                }
+            }
+            SharedLeagues = sharedLeagues;
         }
 
         public static async Task<HomeViewModel> CreateAsync(ApplicationUser user, ApplicationUser homeUser, ICdnService cdnService, ApplicationDbContext dbContext)

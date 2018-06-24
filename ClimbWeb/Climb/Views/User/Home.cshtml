@@ -12,10 +12,15 @@
 <div id="challenge-modal" hidden>
     @foreach(var leagueUser in Model.SharedLeagues)
     {
-        <a href="#">@leagueUser.League.Name</a>
+        <div>
+            <div>@leagueUser.Requester.League.Name</div>
+            <button onclick="sendRequest(@leagueUser.Requester.ID, @leagueUser.Challenged.ID)">Challenge!</button>
+        </div>
     }
 
-    <button id="challenge-modal-close">close</button>
+    <div>
+        <button id="challenge-modal-close">close</button>
+    </div>
 </div>
 
 <div class="width-100">

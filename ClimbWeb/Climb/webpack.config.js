@@ -1,10 +1,30 @@
-﻿module.exports = {
+﻿const entryPlus = require("webpack-entry-plus");
+const glob = require("glob");
+
+const entryFiles = [
+    {
+        entryFiles: ["./ClientApp/components/ReactApp.tsx"],
+        outputName: "app"
+    },
+    {
+        entryFiles: ["./ClientApp/gen/climbClient.ts"],
+        outputName: "climbClient"
+    },
+    {
+        entryFiles: glob.sync("./ClientApp/scripts/**/*.ts"),
+        outputName(item) {
+            return item;
+        }
+    }
+];
+
+module.exports = {
     mode: "development",
-    entry: { main: "./ClientApp/components/ReactApp.tsx" },
+    entry: entryPlus(entryFiles),
     output: {
-        filename: "bundle.js",
-        path: __dirname + "/wwwroot/dist/app",
-        publicPath: "/dist/app/"
+        filename: "[name].js",
+        path: __dirname + "/wwwroot/dist",
+        publicPath: "/dist/"
     },
 
     // Enable sourcemaps for debugging webpack's output.
@@ -31,7 +51,6 @@
     // dependencies, which allows browsers to cache those libraries between builds.
     externals: {
         "react": "React",
-        "react-dom": "ReactDOM",
-        "react-spinners": "RingLoader"
+        "react-dom": "ReactDOM"
     }
 };

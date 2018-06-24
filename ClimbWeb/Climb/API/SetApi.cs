@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Climb.Attributes;
 using Climb.Data;
+using Climb.Models;
 using Climb.Requests.Sets;
 using Climb.Responses.Sets;
 using Climb.Services.ModelServices;
@@ -60,6 +61,21 @@ namespace Climb.API
             var dto = SetDto.Create(set, set.League.GameID);
 
             return CodeResult(HttpStatusCode.OK, dto);
+        }
+        
+        [HttpPost("api/v1/sets/challenge")]
+        [SwaggerResponse(HttpStatusCode.Created, typeof(SetRequest))]
+        public async Task<IActionResult> ChallengeUser(int requesterID, int challengedID)
+        {
+            try
+            {
+                var request = await setService.RequestSetAsync(requesterID, challengedID);
+                return CodeResultAndLog(HttpStatusCode.Created, request, $"Member {requesterID} challenged {challengedID}.");
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, new { requesterID, challengedID });
+            }
         }
     }
 }
