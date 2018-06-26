@@ -2,16 +2,12 @@
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
-    //"module": "commonjs",
+    "module": "amd",
     "target": "es6",
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-  "include": [
-    "./src/scripts/**/*",
-    "./ClientApp/gen/climbClient.ts"
-  ],
   "exclude": [
     "node_modules"
   ]

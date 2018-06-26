@@ -112,6 +112,19 @@ namespace Climb.Test.Services.ModelServices
             Assert.AreEqual(DateTime.Today.ToShortDateString(), request.DateCreated.ToShortDateString());
         }
 
+        [Test]
+        public async Task RequestSet_Valid_SetLeague()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            LeagueUtility.AddUsersToLeague(league, 2, dbContext);
+            var requester = league.Members[0];
+            var challenged = league.Members[1];
+
+            var request = await testObj.RequestSetAsync(requester.ID, challenged.ID);
+
+            Assert.AreEqual(league.ID, request.LeagueID);
+        }
+
         // TODO: Already have an open set request.
 
         private static List<MatchForm> CreateMatchFormsWithScores(int count, int p1Score, int p2Score)

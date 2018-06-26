@@ -14,7 +14,7 @@ var tsClimbProject = ts.createProject('tsconfig.gulp.json');
 gulp.task("ts-climb", function () {
     return gulp.src('ClientApp/gen/climbClient.ts')
         .pipe(tsClimbProject())
-        .pipe(gulp.dest('wwwroot/dist/scripts'));
+        .pipe(gulp.dest('wwwroot/dist/gen'));
 });
 
 gulp.task("less", () => {

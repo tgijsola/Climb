@@ -1,12 +1,27 @@
-﻿import { ClimbClient } from "../gen/climbClient";
+﻿import {onready} from './init';
+import { ClimbClient } from "../gen/climbClient";
 
-function openChallengeModal() {
-    toggleChallengeModal(true);
-}
+onready(async () => {
+    var openButton = document.getElementById("challenge-button");
+    if (openButton != null) {
+        openButton.onclick = () => toggleChallengeModal(true);
+    }
 
-function closeChallengeModal() {
-    toggleChallengeModal(false);
-}
+    var closeButton = document.getElementById("challenge-modal-close");
+    if (closeButton != null) {
+        closeButton.onclick = () => toggleChallengeModal(false);
+    }
+
+    var requestButtons = document.getElementsByClassName("request-button");
+    for (let i = 0; i < requestButtons.length; i++) {
+        const button = <HTMLButtonElement>requestButtons[i];
+        const requester = button.getAttribute("data-requester");
+        const challenged = button.getAttribute("data-challenged");
+        if (requester != null && challenged != null) {
+            button.onclick = () => sendRequest(parseInt(requester), parseInt(challenged));
+        }
+    }
+});
 
 function toggleChallengeModal(open: Boolean)
 {
@@ -19,7 +34,6 @@ function toggleChallengeModal(open: Boolean)
 }
 
 function sendRequest(requesterId: number, challengedId: number) {
-    //alert(requesterId + "vs" + challengedId);
     const setApi = new ClimbClient.SetApi();
     setApi.challengeUser(requesterId, challengedId)
         .then((setRequest: ClimbClient.SetRequest): void => {

@@ -70,7 +70,10 @@ namespace Climb.ViewModels.Users
             if(showSetRequests)
             {
                 setRequests = await dbContext.SetRequests
-                    .Where(sr => user.LeagueUsers.Any(lu => lu.ID == sr.ChallengedID))
+                    .Include(sr => sr.Requester).ThenInclude(lu => lu.User).AsNoTracking()
+                    .Include(sr => sr.Challenged).ThenInclude(lu => lu.User).AsNoTracking()
+                    .Include(sr => sr.League).AsNoTracking()
+                    .Where(sr => homeUser.LeagueUsers.Any(lu => lu.ID == sr.ChallengedID))
                     .OrderByDescending(sr => sr.DateCreated)
                     .ToArrayAsync();
             }

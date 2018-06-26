@@ -14,7 +14,7 @@
     {
         <div>
             <div>@leagueUser.Requester.League.Name</div>
-            <button onclick="sendRequest(@leagueUser.Requester.ID, @leagueUser.Challenged.ID)">Challenge!</button>
+            <button class="request-button" data-requester="@leagueUser.Requester.ID" data-challenged="@leagueUser.Challenged.ID">Challenge!</button>
         </div>
     }
 
@@ -84,7 +84,7 @@
                             foreach(var setRequest in Model.SetRequests)
                             {
                                 <div>
-                                    <div>League @setRequest.Challenged.League.Name</div>
+                                    <div>League @setRequest.League.Name</div>
                                     <div>Challenger @setRequest.Requester.User.UserName</div>
                                     <div>@setRequest.DateCreated.ToShortDateString()</div>
                                     <div>
@@ -120,11 +120,5 @@
 
 @section scripts
 {
-    <script src="~/dist/scripts/Users-Home.js" type="text/javascript" language="javascript"></script>
-
-    @* //TODO: Replace with html attibutes. *@
-    <script language="javascript">
-        document.getElementById("challenge-button").onclick = openChallengeModal;
-        document.getElementById("challenge-modal-close").onclick = closeChallengeModal;
-    </script>
+    <script>require(['dist/scripts/Users-Home']);</script>
 }

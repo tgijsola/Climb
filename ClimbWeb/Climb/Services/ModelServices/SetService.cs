@@ -30,11 +30,16 @@ namespace Climb.Services.ModelServices
                 throw new NotFoundException(typeof(LeagueUser), challengedID);
             }
 
+            var requester = await dbContext.LeagueUsers
+                .Include(lu => lu.League).AsNoTracking()
+                .FirstOrDefaultAsync(lu => lu.ID == requesterID);
+
             var setRequest = new SetRequest
             {
+                LeagueID = requester.LeagueID,
                 RequesterID = requesterID,
                 ChallengedID = challengedID,
-                DateCreated = DateTime.Now
+                DateCreated = DateTime.Now,
             };
             dbContext.Add(setRequest);
             await dbContext.SaveChangesAsync();
