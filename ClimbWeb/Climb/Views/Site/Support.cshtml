@@ -21,8 +21,15 @@
         <button>Send</button>
     </form>
     
-    @if((bool)ViewData["Success"])
+    @if(ViewData.ContainsKey("Success"))
     {
-        <div>Thanks for the feedback!</div>
+        if((bool)ViewData["Success"])
+        {
+            <div>Thanks for the feedback!</div>
+        }
+        else
+        {
+            <div>Failed to send feedback!</div>
+        }
     }
 </div>

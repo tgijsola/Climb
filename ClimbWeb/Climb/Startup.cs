@@ -46,7 +46,7 @@ namespace Climb
             services.AddTransient<ISeasonService, SeasonService>();
             services.AddTransient<ISetService, SetService>();
 
-            services.AddSingleton<IEmailSender, EmailSender>();
+            services.AddSingleton<IEmailSender, SendGridService>();
             services.AddTransient<ITokenHelper, TokenHelper>();
             services.AddTransient<IUrlUtility, UrlUtility>();
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
