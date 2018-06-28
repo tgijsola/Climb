@@ -88,8 +88,8 @@
                                     <div>Challenger @setRequest.Requester.User.UserName</div>
                                     <div>@setRequest.DateCreated.ToShortDateString()</div>
                                     <div>
-                                        <button>Accept</button>
-                                        <button>Decline</button>
+                                        <button class="request-accept" data-requestId="@setRequest.ID">Accept</button>
+                                        <button class="request-decline" data-requestId="@setRequest.ID">Decline</button>
                                     </div>
                                 </div>
                             }

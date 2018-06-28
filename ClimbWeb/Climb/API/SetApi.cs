@@ -77,5 +77,20 @@ namespace Climb.API
                 return GetExceptionResult(exception, new { requesterID, challengedID });
             }
         }
+
+        [HttpPost("api/v1/sets/respondToChallenge")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(SetRequest))]
+        public async Task<IActionResult> RespondToChallenge(int requestID, bool accept)
+        {
+            try
+            {
+                var request = await setService.RespondToSetRequestAsync(requestID, accept);
+                return Ok(request);
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, new { requestID, accept });
+            }
+        }
     }
 }

@@ -58,7 +58,7 @@ namespace Climb.ViewModels.Users
             var profilePic = homeUser.GetProfilePicUrl(cdnService);
             var sets = homeUser.LeagueUsers.SelectMany(lu => lu.P1Sets.Union(lu.P2Sets)).ToArray();
             var recentSets = sets.Where(s => s.IsComplete).Take(10).ToArray();
-            var availableSets = sets.Where(s => !s.IsComplete).Take(10).ToArray();
+            var availableSets = sets.Where(s => !s.IsComplete).Take(100).ToArray();
 
 #if DEBUG
             const bool showSetRequests = true;

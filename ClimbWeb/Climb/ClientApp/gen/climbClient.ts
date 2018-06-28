@@ -1241,6 +1241,49 @@ export class SetApi extends BaseClass {
         }
         return Promise.resolve<SetRequest>(<any>null);
     }
+
+    respondToChallenge(requestID: number, accept: boolean): Promise<SetRequest> {
+        let url_ = this.baseUrl + "/api/v1/sets/respondToChallenge?";
+        if (requestID === undefined || requestID === null)
+            throw new Error("The parameter 'requestID' must be defined and cannot be null.");
+        else
+            url_ += "requestID=" + encodeURIComponent("" + requestID) + "&"; 
+        if (accept === undefined || accept === null)
+            throw new Error("The parameter 'accept' must be defined and cannot be null.");
+        else
+            url_ += "accept=" + encodeURIComponent("" + accept) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processRespondToChallenge(_response);
+        });
+    }
+
+    protected processRespondToChallenge(response: Response): Promise<SetRequest> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? SetRequest.fromJS(resultData200) : new SetRequest();
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<SetRequest>(<any>null);
+    }
 }
 
 export class UserApi extends BaseClass {
@@ -2446,11 +2489,16 @@ export interface IMatchDto {
 
 export class SetRequest implements ISetRequest {
     id!: number;
+    leagueID!: number;
     requesterID!: number;
     challengedID!: number;
     dateCreated!: Date;
+    setID?: number | undefined;
+    isOpen!: boolean;
+    league?: League | undefined;
     requester?: LeagueUser | undefined;
     challenged?: LeagueUser | undefined;
+    set?: Set | undefined;
 
     constructor(data?: ISetRequest) {
         if (data) {
@@ -2464,11 +2512,16 @@ export class SetRequest implements ISetRequest {
     init(data?: any) {
         if (data) {
             this.id = data["id"];
+            this.leagueID = data["leagueID"];
             this.requesterID = data["requesterID"];
             this.challengedID = data["challengedID"];
             this.dateCreated = data["dateCreated"] ? new Date(data["dateCreated"].toString()) : <any>undefined;
+            this.setID = data["setID"];
+            this.isOpen = data["isOpen"];
+            this.league = data["league"] ? League.fromJS(data["league"]) : <any>undefined;
             this.requester = data["requester"] ? LeagueUser.fromJS(data["requester"]) : <any>undefined;
             this.challenged = data["challenged"] ? LeagueUser.fromJS(data["challenged"]) : <any>undefined;
+            this.set = data["set"] ? Set.fromJS(data["set"]) : <any>undefined;
         }
     }
 
@@ -2482,22 +2535,32 @@ export class SetRequest implements ISetRequest {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["leagueID"] = this.leagueID;
         data["requesterID"] = this.requesterID;
         data["challengedID"] = this.challengedID;
         data["dateCreated"] = this.dateCreated ? this.dateCreated.toISOString() : <any>undefined;
+        data["setID"] = this.setID;
+        data["isOpen"] = this.isOpen;
+        data["league"] = this.league ? this.league.toJSON() : <any>undefined;
         data["requester"] = this.requester ? this.requester.toJSON() : <any>undefined;
         data["challenged"] = this.challenged ? this.challenged.toJSON() : <any>undefined;
+        data["set"] = this.set ? this.set.toJSON() : <any>undefined;
         return data; 
     }
 }
 
 export interface ISetRequest {
     id: number;
+    leagueID: number;
     requesterID: number;
     challengedID: number;
     dateCreated: Date;
+    setID?: number | undefined;
+    isOpen: boolean;
+    league?: League | undefined;
     requester?: LeagueUser | undefined;
     challenged?: LeagueUser | undefined;
+    set?: Set | undefined;
 }
 
 export class UserDto implements IUserDto {

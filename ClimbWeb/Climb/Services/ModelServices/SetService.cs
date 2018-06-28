@@ -74,8 +74,8 @@ namespace Climb.Services.ModelServices
 
                 dbContext.Add(set);
                 setRequest.Set = set;
-                await dbContext.SaveChangesAsync();
             }
+            await dbContext.SaveChangesAsync();
 
             return setRequest;
         }

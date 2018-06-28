@@ -21,6 +21,24 @@ onready(async () => {
             button.onclick = () => sendRequest(parseInt(requester), parseInt(challenged));
         }
     }
+
+    var acceptButtons = document.getElementsByClassName("request-accept");
+    for (let i = 0; i < acceptButtons.length; i++) {
+        const button = <HTMLButtonElement>acceptButtons[i];
+        const request = button.getAttribute("data-requestId");
+        if (request != null) {
+            button.onclick = () => respondToRequest(parseInt(request), true);
+        }
+    }
+
+    var declineButtons = document.getElementsByClassName("request-decline");
+    for (let i = 0; i < declineButtons.length; i++) {
+        const button = <HTMLButtonElement>declineButtons[i];
+        const request = button.getAttribute("data-requestId");
+        if (request != null) {
+            button.onclick = () => respondToRequest(parseInt(request), false);
+        }
+    }
 });
 
 function toggleChallengeModal(open: Boolean)
@@ -36,9 +54,18 @@ function toggleChallengeModal(open: Boolean)
 function sendRequest(requesterId: number, challengedId: number) {
     const setApi = new ClimbClient.SetApi();
     setApi.challengeUser(requesterId, challengedId)
-        .then((setRequest: ClimbClient.SetRequest): void => {
-            console.log(setRequest);
+        .then(() => {
             window.location.reload();
         })
         .catch((reason: any) => alert(`Could not challenge user.\n${reason}`));
+}
+
+function respondToRequest(requestId: number, accept: boolean) {
+    const setApi = new ClimbClient.SetApi();
+    setApi.respondToChallenge(requestId, accept)
+        .then(() => {
+            window.location.reload();
+        })
+        .catch((reason: any) => alert(`Could not respond to challenge request.\n${reason}`));
+
 }

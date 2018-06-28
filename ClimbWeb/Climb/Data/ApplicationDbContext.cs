@@ -36,6 +36,8 @@ namespace Climb.Data
             CreateLeagueUser(builder.Entity<LeagueUser>());
             CreateSeasonLeagueUser(builder.Entity<SeasonLeagueUser>());
             CreateMatchCharacter(builder.Entity<MatchCharacter>());
+
+            builder.Entity<SetRequest>().HasQueryFilter(lu => lu.IsOpen);
         }
 
         private static void CreateLeagueUser(EntityTypeBuilder<LeagueUser> entity)
