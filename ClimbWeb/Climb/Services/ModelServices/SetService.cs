@@ -47,6 +47,39 @@ namespace Climb.Services.ModelServices
             return setRequest;
         }
 
+        public async Task<SetRequest> RespondToSetRequestAsync(int requestID, bool accepted)
+        {
+            var setRequest = await dbContext.SetRequests.FirstOrDefaultAsync(sr => sr.ID == requestID);
+            if(setRequest == null)
+            {
+                throw new NotFoundException(typeof(SetRequest), requestID);
+            }
+
+            if(!setRequest.IsOpen)
+            {
+                throw new BadRequestException(nameof(requestID), $"Set Request {requestID} has already been closed.");
+            }
+
+            dbContext.Update(setRequest);
+            setRequest.IsOpen = false;
+
+            if(accepted)
+            {
+                var set = new Set
+                {
+                    LeagueID = setRequest.LeagueID,
+                    Player1ID = setRequest.RequesterID,
+                    Player2ID = setRequest.ChallengedID,
+                };
+
+                dbContext.Add(set);
+                setRequest.Set = set;
+                await dbContext.SaveChangesAsync();
+            }
+
+            return setRequest;
+        }
+
         public async Task<Set> Update(int setID, IReadOnlyList<MatchForm> matchForms)
         {
             var set = await dbContext.Sets

@@ -9,5 +9,6 @@ namespace Climb.Services.ModelServices
     {
         Task<Set> Update(int setID, IReadOnlyList<MatchForm> matchForms);
         Task<SetRequest> RequestSetAsync(int requesterID, int challengedID);
+        Task<SetRequest> RespondToSetRequestAsync(int requestID, bool accepted);
     }
 }

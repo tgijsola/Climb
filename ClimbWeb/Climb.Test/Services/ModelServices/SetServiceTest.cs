@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
+using Climb.Models;
 using Climb.Requests.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
@@ -12,6 +13,7 @@ namespace Climb.Test.Services.ModelServices
 {
     // TODO: Tied scores.
     // TODO: Not matching character counts.
+    // TODO: Already have an open set request.
     [TestFixture]
     public class SetServiceTest
     {
@@ -100,6 +102,12 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
+        public void RespondToSetRequestAsync_NoRequest_NotFoundException()
+        {
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.RespondToSetRequestAsync(0, false));
+        }
+
+        [Test]
         public async Task RequestSet_Valid_DateSet()
         {
             var league = LeagueUtility.CreateLeague(dbContext);
@@ -125,7 +133,57 @@ namespace Climb.Test.Services.ModelServices
             Assert.AreEqual(league.ID, request.LeagueID);
         }
 
-        // TODO: Already have an open set request.
+        [Test]
+        public void RespondToSetRequest_NoRequest_NotFoundException()
+        {
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.RespondToSetRequestAsync(0, true));
+        }
+
+        [Test]
+        public async Task RespondToSetRequest_Approved_CreateSet()
+        {
+            SetRequest setRequest = CreateSetRequest();
+
+            setRequest = await testObj.RespondToSetRequestAsync(setRequest.ID, true);
+
+            Assert.IsNotNull(setRequest.SetID);
+        }
+
+        [Test]
+        public async Task RespondToSetRequest_Declined_NoSet()
+        {
+            SetRequest setRequest = CreateSetRequest();
+
+            setRequest = await testObj.RespondToSetRequestAsync(setRequest.ID, false);
+
+            Assert.IsNull(setRequest.SetID);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task RespondToSetRequest_Responded_IsClosed(bool accepted)
+        {
+            SetRequest setRequest = CreateSetRequest();
+            Assert.IsTrue(setRequest.IsOpen);
+
+            setRequest = await testObj.RespondToSetRequestAsync(setRequest.ID, accepted);
+
+            Assert.IsFalse(setRequest.IsOpen);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void RespondToSetRequest_NotOpen_BadRequestException(bool accepted)
+        {
+            SetRequest setRequest = CreateSetRequest();
+            dbContext.Update(setRequest);
+            setRequest.IsOpen = false;
+            dbContext.SaveChanges();
+
+            Assert.ThrowsAsync<BadRequestException>(() => testObj.RespondToSetRequestAsync(setRequest.ID, accepted));
+        }
+
+        // TODO: RespondToSetRequestAsync: Request approved and date set.
 
         private static List<MatchForm> CreateMatchFormsWithScores(int count, int p1Score, int p2Score)
         {
@@ -155,6 +213,19 @@ namespace Climb.Test.Services.ModelServices
             }
 
             return matchForms;
+        }
+        
+        private SetRequest CreateSetRequest()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var members = LeagueUtility.AddUsersToLeague(league, 2, dbContext);
+            var setRequest = DbContextUtility.AddNew<SetRequest>(dbContext, sr =>
+            {
+                sr.LeagueID = league.ID;
+                sr.RequesterID = members[0].ID;
+                sr.ChallengedID = members[1].ID;
+            });
+            return setRequest;
         }
     }
 }
