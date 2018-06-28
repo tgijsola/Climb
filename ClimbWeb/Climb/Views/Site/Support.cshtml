@@ -1,0 +1,35 @@
+﻿@model Climb.ViewModels.BaseViewModel
+
+@{
+    ViewBag.Title = "Support-Climb";
+    Layout = "_LayoutWithNavbar";
+}
+
+<div>
+    <h2>Climb Feedback</h2>
+    <h5>send bugs, ideas, or general feedback</h5>
+    
+    <form asp-action="SendSupportTicket">
+        <div class="input-group">
+            <label>Summary</label>
+            <input type="text" name="summary" />
+        </div>
+        <div class="input-group">
+            <label>Description</label>
+            <textarea name="description"></textarea>
+        </div>
+        <button>Send</button>
+    </form>
+    
+    @if(ViewData.ContainsKey("Success"))
+    {
+        if((bool)ViewData["Success"])
+        {
+            <div>Thanks for the feedback!</div>
+        }
+        else
+        {
+            <div>Failed to send feedback!</div>
+        }
+    }
+</div>
