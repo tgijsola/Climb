@@ -4,18 +4,20 @@ using Climb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Climb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180611150901_AddSetRequest")]
+    partial class AddSetRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
+                .HasAnnotation("ProductVersion", "2.1.0-rtm-30799")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -322,23 +324,13 @@ namespace Climb.Migrations
 
                     b.Property<DateTime>("DateCreated");
 
-                    b.Property<bool>("IsOpen");
-
-                    b.Property<int>("LeagueID");
-
                     b.Property<int>("RequesterID");
-
-                    b.Property<int?>("SetID");
 
                     b.HasKey("ID");
 
                     b.HasIndex("ChallengedID");
 
-                    b.HasIndex("LeagueID");
-
                     b.HasIndex("RequesterID");
-
-                    b.HasIndex("SetID");
 
                     b.ToTable("SetRequests");
                 });
@@ -595,19 +587,9 @@ namespace Climb.Migrations
                         .HasForeignKey("ChallengedID")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Climb.Models.League", "League")
-                        .WithMany()
-                        .HasForeignKey("LeagueID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Climb.Models.LeagueUser", "Requester")
                         .WithMany()
                         .HasForeignKey("RequesterID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Climb.Models.Set", "Set")
-                        .WithMany()
-                        .HasForeignKey("SetID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

@@ -41,7 +41,7 @@ namespace Climb.Controllers
                 return NotFound();
             }
 
-            var viewModel = HomeViewModel.Create(appUser, user, cdnService);
+            var viewModel = await HomeViewModel.CreateAsync(appUser, user, cdnService, dbContext);
 
             return View(viewModel);
         }
