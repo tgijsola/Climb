@@ -49,7 +49,9 @@ namespace Climb.Services.ModelServices
 
         public async Task<SetRequest> RespondToSetRequestAsync(int requestID, bool accepted)
         {
-            var setRequest = await dbContext.SetRequests.FirstOrDefaultAsync(sr => sr.ID == requestID);
+            var setRequest = await dbContext.SetRequests
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(sr => sr.ID == requestID);
             if(setRequest == null)
             {
                 throw new NotFoundException(typeof(SetRequest), requestID);
