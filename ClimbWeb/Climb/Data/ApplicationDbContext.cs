@@ -17,6 +17,7 @@ namespace Climb.Data
         public DbSet<Match> Matches { get; set; }
         public DbSet<MatchCharacter> MatchCharacters { get; set; }
         public DbSet<RankSnapshot> RankSnapshots { get; set; }
+        public DbSet<SetRequest> SetRequests { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -35,6 +36,8 @@ namespace Climb.Data
             CreateLeagueUser(builder.Entity<LeagueUser>());
             CreateSeasonLeagueUser(builder.Entity<SeasonLeagueUser>());
             CreateMatchCharacter(builder.Entity<MatchCharacter>());
+
+            builder.Entity<SetRequest>().HasQueryFilter(lu => lu.IsOpen);
         }
 
         private static void CreateLeagueUser(EntityTypeBuilder<LeagueUser> entity)

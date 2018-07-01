@@ -4,14 +4,16 @@ using Climb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Climb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180626144723_AddLeagueToSetRequest")]
+    partial class AddLeagueToSetRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,13 +324,9 @@ namespace Climb.Migrations
 
                     b.Property<DateTime>("DateCreated");
 
-                    b.Property<bool>("IsOpen");
-
                     b.Property<int>("LeagueID");
 
                     b.Property<int>("RequesterID");
-
-                    b.Property<int?>("SetID");
 
                     b.HasKey("ID");
 
@@ -337,8 +335,6 @@ namespace Climb.Migrations
                     b.HasIndex("LeagueID");
 
                     b.HasIndex("RequesterID");
-
-                    b.HasIndex("SetID");
 
                     b.ToTable("SetRequests");
                 });
@@ -603,11 +599,6 @@ namespace Climb.Migrations
                     b.HasOne("Climb.Models.LeagueUser", "Requester")
                         .WithMany()
                         .HasForeignKey("RequesterID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Climb.Models.Set", "Set")
-                        .WithMany()
-                        .HasForeignKey("SetID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
