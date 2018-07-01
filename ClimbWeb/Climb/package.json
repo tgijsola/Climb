@@ -37,10 +37,5 @@
     "webpack-prod": "webpack --mode development --env.prod",
     "build-dev": "concurrently \"gulp\" \"webpack --mode development\"",
     "build-prod": "concurrently \"gulp\" \"webpack --mode production\""
-  },
-  "-vs-binding": {
-    "BeforeBuild": [
-      "build-dev"
-    ]
   }
 }
