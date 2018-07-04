@@ -1,16 +1,28 @@
 ﻿@model Climb.ViewModels.Sets.DetailsViewModel
 
-<div>
-    @if(Model.UserIsPlaying)
+<div class="detail-card">
+    @if (Model.UserIsPlaying)
     {
-        <img src="@Model.OpponentProfilePic" width="64" height="64"/>
+        <div class="flex align-center-i justify-center">
+            <img src="@Model.OpponentProfilePic" width="64" height="64" />
+            <div class="flex wrap">
+                <p class="padding-left-10">@Model.Set.Player1.User.UserName</p> 
+                <p class="padding-left-10"><em>vs</em></p>
+                <p class="padding-left-10">@Model.Set.Player2.User.UserName</p>
+            </div>
+        </div>
     }
     else
     {
-        <img src="@Model.P1ProfilePic" width="64" height="64"/>
-        <div>@Model.Set.Player1.User.UserName v @Model.Set.Player2.User.UserName</div>
-        <img src="@Model.P2ProfilePic" width="64" height="64"/>
+        <div class="flex align-center-i justify-center">
+            <img src="@Model.P1ProfilePic" width="64" height="64" />
+            <div class="flex wrap">
+                <p class="padding-left-10">@Model.Set.Player1.User.UserName</p>
+                <p class="padding-left-10"><em>vs</em></p>
+                <p class="padding-left-10">@Model.Set.Player2.User.UserName</p>
+            </div>
+            <img src="@Model.P2ProfilePic" width="64" height="64" />
+        </div>
     }
-
-    <button class="btn btn-primary">Fight</button>
+    <button class="btn btn-fight margin-left-10">Fight</button>
 </div>

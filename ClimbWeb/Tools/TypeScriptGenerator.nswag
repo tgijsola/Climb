@@ -2,7 +2,7 @@
   "runtime": "NetCore21",
   "swaggerGenerator": {
     "fromSwagger": {
-      "url": "http://localhost:52912/swagger/v1/swagger.json",
+      "url": "https://localhost:44349/swagger/v1/swagger.json",
       "output": null
     }
   },
@@ -41,8 +41,8 @@
       "handleReferences": false,
       "generateConstructorInterface": true,
       "convertConstructorInterfaceData": false,
-      "importRequiredTypes": true,
-      "useGetBaseUrlMethod": false,
+      "importRequiredTypes": false,
+      "useGetBaseUrlMethod": true,
       "baseUrlTokenName": "API_BASE_URL",
       "queryNullValue": "",
       "output": "../Climb/ClientApp/gen/climbClient.ts"

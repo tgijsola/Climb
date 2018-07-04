@@ -74,18 +74,6 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public async Task GenerateSchedule_Valid_ReturnSets()
-        {
-            var season = SeasonUtility.CreateSeason(dbContext, 4).season;
-            var setsToCreate = new HashSet<Set> {new Set(), new Set()};
-            scheduler.GenerateScheduleAsync(null, null).ReturnsForAnyArgs(setsToCreate);
-
-            var sets = await testObj.GenerateSchedule(season.ID);
-
-            Assert.AreEqual(setsToCreate.Count, sets.Count);
-        }
-
-        [Test]
         public void GenerateSchedule_NoSeason_NotFoundException()
         {
             Assert.ThrowsAsync<NotFoundException>(() => testObj.GenerateSchedule(0));

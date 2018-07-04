@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Climb.Data;
@@ -16,6 +17,69 @@ namespace Climb.Services.ModelServices
         public SetService(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
+        }
+
+        public async Task<SetRequest> RequestSetAsync(int requesterID, int challengedID)
+        {
+            if (!await dbContext.LeagueUsers.AnyAsync(lu => lu.ID == requesterID))
+            {
+                throw new NotFoundException(typeof(LeagueUser), requesterID);
+            }
+            if (!await dbContext.LeagueUsers.AnyAsync(lu => lu.ID == challengedID))
+            {
+                throw new NotFoundException(typeof(LeagueUser), challengedID);
+            }
+
+            var requester = await dbContext.LeagueUsers
+                .Include(lu => lu.League).AsNoTracking()
+                .FirstOrDefaultAsync(lu => lu.ID == requesterID);
+
+            var setRequest = new SetRequest
+            {
+                LeagueID = requester.LeagueID,
+                RequesterID = requesterID,
+                ChallengedID = challengedID,
+                DateCreated = DateTime.Now,
+            };
+            dbContext.Add(setRequest);
+            await dbContext.SaveChangesAsync();
+
+            return setRequest;
+        }
+
+        public async Task<SetRequest> RespondToSetRequestAsync(int requestID, bool accepted)
+        {
+            var setRequest = await dbContext.SetRequests
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(sr => sr.ID == requestID);
+            if(setRequest == null)
+            {
+                throw new NotFoundException(typeof(SetRequest), requestID);
+            }
+
+            if(!setRequest.IsOpen)
+            {
+                throw new BadRequestException(nameof(requestID), $"Set Request {requestID} has already been closed.");
+            }
+
+            dbContext.Update(setRequest);
+            setRequest.IsOpen = false;
+
+            if(accepted)
+            {
+                var set = new Set
+                {
+                    LeagueID = setRequest.LeagueID,
+                    Player1ID = setRequest.RequesterID,
+                    Player2ID = setRequest.ChallengedID,
+                };
+
+                dbContext.Add(set);
+                setRequest.Set = set;
+            }
+            await dbContext.SaveChangesAsync();
+
+            return setRequest;
         }
 
         public async Task<Set> Update(int setID, IReadOnlyList<MatchForm> matchForms)

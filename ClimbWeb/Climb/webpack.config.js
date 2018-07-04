@@ -32,6 +32,6 @@
     externals: {
         "react": "React",
         "react-dom": "ReactDOM",
-        "react-spinners": "RingLoader"
+        "../gen/climbClient": "ClimbClient"
     }
 };

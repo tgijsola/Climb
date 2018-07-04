@@ -23,6 +23,7 @@
       <Content Remove="Views\Site\Home.cshtml" />
       <Content Remove="Views\League\Home.cshtml" />
       <Content Remove="Views\Game\Home.cshtml" />
+      <Content Remove="Views\Site\Support.cshtml" />
       <Content Remove="Views\User\Home.cshtml" />
       <Content Remove="Views\User\Partials\LeagueUser.cshtml" />
     </ItemGroup>
@@ -37,9 +38,16 @@
     <PackageReference Include="NSwag.AspNetCore" Version="11.17.15" />
   </ItemGroup>
 
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Views\User\Home.cshtml" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" PrivateAssets="All" />
+        <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.1" />
+        <PackageReference Include="morelinq" Version="2.10.0" />
+        <PackageReference Include="NSwag.AspNetCore" Version="11.17.18" />
+        <PackageReference Include="Sendgrid" Version="9.9.0" />
+    </ItemGroup>
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\User\Home.cshtml" />
@@ -54,6 +62,7 @@
     <None Include="Views\Game\Index.cshtml" />
     <None Include="Views\League\Index.cshtml" />
     <None Include="Views\Season\Home.cshtml" />
+    <None Include="Views\Site\Support.cshtml" />
     <None Include="Views\Site\Home.cshtml" />
     <None Include="Views\League\Home.cshtml" />
     <None Include="Views\Game\Home.cshtml" />
