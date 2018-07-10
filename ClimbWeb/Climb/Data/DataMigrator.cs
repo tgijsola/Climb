@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClimbV1.Models;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,8 @@ namespace Climb.Data
 {
     public static class DataMigrator
     {
+        private static readonly Dictionary<int, int> gameIDs = new Dictionary<int, int>();
+
         public static async Task MigrateV1(ApplicationDbContext context)
         {
             await ResetDatabase(context);
@@ -14,6 +17,7 @@ namespace Climb.Data
             ClimbV1Context v1Context = CreateDB();
 
             await MigrateUsers(v1Context, context);
+            await MigrateGames(v1Context, context);
         }
 
         private static async Task ResetDatabase(ApplicationDbContext context)
@@ -56,6 +60,33 @@ namespace Climb.Data
 
             context.Users.AddRange(users);
             await context.SaveChangesAsync();
+        }
+
+        private static async Task MigrateGames(ClimbV1Context v1Context, ApplicationDbContext context)
+        {
+            var oldGames = await v1Context.Game.ToArrayAsync();
+
+            var games = new Models.Game[oldGames.Length];
+            for(int i = 0; i < oldGames.Length; i++)
+            {
+                var v1Game = oldGames[i];
+                games[i] = new Models.Game
+                {
+                    Name = v1Game.Name,
+                    CharactersPerMatch = v1Game.CharactersPerMatch,
+                    MaxMatchPoints = v1Game.MaxMatchPoints,
+                    DateAdded = DateTime.Today,
+                    HasStages = v1Game.RequireStage,
+                };
+            }
+
+            context.Games.AddRange(games);
+            await context.SaveChangesAsync();
+
+            for(int i = 0; i < oldGames.Length; i++)
+            {
+                gameIDs[oldGames[i].ID] = games[i].ID;
+            }
         }
     }
 }
