@@ -40,10 +40,17 @@ namespace Climb.Data
             var users = new ApplicationUser[v1Users.Length];
             for(int i = 0; i < v1Users.Length; i++)
             {
+                var v1User = v1Users[i];
                 users[i] = new ApplicationUser
                 {
-                    Email = v1Users[i].ApplicationUser.Email,
-                    UserName = v1Users[i].Username,
+                    Id = v1User.ApplicationUser.Id,
+                    Email = v1User.ApplicationUser.Email,
+                    NormalizedEmail = v1User.ApplicationUser.NormalizedEmail,
+                    UserName = v1User.Username,
+                    // TODO: Need to normalize.
+                    NormalizedUserName = v1User.Username,
+                    PasswordHash = v1User.ApplicationUser.PasswordHash,
+                    ProfilePicKey = v1User.ProfilePicKey,
                 };
             }
 
