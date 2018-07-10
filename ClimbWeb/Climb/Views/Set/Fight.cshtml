@@ -9,12 +9,12 @@
 
 @section scripts {
     <environment include="Development">
-        <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
-        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script crossorigin="anonymous" src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin="anonymous" src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     </environment>
 
-    <link href="~/dist/styles/matches.css" rel="stylesheet" />
+    <link href="~/dist/styles/matches.css" rel="stylesheet"/>
 
-    <script type="module" src="~/dist/gen/climbClient.js"></script>
+    @*<script type="module" src="~/dist/gen/climbClient.js"></script>*@
     <script type="module" src="~/dist/app/bundle.js"></script>
 }

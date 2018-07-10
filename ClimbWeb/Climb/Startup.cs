@@ -76,12 +76,12 @@ namespace Climb
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
 
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true,
-                    EnvironmentVariables = new Dictionary<string, string> {{"mode", "development"}},
-                });
+                //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                //{
+                //    HotModuleReplacement = false,
+                //    ReactHotModuleReplacement = false,
+                //    EnvironmentVariables = new Dictionary<string, string> {{"mode", "development"}},
+                //});
             }
             else
             {
