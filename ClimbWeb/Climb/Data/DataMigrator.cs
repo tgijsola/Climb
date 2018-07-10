@@ -18,6 +18,7 @@ namespace Climb.Data
 
             await MigrateUsers(v1Context, context);
             await MigrateGames(v1Context, context);
+            await MigrateLeagues(v1Context, context);
         }
 
         private static async Task ResetDatabase(ApplicationDbContext context)
@@ -40,8 +41,8 @@ namespace Climb.Data
             var v1Users = await v1Context.User
                 .Include(u => u.ApplicationUser).AsNoTracking()
                 .ToArrayAsync();
-
             var users = new ApplicationUser[v1Users.Length];
+
             for(int i = 0; i < v1Users.Length; i++)
             {
                 var v1User = v1Users[i];
@@ -65,8 +66,8 @@ namespace Climb.Data
         private static async Task MigrateGames(ClimbV1Context v1Context, ApplicationDbContext context)
         {
             var oldGames = await v1Context.Game.ToArrayAsync();
-
             var games = new Models.Game[oldGames.Length];
+
             for(int i = 0; i < oldGames.Length; i++)
             {
                 var v1Game = oldGames[i];
@@ -87,6 +88,30 @@ namespace Climb.Data
             {
                 gameIDs[oldGames[i].ID] = games[i].ID;
             }
+        }
+
+        private static async Task MigrateLeagues(ClimbV1Context v1Context, ApplicationDbContext context)
+        {
+            var oldLeagues = await v1Context.League
+                .Include(l => l.Admin).ThenInclude(u => u.ApplicationUser).AsNoTracking()
+                .ToArrayAsync();
+            var leagues = new Models.League[oldLeagues.Length];
+
+            for(int i = 0; i < oldLeagues.Length; i++)
+            {
+                var oldLeague = oldLeagues[i];
+                leagues[i] = new Models.League
+                {
+                    GameID = gameIDs[oldLeague.GameID],
+                    AdminID = oldLeague.Admin.ApplicationUser.Id,
+                    Name = oldLeague.Name,
+                    DateCreated = DateTime.Today,
+                    SetsTillRank = 4,
+                };
+            }
+
+            context.Leagues.AddRange(leagues);
+            await context.SaveChangesAsync();
         }
     }
 }
