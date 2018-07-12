@@ -142,7 +142,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task RespondToSetRequest_Approved_CreateSet()
         {
-            SetRequest setRequest = CreateSetRequest();
+            SetRequest setRequest = CreateSetRequest(true);
 
             setRequest = await testObj.RespondToSetRequestAsync(setRequest.ID, true);
 
@@ -152,7 +152,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task RespondToSetRequest_Declined_NoSet()
         {
-            SetRequest setRequest = CreateSetRequest();
+            SetRequest setRequest = CreateSetRequest(true);
 
             setRequest = await testObj.RespondToSetRequestAsync(setRequest.ID, false);
 
@@ -163,7 +163,7 @@ namespace Climb.Test.Services.ModelServices
         [TestCase(false)]
         public async Task RespondToSetRequest_Responded_IsClosed(bool accepted)
         {
-            SetRequest setRequest = CreateSetRequest();
+            SetRequest setRequest = CreateSetRequest(true);
             Assert.IsTrue(setRequest.IsOpen);
 
             setRequest = await testObj.RespondToSetRequestAsync(setRequest.ID, accepted);
@@ -175,10 +175,7 @@ namespace Climb.Test.Services.ModelServices
         [TestCase(false)]
         public void RespondToSetRequest_NotOpen_BadRequestException(bool accepted)
         {
-            SetRequest setRequest = CreateSetRequest();
-            dbContext.Update(setRequest);
-            setRequest.IsOpen = false;
-            dbContext.SaveChanges();
+            SetRequest setRequest = CreateSetRequest(false);
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.RespondToSetRequestAsync(setRequest.ID, accepted));
         }
@@ -215,7 +212,7 @@ namespace Climb.Test.Services.ModelServices
             return matchForms;
         }
         
-        private SetRequest CreateSetRequest()
+        private SetRequest CreateSetRequest(bool isOpen)
         {
             var league = LeagueUtility.CreateLeague(dbContext);
             var members = LeagueUtility.AddUsersToLeague(league, 2, dbContext);
@@ -224,6 +221,7 @@ namespace Climb.Test.Services.ModelServices
                 sr.LeagueID = league.ID;
                 sr.RequesterID = members[0].ID;
                 sr.ChallengedID = members[1].ID;
+                sr.IsOpen = isOpen;
             });
             return setRequest;
         }
