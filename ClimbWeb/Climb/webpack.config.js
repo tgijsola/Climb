@@ -29,6 +29,7 @@
     externals: {
         "react": "React",
         "react-dom": "ReactDOM",
+        "react-router-dom": "ReactRouterDOM",
         //"../gen/climbClient": "ClimbClient"
     }
 };
