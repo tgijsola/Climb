@@ -13,6 +13,7 @@ namespace Climb.Controllers
 {
     public class AccountController : BaseController<AccountController>
     {
+        private const string LoginFail = "LoginFail";
         private readonly IApplicationUserService applicationUserService;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ICdnService cdnService;
@@ -32,6 +33,12 @@ namespace Climb.Controllers
 
         public IActionResult LogIn()
         {
+            if(TempData.ContainsKey(LoginFail))
+            {
+                TempData.Remove(LoginFail);
+                ViewData[LoginFail] = true;
+            }
+
             return View();
         }
 
@@ -46,7 +53,9 @@ namespace Climb.Controllers
             }
             catch(Exception exception)
             {
-                return new BadRequestResult();
+                logger.LogError(exception, "Failed to log in.");
+                TempData[LoginFail] = true;
+                return RedirectToAction("LogIn");
             }
         }
 
