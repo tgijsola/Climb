@@ -4,21 +4,21 @@ using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Climb.Services.ModelServices
 {
-    [UsedImplicitly]
     public class SeasonService : ISeasonService
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IScheduleFactory scheduleFactory;
+        private readonly ISeasonPointCalculator pointCalculator;
 
-        public SeasonService(ApplicationDbContext dbContext, IScheduleFactory scheduleFactory)
+        public SeasonService(ApplicationDbContext dbContext, IScheduleFactory scheduleFactory, ISeasonPointCalculator pointCalculator)
         {
             this.dbContext = dbContext;
             this.scheduleFactory = scheduleFactory;
+            this.pointCalculator = pointCalculator;
         }
 
         public async Task<Season> Create(int leagueID, DateTime start, DateTime end)
@@ -68,6 +68,35 @@ namespace Climb.Services.ModelServices
             await scheduleFactory.GenerateScheduleAsync(season, dbContext);
 
             return season;
+        }
+
+        public async Task<Season> UpdateStandings(int setID)
+        {
+            var set = await dbContext.Sets
+                .Include(s => s.Season).ThenInclude(s => s.Participants)
+                .FirstOrDefaultAsync(s => s.ID == setID);
+            dbContext.Update(set);
+
+            UpdatePoints(set);
+
+            await dbContext.SaveChangesAsync();
+
+            return set.Season;
+        }
+
+        private void UpdatePoints(Set set)
+        {
+            var winner = set.WinnerID == set.Player1ID ? set.SeasonPlayer1 : set.SeasonPlayer2;
+            dbContext.Update(winner);
+            var loser = set.LoserID == set.Player1ID ? set.SeasonPlayer1 : set.SeasonPlayer2;
+            dbContext.Update(loser);
+
+            var (winnerPointDelta, loserPointDelta) = pointCalculator.CalculatePointDeltas(winner, loser);
+
+            set.Player1SeasonPoints = set.WinnerID == set.Player1ID ? winnerPointDelta : loserPointDelta;
+            set.Player2SeasonPoints = set.WinnerID == set.Player2ID ? winnerPointDelta : loserPointDelta;
+            winner.Points += winnerPointDelta;
+            loser.Points += loserPointDelta;
         }
     }
 }

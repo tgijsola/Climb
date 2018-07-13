@@ -1,48 +1,44 @@
-﻿import {onready} from './init';
-import { ClimbClient } from "../gen/climbClient";
+﻿import { ClimbClient } from "../gen/climbClient.js";
 
-onready(async () => {
-    var openButton = document.getElementById("challenge-button");
-    if (openButton != null) {
-        openButton.onclick = () => toggleChallengeModal(true);
+var openButton = document.getElementById("challenge-button");
+if (openButton != null) {
+    openButton.onclick = () => toggleChallengeModal(true);
+}
+
+var closeButton = document.getElementById("challenge-modal-close");
+if (closeButton != null) {
+    closeButton.onclick = () => toggleChallengeModal(false);
+}
+
+var requestButtons = document.getElementsByClassName("request-button");
+for (let i = 0; i < requestButtons.length; i++) {
+    const button = requestButtons[i] as HTMLButtonElement;
+    const requester = button.getAttribute("data-requester");
+    const challenged = button.getAttribute("data-challenged");
+    if (requester != null && challenged != null) {
+        button.onclick = () => sendRequest(parseInt(requester), parseInt(challenged));
     }
+}
 
-    var closeButton = document.getElementById("challenge-modal-close");
-    if (closeButton != null) {
-        closeButton.onclick = () => toggleChallengeModal(false);
+var acceptButtons = document.getElementsByClassName("request-accept");
+for (let i = 0; i < acceptButtons.length; i++) {
+    const button = acceptButtons[i] as HTMLButtonElement;
+    const request = button.getAttribute("data-requestId");
+    if (request != null) {
+        button.onclick = () => respondToRequest(parseInt(request), true);
     }
+}
 
-    var requestButtons = document.getElementsByClassName("request-button");
-    for (let i = 0; i < requestButtons.length; i++) {
-        const button = <HTMLButtonElement>requestButtons[i];
-        const requester = button.getAttribute("data-requester");
-        const challenged = button.getAttribute("data-challenged");
-        if (requester != null && challenged != null) {
-            button.onclick = () => sendRequest(parseInt(requester), parseInt(challenged));
-        }
+var declineButtons = document.getElementsByClassName("request-decline");
+for (let i = 0; i < declineButtons.length; i++) {
+    const button = declineButtons[i] as HTMLButtonElement;
+    const request = button.getAttribute("data-requestId");
+    if (request != null) {
+        button.onclick = () => respondToRequest(parseInt(request), false);
     }
+}
 
-    var acceptButtons = document.getElementsByClassName("request-accept");
-    for (let i = 0; i < acceptButtons.length; i++) {
-        const button = <HTMLButtonElement>acceptButtons[i];
-        const request = button.getAttribute("data-requestId");
-        if (request != null) {
-            button.onclick = () => respondToRequest(parseInt(request), true);
-        }
-    }
-
-    var declineButtons = document.getElementsByClassName("request-decline");
-    for (let i = 0; i < declineButtons.length; i++) {
-        const button = <HTMLButtonElement>declineButtons[i];
-        const request = button.getAttribute("data-requestId");
-        if (request != null) {
-            button.onclick = () => respondToRequest(parseInt(request), false);
-        }
-    }
-});
-
-function toggleChallengeModal(open: Boolean)
-{
+function toggleChallengeModal(open: Boolean) {
     const challengeModal = document.getElementById("challenge-modal");
     if (challengeModal == null) {
         return;

@@ -52,6 +52,7 @@ namespace Climb
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
             services.AddTransient<ICdnService, FileStorageCdn>();
             services.AddTransient<IPointService, EloPointService>();
+            services.AddTransient<ISeasonPointCalculator, ParticipationSeasonPointCalculator>();
         }
 
         private void ConfigureDB(IServiceCollection services)
@@ -75,12 +76,12 @@ namespace Climb
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
 
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true,
-                    EnvironmentVariables = new Dictionary<string, string> {{"mode", "development"}},
-                });
+                //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                //{
+                //    HotModuleReplacement = false,
+                //    ReactHotModuleReplacement = false,
+                //    EnvironmentVariables = new Dictionary<string, string> {{"mode", "development"}},
+                //});
             }
             else
             {

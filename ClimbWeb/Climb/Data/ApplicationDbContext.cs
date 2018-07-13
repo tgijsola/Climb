@@ -34,7 +34,6 @@ namespace Climb.Data
             }
 
             CreateLeagueUser(builder.Entity<LeagueUser>());
-            CreateSeasonLeagueUser(builder.Entity<SeasonLeagueUser>());
             CreateMatchCharacter(builder.Entity<MatchCharacter>());
 
             builder.Entity<SetRequest>().HasQueryFilter(lu => lu.IsOpen);
@@ -43,11 +42,6 @@ namespace Climb.Data
         private static void CreateLeagueUser(EntityTypeBuilder<LeagueUser> entity)
         {
             entity.HasQueryFilter(lu => lu.HasLeft == false);
-        }
-
-        private static void CreateSeasonLeagueUser(EntityTypeBuilder<SeasonLeagueUser> entity)
-        {
-            entity.HasKey(lus => new {lus.LeagueUserID, lus.SeasonID});
         }
 
         private static void CreateMatchCharacter(EntityTypeBuilder<MatchCharacter> entity)
