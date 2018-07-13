@@ -1,4 +1,5 @@
 ﻿import * as React from "react";
+import { RouteComponentProps } from "react-router-dom";
 import { ClimbClient } from "../gen/climbClient";
 import { MatchSummary } from "./MatchSummary";
 import { MatchEdit } from "./MatchEdit";
@@ -11,15 +12,15 @@ interface ISetSubmitState {
     player2: ClimbClient.LeagueUserDto | null;
 }
 
-export class Submit extends React.Component<any, ISetSubmitState> {
+export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmitState> {
     client: ClimbClient.SetApi;
     setId: number;
 
-    constructor(props: any) {
+    constructor(props: RouteComponentProps<any>) {
         super(props);
 
         this.client = new ClimbClient.SetApi(window.location.origin);
-        this.setId = 10;
+        this.setId = this.props.match.params.setID;
 
         this.state = {
             set: null,
@@ -119,7 +120,6 @@ export class Submit extends React.Component<any, ISetSubmitState> {
                     set.matches.sort((a: any, b: any) => a.index - b.index);
                 }
                 this.setState({ set: set });
-                console.log(set);
                 this.loadGame(set.gameID);
                 this.loadPlayers(set.player1ID, set.player2ID);
             })
