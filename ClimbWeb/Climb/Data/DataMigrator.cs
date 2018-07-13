@@ -9,6 +9,7 @@ namespace Climb.Data
     public static class DataMigrator
     {
         private static readonly Dictionary<int, int> gameIDs = new Dictionary<int, int>();
+        private static readonly Dictionary<int, int> leagueIDs = new Dictionary<int, int>();
 
         public static async Task MigrateV1(ApplicationDbContext context)
         {
@@ -19,6 +20,7 @@ namespace Climb.Data
             await MigrateUsers(v1Context, context);
             await MigrateGames(v1Context, context);
             await MigrateLeagues(v1Context, context);
+            await MigrateSeasons(v1Context, context);
         }
 
         private static async Task ResetDatabase(ApplicationDbContext context)
@@ -111,6 +113,33 @@ namespace Climb.Data
             }
 
             context.Leagues.AddRange(leagues);
+            await context.SaveChangesAsync();
+
+            for(int i = 0; i < oldLeagues.Length; i++)
+            {
+                leagueIDs[oldLeagues[i].ID] = leagues[i].ID;
+            }
+        }
+
+        private static async Task MigrateSeasons(ClimbV1Context v1Context, ApplicationDbContext context)
+        {
+            var oldSeasons = await v1Context.Season.ToArrayAsync();
+            var seasons = new Models.Season[oldSeasons.Length];
+
+            for(int i = 0; i < oldSeasons.Length; i++)
+            {
+                var oldSeason = oldSeasons[i];
+                seasons[i] = new Models.Season
+                {
+                    LeagueID = leagueIDs[oldSeason.LeagueID],
+                    StartDate = oldSeason.StartDate,
+                    EndDate = oldSeason.StartDate + TimeSpan.FromDays(30),
+                    Index = oldSeason.Index,
+                    IsActive = !oldSeason.IsComplete,
+                };
+            }
+
+            context.Seasons.AddRange(seasons);
             await context.SaveChangesAsync();
         }
     }
