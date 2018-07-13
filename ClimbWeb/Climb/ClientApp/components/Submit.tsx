@@ -120,7 +120,6 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
                     set.matches.sort((a: any, b: any) => a.index - b.index);
                 }
                 this.setState({ set: set });
-                console.log(set);
                 this.loadGame(set.gameID);
                 this.loadPlayers(set.player1ID, set.player2ID);
             })
