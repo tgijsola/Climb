@@ -8,6 +8,7 @@ namespace Climb.Data
 {
     public static class DataMigrator
     {
+        private static readonly Dictionary<string, string> applicationUserIDs = new Dictionary<string, string>();
         private static readonly Dictionary<int, int> gameIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> leagueIDs = new Dictionary<int, int>();
 
@@ -23,6 +24,7 @@ namespace Climb.Data
             await MigrateStages(v1Context, context);
             await MigrateLeagues(v1Context, context);
             await MigrateSeasons(v1Context, context);
+            await MigrateLeagueUsers(v1Context, context);
         }
 
         private static async Task ResetDatabase(ApplicationDbContext context)
@@ -65,6 +67,11 @@ namespace Climb.Data
 
             context.Users.AddRange(users);
             await context.SaveChangesAsync();
+
+            for(var i = 0; i < users.Length; i++)
+            {
+                applicationUserIDs[v1Users[i].ApplicationUser.Id] = users[i].Id;
+            }
         }
 
         private static async Task MigrateGames(ClimbV1Context v1Context, ApplicationDbContext context)
@@ -180,6 +187,31 @@ namespace Climb.Data
             }
 
             context.Seasons.AddRange(seasons);
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task MigrateLeagueUsers(ClimbV1Context v1Context, ApplicationDbContext context)
+        {
+            var oldLeagueUsers = await v1Context.LeagueUser
+                .Include(lu => lu.User).ThenInclude(u => u.ApplicationUser).AsNoTracking()
+                .ToArrayAsync();
+            var leagueUsers = new Models.LeagueUser[oldLeagueUsers.Length];
+
+            for(int i = 0; i < oldLeagueUsers.Length; i++)
+            {
+                var oldLeagueUser = oldLeagueUsers[i];
+                leagueUsers[i] = new Models.LeagueUser
+                {
+                    LeagueID = leagueIDs[oldLeagueUser.LeagueID],
+                    UserID = applicationUserIDs[oldLeagueUser.User.ApplicationUser.Id],
+                    HasLeft = oldLeagueUser.HasLeft,
+                    Rank = oldLeagueUser.Rank,
+                    Points = oldLeagueUser.Points,
+                    SetCount = oldLeagueUser.SetsPlayed,
+                };
+            }
+
+            context.LeagueUsers.AddRange(leagueUsers);
             await context.SaveChangesAsync();
         }
     }
