@@ -15,6 +15,7 @@ namespace Climb.Data
         public DbSet<SeasonLeagueUser> SeasonLeagueUsers { get; set; }
         public DbSet<Set> Sets { get; set; }
         public DbSet<Match> Matches { get; set; }
+        public DbSet<Character> Characters { get; set; }
         public DbSet<MatchCharacter> MatchCharacters { get; set; }
         public DbSet<RankSnapshot> RankSnapshots { get; set; }
         public DbSet<SetRequest> SetRequests { get; set; }
