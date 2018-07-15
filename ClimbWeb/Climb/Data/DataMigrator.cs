@@ -20,6 +20,7 @@ namespace Climb.Data
             await MigrateUsers(v1Context, context);
             await MigrateGames(v1Context, context);
             await MigrateCharacters(v1Context, context);
+            await MigrateStages(v1Context, context);
             await MigrateLeagues(v1Context, context);
             await MigrateSeasons(v1Context, context);
         }
@@ -109,6 +110,25 @@ namespace Climb.Data
             }
 
             context.Characters.AddRange(characters);
+            await context.SaveChangesAsync();
+        }
+        
+        private static async Task MigrateStages(ClimbV1Context v1Context, ApplicationDbContext context)
+        {
+            var oldStages = await v1Context.Stage.ToArrayAsync();
+            var stages = new Models.Stage[oldStages.Length];
+
+            for(int i = 0; i < oldStages.Length; i++)
+            {
+                var v1Stage = oldStages[i];
+                stages[i] = new Models.Stage
+                {
+                    Name = v1Stage.Name,
+                    GameID = gameIDs[v1Stage.GameID],
+                };
+            }
+
+            context.Stages.AddRange(stages);
             await context.SaveChangesAsync();
         }
 
