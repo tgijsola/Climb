@@ -11,10 +11,12 @@ namespace Climb.Data
     {
         private static readonly Dictionary<string, string> applicationUserIDs = new Dictionary<string, string>();
         private static readonly Dictionary<int, int> gameIDs = new Dictionary<int, int>();
+        private static readonly Dictionary<int, int> characterIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> leagueIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> leagueUserIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> seasonIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> setIDs = new Dictionary<int, int>();
+        private static readonly Dictionary<int, int> matchIDs = new Dictionary<int, int>();
 
         public static async Task MigrateV1(ApplicationDbContext context)
         {
@@ -31,6 +33,7 @@ namespace Climb.Data
             await MigrateLeagueUsers(v1Context, context);
             await MigrateSets(v1Context, context);
             await MigrateMatches(v1Context, context);
+            await MigrateMatchCharacters(v1Context, context);
         }
 
         private static async Task ResetDatabase(ApplicationDbContext context)
@@ -124,6 +127,11 @@ namespace Climb.Data
 
             context.Characters.AddRange(characters);
             await context.SaveChangesAsync();
+            
+            for(int i = 0; i < oldCharacters.Length; i++)
+            {
+                characterIDs[oldCharacters[i].ID] = characters[i].ID;
+            }
         }
         
         private static async Task MigrateStages(ClimbV1Context v1Context, ApplicationDbContext context)
@@ -292,6 +300,36 @@ namespace Climb.Data
             }
 
             context.Matches.AddRange(matches);
+            await context.SaveChangesAsync();
+
+            for(int i = 0; i < oldMatches.Length; i++)
+            {
+                matchIDs[oldMatches[i].ID] = matches[i].ID;
+            }
+        }
+
+        private static async Task MigrateMatchCharacters(ClimbV1Context v1Context, ApplicationDbContext context)
+        {
+            var oldMatchCharacters = await v1Context.MatchCharacters.ToArrayAsync();
+            var matchCharacters = new List<Models.MatchCharacter>(oldMatchCharacters.Length);
+
+            for(int i = 0; i < oldMatchCharacters.Length; i++)
+            {
+                var oldMatchCharacter = oldMatchCharacters[i];
+                if(!matchIDs.ContainsKey(oldMatchCharacter.MatchID))
+                {
+                    continue;
+                }
+
+                matchCharacters.Add(new Models.MatchCharacter
+                {
+                    MatchID = matchIDs[oldMatchCharacter.MatchID],
+                    LeagueUserID = leagueUserIDs[oldMatchCharacter.LeagueUserID],
+                    CharacterID = characterIDs[oldMatchCharacter.CharacterID],
+                });
+            }
+
+            context.MatchCharacters.AddRange(matchCharacters);
             await context.SaveChangesAsync();
         }
     }
