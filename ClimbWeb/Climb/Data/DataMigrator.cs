@@ -31,6 +31,7 @@ namespace Climb.Data
             await MigrateLeagues(v1Context, context);
             await MigrateSeasons(v1Context, context);
             await MigrateLeagueUsers(v1Context, context);
+            await MigrateSeasonLeagueUsers(v1Context, context);
             await MigrateSets(v1Context, context);
             await MigrateMatches(v1Context, context);
             await MigrateMatchCharacters(v1Context, context);
@@ -330,6 +331,27 @@ namespace Climb.Data
             }
 
             context.MatchCharacters.AddRange(matchCharacters);
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task MigrateSeasonLeagueUsers(ClimbV1Context v1Context, ApplicationDbContext context)
+        {
+            var oldLeagueUserSeasons = await v1Context.LeagueUserSeason.ToArrayAsync();
+            var seasonLeagueUsers = new Models.SeasonLeagueUser[oldLeagueUserSeasons.Length];
+
+            for(int i = 0; i < oldLeagueUserSeasons.Length; i++)
+            {
+                var oldLeagueUserSeason = oldLeagueUserSeasons[i];
+                seasonLeagueUsers[i] = new Models.SeasonLeagueUser
+                {
+                    LeagueUserID = leagueUserIDs[oldLeagueUserSeason.LeagueUserID],
+                    SeasonID = seasonIDs[oldLeagueUserSeason.SeasonID],
+                    Standing = oldLeagueUserSeason.Standing,
+                    Points = oldLeagueUserSeason.Points,
+                };
+            }
+
+            context.SeasonLeagueUsers.AddRange(seasonLeagueUsers);
             await context.SaveChangesAsync();
         }
     }
