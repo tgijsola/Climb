@@ -35,6 +35,7 @@ namespace Climb.Data
             await MigrateSets(v1Context, context);
             await MigrateMatches(v1Context, context);
             await MigrateMatchCharacters(v1Context, context);
+            await MigrateRankSnapshots(v1Context, context);
         }
 
         private static async Task ResetDatabase(ApplicationDbContext context)
@@ -312,22 +313,17 @@ namespace Climb.Data
         private static async Task MigrateMatchCharacters(ClimbV1Context v1Context, ApplicationDbContext context)
         {
             var oldMatchCharacters = await v1Context.MatchCharacters.ToArrayAsync();
-            var matchCharacters = new List<Models.MatchCharacter>(oldMatchCharacters.Length);
+            var matchCharacters = new Models.MatchCharacter[oldMatchCharacters.Length];
 
             for(int i = 0; i < oldMatchCharacters.Length; i++)
             {
                 var oldMatchCharacter = oldMatchCharacters[i];
-                if(!matchIDs.ContainsKey(oldMatchCharacter.MatchID))
-                {
-                    continue;
-                }
-
-                matchCharacters.Add(new Models.MatchCharacter
+                matchCharacters[i] = new Models.MatchCharacter
                 {
                     MatchID = matchIDs[oldMatchCharacter.MatchID],
                     LeagueUserID = leagueUserIDs[oldMatchCharacter.LeagueUserID],
                     CharacterID = characterIDs[oldMatchCharacter.CharacterID],
-                });
+                };
             }
 
             context.MatchCharacters.AddRange(matchCharacters);
@@ -352,6 +348,29 @@ namespace Climb.Data
             }
 
             context.SeasonLeagueUsers.AddRange(seasonLeagueUsers);
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task MigrateRankSnapshots(ClimbV1Context v1Context, ApplicationDbContext context)
+        {
+            var oldRankSnapshots = await v1Context.RankSnapshot.ToArrayAsync();
+            var rankSnapshots = new Models.RankSnapshot[oldRankSnapshots.Length];
+
+            for(int i = 0; i < oldRankSnapshots.Length; i++)
+            {
+                var oldRankSnapshot = oldRankSnapshots[i];
+                rankSnapshots[i] = new Models.RankSnapshot
+                {
+                    CreatedDate = oldRankSnapshot.CreatedDate,
+                    LeagueUserID = leagueUserIDs[oldRankSnapshot.LeagueUserID],
+                    Points = oldRankSnapshot.Points,
+                    Rank = oldRankSnapshot.Rank,
+                    DeltaPoints = oldRankSnapshot.DeltaPoints,
+                    DeltaRank = oldRankSnapshot.DeltaRank,
+                };
+            }
+
+            context.RankSnapshots.AddRange(rankSnapshots);
             await context.SaveChangesAsync();
         }
     }

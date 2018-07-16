@@ -33,15 +33,6 @@ namespace ClimbV1.Models
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
-            modelBuilder.Entity<LeagueUser>()
-                .HasQueryFilter(lu => lu.HasLeft == false);
-
-            modelBuilder.Entity<LeagueUserSeason>()
-                .HasQueryFilter(lu => lu.HasLeft == false);
-
-            modelBuilder.Entity<Set>()
-                .HasQueryFilter(s => s.IsDeactivated == false);
-
             modelBuilder.Entity<LeagueUserSeason>()
                 .HasKey(lus => new { lus.LeagueUserID, lus.SeasonID });
 
