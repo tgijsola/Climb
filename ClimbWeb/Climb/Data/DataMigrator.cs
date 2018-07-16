@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using ClimbV1.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Climb.Data
@@ -18,13 +19,13 @@ namespace Climb.Data
         private static readonly Dictionary<int, int> setIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> matchIDs = new Dictionary<int, int>();
 
-        public static async Task MigrateV1(ApplicationDbContext context)
+        public static async Task MigrateV1(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             await ResetDatabase(context);
 
             ClimbV1Context v1Context = CreateDB();
 
-            await MigrateUsers(v1Context, context);
+            await MigrateUsers(v1Context, context, userManager);
             await MigrateGames(v1Context, context);
             await MigrateCharacters(v1Context, context);
             await MigrateStages(v1Context, context);
@@ -53,7 +54,7 @@ namespace Climb.Data
             return context;
         }
 
-        private static async Task MigrateUsers(ClimbV1Context v1Context, ApplicationDbContext context)
+        private static async Task MigrateUsers(ClimbV1Context v1Context, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             var v1Users = await v1Context.User
                 .Include(u => u.ApplicationUser).AsNoTracking()
@@ -62,17 +63,19 @@ namespace Climb.Data
 
             for(int i = 0; i < v1Users.Length; i++)
             {
-                var v1User = v1Users[i];
+                var oldUser = v1Users[i];
                 users[i] = new ApplicationUser
                 {
-                    Id = v1User.ApplicationUser.Id,
-                    Email = v1User.ApplicationUser.Email,
-                    NormalizedEmail = v1User.ApplicationUser.NormalizedEmail,
-                    UserName = v1User.Username,
-                    // TODO: Need to normalize.
-                    NormalizedUserName = v1User.Username,
-                    PasswordHash = v1User.ApplicationUser.PasswordHash,
-                    ProfilePicKey = v1User.ProfilePicKey,
+                    Id = oldUser.ApplicationUser.Id,
+                    Email = oldUser.ApplicationUser.Email,
+                    NormalizedEmail = oldUser.ApplicationUser.NormalizedEmail,
+                    UserName = oldUser.Username,
+                    NormalizedUserName = userManager.KeyNormalizer.Normalize(oldUser.Username),
+                    //PasswordHash = "AQAAAAEAACcQAAAAEDc3ChoYyz6aQnxea4QetvhCiSWrn38F5CPFwtUfDWDCevoq8uSEQytCOu9s1hppSA==", // Abc.123
+                    PasswordHash = oldUser.ApplicationUser.PasswordHash,
+                    ProfilePicKey = oldUser.ProfilePicKey,
+                    ConcurrencyStamp = oldUser.ApplicationUser.ConcurrencyStamp,
+                    SecurityStamp = oldUser.ApplicationUser.SecurityStamp,
                 };
             }
 
