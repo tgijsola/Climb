@@ -14,6 +14,7 @@ namespace Climb.Data
         private static readonly Dictionary<int, int> leagueIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> leagueUserIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> seasonIDs = new Dictionary<int, int>();
+        private static readonly Dictionary<int, int> setIDs = new Dictionary<int, int>();
 
         public static async Task MigrateV1(ApplicationDbContext context)
         {
@@ -29,6 +30,7 @@ namespace Climb.Data
             await MigrateSeasons(v1Context, context);
             await MigrateLeagueUsers(v1Context, context);
             await MigrateSets(v1Context, context);
+            await MigrateMatches(v1Context, context);
         }
 
         private static async Task ResetDatabase(ApplicationDbContext context)
@@ -261,6 +263,35 @@ namespace Climb.Data
             }
 
             context.Sets.AddRange(sets);
+            await context.SaveChangesAsync();
+            
+            for(int i = 0; i < oldSets.Length; i++)
+            {
+                setIDs[oldSets[i].ID] = sets[i].ID;
+            }
+        }
+        
+        private static async Task MigrateMatches(ClimbV1Context v1Context, ApplicationDbContext context)
+        {
+            var oldMatches = await v1Context.Match
+                .Include(m => m.Set).AsNoTracking()
+                .ToArrayAsync();
+            var matches = new Models.Match[oldMatches.Length];
+
+            for(int i = 0; i < oldMatches.Length; i++)
+            {
+                var oldMatch = oldMatches[i];
+                matches[i] = new Models.Match
+                {
+                    Index = oldMatch.Index,
+                    SetID = setIDs[oldMatch.Set.ID],
+                    Player1Score = oldMatch.Player1Score,
+                    Player2Score = oldMatch.Player2Score,
+                    StageID = oldMatch.StageID,
+                };
+            }
+
+            context.Matches.AddRange(matches);
             await context.SaveChangesAsync();
         }
     }
