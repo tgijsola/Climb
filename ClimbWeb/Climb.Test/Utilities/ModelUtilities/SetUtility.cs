@@ -38,7 +38,7 @@ namespace Climb.Test.Utilities
             GameUtility.Create(dbContext, 3, 3);
 
             var (season, members) = SeasonUtility.CreateSeason(dbContext, 2);
-            var set = Create(dbContext, members[0].ID, members[1].ID, season.LeagueID);
+            var set = Create(dbContext, members[0].ID, members[1].ID, season.LeagueID, season);
             return set;
         }
     }
