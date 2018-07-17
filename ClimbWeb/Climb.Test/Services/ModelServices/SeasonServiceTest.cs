@@ -102,6 +102,18 @@ namespace Climb.Test.Services.ModelServices
             Assert.AreEqual(winnerPoints, set.Player2SeasonPoints);
         }
 
+        [Test]
+        public async Task UpdateStandings_NoTies_RanksUpdated()
+        {
+            var (winnerPoints, loserPoints) = (2, 1);
+            var set = CreateSet(loserPoints, winnerPoints);
+
+            await testObj.UpdateStandings(set.ID);
+
+            Assert.AreEqual(1, set.SeasonPlayer2.Standing);
+            Assert.AreEqual(2, set.SeasonPlayer1.Standing);
+        }
+
         private Set CreateSet(int p1Score, int p2Score)
         {
             var winnerScore = p1Score > p2Score ? p1Score : p2Score;

@@ -78,6 +78,7 @@ namespace Climb.Services.ModelServices
             dbContext.Update(set);
 
             UpdatePoints(set);
+            UpdateRanks(set.Season);
 
             await dbContext.SaveChangesAsync();
 
@@ -97,6 +98,26 @@ namespace Climb.Services.ModelServices
             set.Player2SeasonPoints = set.WinnerID == set.Player2ID ? winnerPointDelta : loserPointDelta;
             winner.Points += winnerPointDelta;
             loser.Points += loserPointDelta;
+        }
+
+        private void UpdateRanks(Season season)
+        {
+            dbContext.UpdateRange(season.Participants);
+
+            var sortedParticipants = season.Participants.OrderByDescending(slu => slu.Points).ToArray();
+
+            var rank = 1;
+            var lastPoints = -1;
+            for(int i = 0; i < sortedParticipants.Length; i++)
+            {
+                var participant = sortedParticipants[i];
+                participant.Standing = rank;
+                if (participant.Points != lastPoints)
+                {
+                    lastPoints = participant.Points;
+                }
+                ++rank;
+            }
         }
     }
 }
