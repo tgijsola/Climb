@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Climb.Core.TieBreakers;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
@@ -13,12 +14,15 @@ namespace Climb.Services.ModelServices
         private readonly ApplicationDbContext dbContext;
         private readonly IScheduleFactory scheduleFactory;
         private readonly ISeasonPointCalculator pointCalculator;
+        private readonly ITieBreaker tieBreaker;
 
-        public SeasonService(ApplicationDbContext dbContext, IScheduleFactory scheduleFactory, ISeasonPointCalculator pointCalculator)
+        public SeasonService(ApplicationDbContext dbContext, IScheduleFactory scheduleFactory, ISeasonPointCalculator pointCalculator, ITieBreakerFactory tieBreakerFactory)
         {
             this.dbContext = dbContext;
             this.scheduleFactory = scheduleFactory;
             this.pointCalculator = pointCalculator;
+
+            tieBreaker = tieBreakerFactory.Create();
         }
 
         public async Task<Season> Create(int leagueID, DateTime start, DateTime end)
