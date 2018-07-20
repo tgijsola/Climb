@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Climb.Core.TieBreakers;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
@@ -30,8 +31,9 @@ namespace Climb.Test.Services.ModelServices
             dbContext = DbContextUtility.CreateMockDb();
             scheduler = Substitute.For<IScheduleFactory>();
             pointCalculator = Substitute.For<ISeasonPointCalculator>();
+            var tieBreakerFactory = Substitute.For<ITieBreakerFactory>();
 
-            testObj = new SeasonService(dbContext, scheduler, pointCalculator);
+            testObj = new SeasonService(dbContext, scheduler, pointCalculator, tieBreakerFactory);
         }
 
         [Test]

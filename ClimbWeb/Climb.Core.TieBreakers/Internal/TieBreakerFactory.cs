@@ -4,7 +4,7 @@
     {
         public ITieBreaker Create()
         {
-            throw new System.NotImplementedException();
+            return new TieBreaker();
         }
     }
 }

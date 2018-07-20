@@ -6,12 +6,20 @@ namespace Climb.Core.TieBreakers.Test
     [TestFixture]
     public class TieBreakerFactoryTests
     {
-        private TieBreaker testObj;
+        private TieBreakerFactory testObj;
 
         [SetUp]
         public void SetUp()
         {
-            testObj = new TieBreaker();
+            testObj = new TieBreakerFactory();
+        }
+
+        [Test]
+        public void Create_ReturnsTieBreaker()
+        {
+            var tieBreaker = testObj.Create();
+
+            Assert.IsNotNull(tieBreaker);
         }
     }
 }

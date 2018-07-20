@@ -4,6 +4,7 @@ namespace Climb.Core.TieBreakers
 {
     public interface ITieBreaker
     {
-        void Break(List<int> standings);
+        void AddAttempt(TieBreakAttempt tieBreakAttempt);
+        void Break(IReadOnlyList<Participant> participants);
     }
 }
