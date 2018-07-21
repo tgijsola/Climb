@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Climb.Core.TieBreakers.Internal;
 using NUnit.Framework;
 
@@ -29,7 +30,7 @@ namespace Climb.Core.TieBreakers.Test
 
         private static Participant AddParticipant(int id, int winCount)
         {
-            var participant = new Participant(id, 0, 0);
+            var participant = new Participant(id, 0, 0, DateTime.MinValue);
             for(var i = 0; i < winCount; i++)
             {
                 participant.AddWin(0);

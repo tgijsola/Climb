@@ -1,4 +1,5 @@
-﻿using Climb.Core.TieBreakers.Internal;
+﻿using System;
+using Climb.Core.TieBreakers.Internal;
 using NUnit.Framework;
 
 namespace Climb.Core.TieBreakers.Test
@@ -28,7 +29,7 @@ namespace Climb.Core.TieBreakers.Test
 
         private static Participant AddParticipant(int id, int leaguePoints)
         {
-            return new Participant(id, leaguePoints, 0);
+            return new Participant(id, leaguePoints, 0, DateTime.MinValue);
         }
     }
 }

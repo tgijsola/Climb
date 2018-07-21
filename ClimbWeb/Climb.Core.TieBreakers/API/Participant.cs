@@ -10,15 +10,17 @@ namespace Climb.Core.TieBreakers
         public int UserID { get; }
         public int LeaguePoints { get; }
         public int SeasonPoints { get; }
+        public DateTime JoinDate { get; }
         public int Wins { get; private set; }
         public int Losses { get; private set; }
         public decimal TieBreakerPoints { get; internal set; }
 
-        public Participant(int userID, int leaguePoints, int seasonPoints)
+        public Participant(int userID, int leaguePoints, int seasonPoints, DateTime joinDate)
         {
             UserID = userID;
             LeaguePoints = leaguePoints;
             SeasonPoints = seasonPoints;
+            JoinDate = joinDate;
         }
 
         public int CompareTo(Participant other)

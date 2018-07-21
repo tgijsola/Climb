@@ -106,9 +106,9 @@ namespace Climb.Core.TieBreakers.Test
         {
             return new List<Participant>
             {
-                new Participant(1, 0, 0),
-                new Participant(2, 0, 0),
-                new Participant(3, 0, 0),
+                new Participant(1, 0, 0, DateTime.MinValue),
+                new Participant(2, 0, 0, DateTime.MinValue),
+                new Participant(3, 0, 0, DateTime.MinValue),
             };
         }
     }
