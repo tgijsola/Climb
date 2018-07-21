@@ -42,9 +42,10 @@ namespace Climb.Core.TieBreakers
             }
         }
 
-        public void AddLoss()
+        public int TimesBeatenOpponent(int opponentID)
         {
-            ++Losses;
+            beatenOpponents.TryGetValue(opponentID, out var wins);
+            return wins;
         }
     }
 }
