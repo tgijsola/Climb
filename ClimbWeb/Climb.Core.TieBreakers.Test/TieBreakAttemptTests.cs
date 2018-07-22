@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using NSubstitute;
 using NUnit.Framework;
 
 namespace Climb.Core.TieBreakers.Test
