@@ -7,13 +7,13 @@ namespace Climb.Core.TieBreakers
     {
         protected abstract int GetUserScore(IReadOnlyList<Participant> participants, Participant current);
 
-        internal List<TieBreakerScore> Evaluate(IReadOnlyList<Participant> standingData)
+        internal List<TieBreakerScore> Evaluate(IReadOnlyList<Participant> participants)
         {
             var scores = new List<TieBreakerScore>();
 
-            foreach(var data in standingData)
+            foreach(var data in participants)
             {
-                var score = GetUserScore(standingData, data);
+                var score = GetUserScore(participants, data);
                 scores.Add(new TieBreakerScore(data, score));
             }
 
