@@ -12,7 +12,6 @@ namespace Climb.Core.TieBreakers
         public int SeasonPoints { get; }
         public DateTime JoinDate { get; }
         public int Wins { get; private set; }
-        public int Losses { get; private set; }
         public decimal TieBreakerPoints { get; internal set; }
 
         public Participant(int userID, int leaguePoints, int seasonPoints, DateTime joinDate)
