@@ -71,7 +71,6 @@ namespace Climb.Data
                     NormalizedEmail = oldUser.ApplicationUser.NormalizedEmail,
                     UserName = oldUser.Username,
                     NormalizedUserName = userManager.KeyNormalizer.Normalize(oldUser.Username),
-                    //PasswordHash = "AQAAAAEAACcQAAAAEDc3ChoYyz6aQnxea4QetvhCiSWrn38F5CPFwtUfDWDCevoq8uSEQytCOu9s1hppSA==", // Abc.123
                     PasswordHash = oldUser.ApplicationUser.PasswordHash,
                     ProfilePicKey = oldUser.ProfilePicKey,
                     ConcurrencyStamp = oldUser.ApplicationUser.ConcurrencyStamp,
