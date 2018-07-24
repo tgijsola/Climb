@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
@@ -47,25 +48,31 @@ namespace Climb.Services.ModelServices
             return game;
         }
 
-        public async Task<Character> AddCharacter(AddCharacterRequest request)
+        public async Task<Character> AddCharacter(int gameID, string name, string imageKey)
         {
             var game = await dbContext.Games
                 .Include(g => g.Characters).AsNoTracking()
-                .FirstOrDefaultAsync(g => g.ID == request.GameID);
+                .FirstOrDefaultAsync(g => g.ID == gameID);
             if(game == null)
             {
-                throw new NotFoundException(typeof(Game), request.GameID);
+                throw new NotFoundException(typeof(Game), gameID);
             }
 
-            if(game.Characters.Any(c => c.Name == request.Name))
+            if(string.IsNullOrWhiteSpace(imageKey))
             {
-                throw new ConflictException(typeof(Character), nameof(Character.Name), request.Name);
+                throw new ArgumentNullException(nameof(imageKey));
+            }
+            
+            if(game.Characters.Any(c => c.Name == name))
+            {
+                throw new ConflictException(typeof(Character), nameof(Character.Name), name);
             }
 
             var character = new Character
             {
-                Name = request.Name,
-                GameID = request.GameID,
+                Name = name,
+                GameID =gameID,
+                ImageKey = imageKey,
             };
 
             dbContext.Add(character);

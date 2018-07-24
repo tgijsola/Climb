@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Requests.Games;
@@ -77,9 +78,8 @@ namespace Climb.Test.Services.ModelServices
         public async Task AddCharacter_Valid_Character()
         {
             var game = GameUtility.Create(dbContext, 0, 0);
-            var request = new AddCharacterRequest(game.ID, "Char1");
 
-            var character = await testObj.AddCharacter(request);
+            var character = await testObj.AddCharacter(game.ID, "Char1", "image.png");
 
             Assert.IsNotNull(character);
         }
@@ -87,9 +87,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public void AddCharacter_NoGame_NotFoundException()
         {
-            var request = new AddCharacterRequest(0, "Char1");
-
-            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddCharacter(request));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddCharacter(0, "Char1", "image.png"));
         }
 
         // TODO: Also need to add utility class for normalizing and testing names.
@@ -97,9 +95,17 @@ namespace Climb.Test.Services.ModelServices
         public void AddCharacter_NameTaken_ConflictException()
         {
             var game = GameUtility.Create(dbContext, 1, 0);
-            var request = new AddCharacterRequest(game.ID, game.Characters[0].Name);
 
-            Assert.ThrowsAsync<ConflictException>(() => testObj.AddCharacter(request));
+            Assert.ThrowsAsync<ConflictException>(() => testObj.AddCharacter(game.ID, game.Characters[0].Name, "image.png"));
+        }
+
+        [TestCase("")]
+        [TestCase("  ")]
+        public void AddCharacter_NoImageKey_NullArgumentException(string imageKey)
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+
+            Assert.ThrowsAsync<ArgumentNullException>(() => testObj.AddCharacter(game.ID, "Char1", imageKey));
         }
 
         [Test]

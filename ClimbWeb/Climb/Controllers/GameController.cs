@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Requests.Games;
+using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.ViewModels.Games;
 using Microsoft.AspNetCore.Identity;
@@ -15,11 +15,13 @@ namespace Climb.Controllers
     public class GameController : BaseController<GameController>
     {
         private readonly IGameService gameService;
+        private readonly ICdnService cdnService;
 
-        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger, UserManager<ApplicationUser> userManager)
+        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger, UserManager<ApplicationUser> userManager, ICdnService cdnService)
             : base(logger, userManager, dbContext)
         {
             this.gameService = gameService;
+            this.cdnService = cdnService;
         }
 
         [HttpGet("games")]
@@ -65,7 +67,8 @@ namespace Climb.Controllers
         {
             try
             {
-                await gameService.AddCharacter(request);
+                var imageKey = await cdnService.UploadImageAsync(request.Image, ClimbImageRules.CharacterPic);
+                await gameService.AddCharacter(request.GameID, request.Name, imageKey);
                 return RedirectToAction("Home", new {request.GameID});
             }
             catch(Exception exception)

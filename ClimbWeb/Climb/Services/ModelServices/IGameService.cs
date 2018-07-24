@@ -7,7 +7,7 @@ namespace Climb.Services.ModelServices
     public interface IGameService
     {
         Task<Game> Create(CreateRequest request);
-        Task<Character> AddCharacter(AddCharacterRequest request);
+        Task<Character> AddCharacter(int gameID, string name, string imageKey);
         Task<Stage> AddStage(AddStageRequest request);
     }
 }
