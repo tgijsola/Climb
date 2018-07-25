@@ -7,6 +7,7 @@ namespace Climb.Requests.Games
     {
         [Required]
         public int GameID { get; set; }
+        public int? CharacterID { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
