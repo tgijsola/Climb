@@ -5,15 +5,22 @@
     Layout = "_LayoutWithNavbar";
 }
 
-<link rel="stylesheet" href="~/dist/game/game-home.css"/>
+<link rel="stylesheet" href="~/dist/styles/game/game-home.css"/>
 
 <div>
     <h1>@Model.Game.Name</h1>
     <h3>Add Character</h3>
 
-    <form asp-action="CharacterAddPost">
-        <input name="gameID" value="@Model.Game.ID" type="hidden"/>
-        <input name="name" type="text"/>
+    <form asp-action="CharacterAddPost" enctype="multipart/form-data">
+        <input name="gameID" value="@Model.Game.ID" type="hidden" />
+        <div>
+            <label>Name</label>
+            <input name="name" type="text" />
+        </div>
+        <div>
+            <label>Image</label>
+            <input name="image" type="file" accept=".png" />
+        </div>
         <button>Add</button>
     </form>
 </div>

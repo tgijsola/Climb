@@ -19,11 +19,11 @@ namespace Climb.Data
         private static readonly Dictionary<int, int> setIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> matchIDs = new Dictionary<int, int>();
 
-        public static async Task MigrateV1(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public static async Task MigrateV1(ApplicationDbContext context, UserManager<ApplicationUser> userManager, string connectionString)
         {
             await ResetDatabase(context);
 
-            ClimbV1Context v1Context = CreateDB();
+            ClimbV1Context v1Context = CreateDB(connectionString);
 
             await MigrateUsers(v1Context, context, userManager);
             await MigrateGames(v1Context, context);
@@ -45,10 +45,10 @@ namespace Climb.Data
             await context.Database.MigrateAsync();
         }
 
-        private static ClimbV1Context CreateDB()
+        private static ClimbV1Context CreateDB(string connectionString)
         {
             var options = new DbContextOptionsBuilder<ClimbV1Context>()
-                            .UseSqlServer("Data Source=climbranks.database.windows.net;Initial Catalog=climbranks;Integrated Security=False;User ID=climbranks_admin;Password=051xu0wvLYM9;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
+                            .UseSqlServer(connectionString)
                             .Options;
             ClimbV1Context context = new ClimbV1Context(options);
             return context;
@@ -71,7 +71,6 @@ namespace Climb.Data
                     NormalizedEmail = oldUser.ApplicationUser.NormalizedEmail,
                     UserName = oldUser.Username,
                     NormalizedUserName = userManager.KeyNormalizer.Normalize(oldUser.Username),
-                    //PasswordHash = "AQAAAAEAACcQAAAAEDc3ChoYyz6aQnxea4QetvhCiSWrn38F5CPFwtUfDWDCevoq8uSEQytCOu9s1hppSA==", // Abc.123
                     PasswordHash = oldUser.ApplicationUser.PasswordHash,
                     ProfilePicKey = oldUser.ProfilePicKey,
                     ConcurrencyStamp = oldUser.ApplicationUser.ConcurrencyStamp,
