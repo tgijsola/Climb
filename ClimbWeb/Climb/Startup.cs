@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using Climb.Data;
 using Climb.Services;
 using Climb.Services.ModelServices;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +50,7 @@ namespace Climb
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
             services.AddTransient<ICdnService, FileStorageCdn>();
             services.AddTransient<IPointService, EloPointService>();
+            services.AddTransient<ISeasonPointCalculator, ParticipationSeasonPointCalculator>();
         }
 
         private void ConfigureDB(IServiceCollection services)
@@ -75,12 +74,12 @@ namespace Climb
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
 
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true,
-                    EnvironmentVariables = new Dictionary<string, string> {{"mode", "development"}},
-                });
+                //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                //{
+                //    HotModuleReplacement = false,
+                //    ReactHotModuleReplacement = false,
+                //    EnvironmentVariables = new Dictionary<string, string> {{"mode", "development"}},
+                //});
             }
             else
             {

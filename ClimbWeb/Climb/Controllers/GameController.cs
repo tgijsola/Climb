@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Models;
 using Climb.Requests.Games;
+using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.ViewModels.Games;
 using Microsoft.AspNetCore.Identity;
@@ -15,11 +16,13 @@ namespace Climb.Controllers
     public class GameController : BaseController<GameController>
     {
         private readonly IGameService gameService;
+        private readonly ICdnService cdnService;
 
-        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger, UserManager<ApplicationUser> userManager)
+        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger, UserManager<ApplicationUser> userManager, ICdnService cdnService)
             : base(logger, userManager, dbContext)
         {
             this.gameService = gameService;
+            this.cdnService = cdnService;
         }
 
         [HttpGet("games")]
@@ -47,16 +50,27 @@ namespace Climb.Controllers
         }
 
         [HttpGet("games/characters/add/{gameID:int}")]
-        public async Task<IActionResult> CharacterAdd(int gameID)
+        public async Task<IActionResult> CharacterAdd(int gameID, int? characterID)
         {
             var user = await GetViewUserAsync();
+
             var game = await dbContext.Games.FirstOrDefaultAsync(g => g.ID == gameID);
             if(game == null)
             {
                 return NotFound();
             }
 
-            var viewModel = new CharacterAddViewModel(user, game);
+            Character character = null;
+            if(characterID != null)
+            {
+                character = await dbContext.Characters.FirstOrDefaultAsync(c => c.ID == characterID);
+                if(character == null)
+                {
+                    return NotFound();
+                }
+            }
+
+            var viewModel = CharacterAddViewModel.Create(user, game, character, cdnService);
             return View(viewModel);
         }
 
@@ -65,7 +79,7 @@ namespace Climb.Controllers
         {
             try
             {
-                await gameService.AddCharacter(request);
+                await gameService.AddCharacter(request.GameID, request.CharacterID, request.Name, request.Image);
                 return RedirectToAction("Home", new {request.GameID});
             }
             catch(Exception exception)

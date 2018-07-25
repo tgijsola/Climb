@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
 using Climb.Requests.Games;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Climb.Services.ModelServices
@@ -11,10 +13,12 @@ namespace Climb.Services.ModelServices
     public class GameService : IGameService
     {
         private readonly ApplicationDbContext dbContext;
+        private readonly ICdnService cdnService;
 
-        public GameService(ApplicationDbContext dbContext)
+        public GameService(ApplicationDbContext dbContext, ICdnService cdnService)
         {
             this.dbContext = dbContext;
+            this.cdnService = cdnService;
         }
 
         public async Task<Game> Create(CreateRequest request)
@@ -47,28 +51,59 @@ namespace Climb.Services.ModelServices
             return game;
         }
 
-        public async Task<Character> AddCharacter(AddCharacterRequest request)
+        public async Task<Character> AddCharacter(int gameID, int? characterID, string name, IFormFile imageFile)
         {
             var game = await dbContext.Games
                 .Include(g => g.Characters).AsNoTracking()
-                .FirstOrDefaultAsync(g => g.ID == request.GameID);
+                .FirstOrDefaultAsync(g => g.ID == gameID);
             if(game == null)
             {
-                throw new NotFoundException(typeof(Game), request.GameID);
+                throw new NotFoundException(typeof(Game), gameID);
             }
 
-            if(game.Characters.Any(c => c.Name == request.Name))
+            Character character;
+            if(characterID == null)
             {
-                throw new ConflictException(typeof(Character), nameof(Character.Name), request.Name);
+                if(imageFile == null)
+                {
+                    throw new ArgumentNullException(nameof(imageFile));
+                }
+
+                if(game.Characters.Any(c => c.Name == name))
+                {
+                    throw new ConflictException(typeof(Character), nameof(Character.Name), name);
+                }
+
+                var imageKey = await cdnService.UploadImageAsync(imageFile, ClimbImageRules.CharacterPic);
+
+                character = new Character
+                {
+                    Name = name,
+                    GameID = gameID,
+                    ImageKey = imageKey,
+                };
+
+                dbContext.Add(character);
+            }
+            else
+            {
+                character = await dbContext.Characters.FirstOrDefaultAsync(c => c.ID == characterID);
+                if (character == null)
+                {
+                    throw new NotFoundException(typeof(Character), characterID.Value);
+                }
+
+                dbContext.Update(character);
+                character.Name = name;
+
+                if(imageFile != null)
+                {
+                    await cdnService.DeleteImageAsync(character.ImageKey, ClimbImageRules.CharacterPic);
+                    var imageKey = await cdnService.UploadImageAsync(imageFile, ClimbImageRules.CharacterPic);
+                    character.ImageKey = imageKey;
+                }
             }
 
-            var character = new Character
-            {
-                Name = request.Name,
-                GameID = request.GameID,
-            };
-
-            dbContext.Add(character);
             await dbContext.SaveChangesAsync();
 
             return character;

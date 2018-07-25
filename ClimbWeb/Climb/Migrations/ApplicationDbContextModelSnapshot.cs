@@ -80,6 +80,8 @@ namespace Climb.Migrations
 
                     b.Property<int>("GameID");
 
+                    b.Property<string>("ImageKey");
+
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -87,7 +89,7 @@ namespace Climb.Migrations
 
                     b.HasIndex("GameID");
 
-                    b.ToTable("Character");
+                    b.ToTable("Characters");
                 });
 
             modelBuilder.Entity("Climb.Models.Game", b =>
@@ -258,15 +260,21 @@ namespace Climb.Migrations
 
             modelBuilder.Entity("Climb.Models.SeasonLeagueUser", b =>
                 {
-                    b.Property<int>("LeagueUserID");
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("SeasonID");
+                    b.Property<int>("LeagueUserID");
 
                     b.Property<int>("Points");
 
+                    b.Property<int>("SeasonID");
+
                     b.Property<int>("Standing");
 
-                    b.HasKey("LeagueUserID", "SeasonID");
+                    b.HasKey("ID");
+
+                    b.HasIndex("LeagueUserID");
 
                     b.HasIndex("SeasonID");
 
@@ -291,11 +299,19 @@ namespace Climb.Migrations
 
                     b.Property<int?>("Player1Score");
 
+                    b.Property<int>("Player1SeasonPoints");
+
                     b.Property<int>("Player2ID");
 
                     b.Property<int?>("Player2Score");
 
+                    b.Property<int>("Player2SeasonPoints");
+
                     b.Property<int?>("SeasonID");
+
+                    b.Property<int?>("SeasonPlayer1ID");
+
+                    b.Property<int?>("SeasonPlayer2ID");
 
                     b.Property<DateTime?>("UpdatedDate");
 
@@ -308,6 +324,10 @@ namespace Climb.Migrations
                     b.HasIndex("Player2ID");
 
                     b.HasIndex("SeasonID");
+
+                    b.HasIndex("SeasonPlayer1ID");
+
+                    b.HasIndex("SeasonPlayer2ID");
 
                     b.ToTable("Sets");
                 });
@@ -358,7 +378,7 @@ namespace Climb.Migrations
 
                     b.HasIndex("GameID");
 
-                    b.ToTable("Stage");
+                    b.ToTable("Stages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -585,6 +605,16 @@ namespace Climb.Migrations
                     b.HasOne("Climb.Models.Season", "Season")
                         .WithMany("Sets")
                         .HasForeignKey("SeasonID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.SeasonLeagueUser", "SeasonPlayer1")
+                        .WithMany("P1Sets")
+                        .HasForeignKey("SeasonPlayer1ID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.SeasonLeagueUser", "SeasonPlayer2")
+                        .WithMany("P2Sets")
+                        .HasForeignKey("SeasonPlayer2ID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

@@ -54,7 +54,13 @@ namespace Climb.Test.Services
             var oldSet = SetUtility.Create(dbContext, participants[0].ID, participants[1].ID, season.LeagueID);
             season.Sets = new HashSet<Set> {oldSet};
 
-            var newSet = new Set(season.LeagueID, season.ID, participants[0].ID, participants[1].ID, DateTime.Now.AddDays(1));
+            var newSet = new Set{
+                LeagueID = season.LeagueID,
+                SeasonID = season.ID, 
+                DueDate = DateTime.Now.AddDays(1),
+                Player1ID = participants[0].ID, 
+                Player2ID = participants[1].ID, 
+            };
             testObj.generatedSets = new HashSet<Set> {newSet};
 
             await testObj.GenerateScheduleAsync(season, dbContext);

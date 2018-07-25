@@ -8,8 +8,15 @@
 <h1 id="react-app"></h1>
 
 @section scripts {
+<environment include="Development">
+    <script crossorigin="anonymous" src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin="anonymous" src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin="anonymous" src="https://unpkg.com/react-router@4.3.1/umd/react-router.js"></script>
+    <script crossorigin="anonymous" src="https://unpkg.com/react-router-dom@4.3.1/umd/react-router-dom.js"></script>
+</environment>
+
     <link href="~/dist/styles/matches.css" rel="stylesheet"/>
-    <script src="~/lib/react/react.min.js"></script>
-    <script src="~/lib/react/react-dom.min.js"></script>
-    <script src="~/dist/app/bundle.js"></script>
+
+    @*<script type="module" src="~/dist/gen/climbClient.js"></script>*@
+    <script type="module" src="~/dist/app/bundle.js"></script>
 }

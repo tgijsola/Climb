@@ -14,7 +14,7 @@ namespace Climb.Controllers
         {
         }
 
-        [HttpGet("sets/fight")]
+        [HttpGet("sets/fight/{setID:int}")]
         public async Task<IActionResult> Fight()
         {
             var user = await GetViewUserAsync();
