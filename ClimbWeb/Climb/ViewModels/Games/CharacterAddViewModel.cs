@@ -22,7 +22,9 @@ namespace Climb.ViewModels.Games
 
         public static CharacterAddViewModel Create(ApplicationUser user, Game game, Character character, ICdnService cdnService)
         {
-            string imageKey = character != null ? cdnService.GetImageUrl(character.ImageKey, ClimbImageRules.CharacterPic) : "";
+            var imageKey = character != null
+                ? cdnService.GetImageUrl(character.ImageKey, ClimbImageRules.CharacterPic)
+                : "/images/NewCharacterIcon.png";
 
             return new CharacterAddViewModel(user, game, character, imageKey);
         }
