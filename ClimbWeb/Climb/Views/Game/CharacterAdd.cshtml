@@ -1,7 +1,7 @@
 ﻿@model Climb.ViewModels.Games.CharacterAddViewModel
 
 @{
-    ViewBag.Title = "Games-Home";
+    ViewBag.Title = "Character-Add";
     Layout = "_LayoutWithNavbar";
 }
 
@@ -9,18 +9,20 @@
 
 <div>
     <h1>@Model.Game.Name</h1>
-    <h3>Add Character</h3>
+    <h3>@Model.ActionName Character</h3>
 
     <form asp-action="CharacterAddPost" enctype="multipart/form-data">
-        <input name="gameID" value="@Model.Game.ID" type="hidden" />
+        <input name="gameID" value="@Model.Game.ID" type="hidden"/>
+        <input name="characterID" value="@Model.Character?.ID" type="hidden"/>
         <div>
             <label>Name</label>
-            <input name="name" type="text" />
+            <input name="name" type="text" value="@Model.Character?.Name"/>
         </div>
         <div>
             <label>Image</label>
-            <input name="image" type="file" accept=".png" />
+            <img src="@Model.ImageUrl" height="64" width="64"/>
+            <input name="image" type="file" accept=".png"/>
         </div>
-        <button>Add</button>
+        <button>@Model.ActionName</button>
     </form>
 </div>

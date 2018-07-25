@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Models;
 using Climb.Requests.Games;
 using Climb.Services;
 using Climb.Services.ModelServices;
@@ -49,16 +50,27 @@ namespace Climb.Controllers
         }
 
         [HttpGet("games/characters/add/{gameID:int}")]
-        public async Task<IActionResult> CharacterAdd(int gameID)
+        public async Task<IActionResult> CharacterAdd(int gameID, int? characterID)
         {
             var user = await GetViewUserAsync();
+
             var game = await dbContext.Games.FirstOrDefaultAsync(g => g.ID == gameID);
             if(game == null)
             {
                 return NotFound();
             }
 
-            var viewModel = new CharacterAddViewModel(user, game);
+            Character character = null;
+            if(characterID != null)
+            {
+                character = await dbContext.Characters.FirstOrDefaultAsync(c => c.ID == characterID);
+                if(character == null)
+                {
+                    return NotFound();
+                }
+            }
+
+            var viewModel = CharacterAddViewModel.Create(user, game, character, cdnService);
             return View(viewModel);
         }
 
@@ -67,8 +79,7 @@ namespace Climb.Controllers
         {
             try
             {
-                var imageKey = await cdnService.UploadImageAsync(request.Image, ClimbImageRules.CharacterPic);
-                await gameService.AddCharacter(request.GameID, request.Name, imageKey);
+                await gameService.AddCharacter(request.GameID, request.CharacterID, request.Name, request.Image);
                 return RedirectToAction("Home", new {request.GameID});
             }
             catch(Exception exception)

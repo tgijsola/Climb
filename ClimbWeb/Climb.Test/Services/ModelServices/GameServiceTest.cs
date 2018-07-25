@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Requests.Games;
+using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
@@ -15,17 +17,15 @@ namespace Climb.Test.Services.ModelServices
     {
         private GameService testObj;
         private ApplicationDbContext dbContext;
+        private ICdnService cdnService;
 
         [SetUp]
         public void SetUp()
         {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("TestDB")
-                .Options;
+            dbContext = DbContextUtility.CreateMockDb();
+            cdnService = Substitute.For<ICdnService>();
 
-            dbContext = new ApplicationDbContext(options);
-
-            testObj = new GameService(dbContext);
+            testObj = new GameService(dbContext, cdnService);
         }
 
         [Test]
@@ -78,8 +78,9 @@ namespace Climb.Test.Services.ModelServices
         public async Task AddCharacter_Valid_Character()
         {
             var game = GameUtility.Create(dbContext, 0, 0);
+            var imageFile = Substitute.For<IFormFile>();
 
-            var character = await testObj.AddCharacter(game.ID, "Char1", "image.png");
+            var character = await testObj.AddCharacter(game.ID, null, "Char1", imageFile);
 
             Assert.IsNotNull(character);
         }
@@ -87,25 +88,104 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public void AddCharacter_NoGame_NotFoundException()
         {
-            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddCharacter(0, "Char1", "image.png"));
+            var imageFile = Substitute.For<IFormFile>();
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddCharacter(0, null, "Char1", imageFile));
         }
 
-        // TODO: Also need to add utility class for normalizing and testing names.
         [Test]
         public void AddCharacter_NameTaken_ConflictException()
         {
             var game = GameUtility.Create(dbContext, 1, 0);
+            var imageFile = Substitute.For<IFormFile>();
 
-            Assert.ThrowsAsync<ConflictException>(() => testObj.AddCharacter(game.ID, game.Characters[0].Name, "image.png"));
+            Assert.ThrowsAsync<ConflictException>(() => testObj.AddCharacter(game.ID, null, game.Characters[0].Name, imageFile));
         }
 
-        [TestCase("")]
-        [TestCase("  ")]
-        public void AddCharacter_NoImageKey_NullArgumentException(string imageKey)
+        [Test]
+        public void AddCharacter_NewCharacterNoImageKey_NullArgumentException()
         {
             var game = GameUtility.Create(dbContext, 0, 0);
 
-            Assert.ThrowsAsync<ArgumentNullException>(() => testObj.AddCharacter(game.ID, "Char1", imageKey));
+            Assert.ThrowsAsync<ArgumentNullException>(() => testObj.AddCharacter(game.ID, null, "Char1", null));
+        }
+
+        [Test]
+        public async Task AddCharacter_NewCharacter_UploadImage()
+        {
+            var game = GameUtility.Create(dbContext, 1, 0);
+            var imageFile = Substitute.For<IFormFile>();
+
+            await testObj.AddCharacter(game.ID, null, "Char1", imageFile);
+
+            await cdnService.Received(1).UploadImageAsync(imageFile, ClimbImageRules.CharacterPic);
+        }
+
+        [Test]
+        public async Task AddCharacter_OldCharacterNoImage_ImageKeyNotUpdated()
+        {
+            var game = GameUtility.Create(dbContext, 1, 0);
+            var imageKey = game.Characters[0].ImageKey;
+
+            var character = await testObj.AddCharacter(game.ID, game.Characters[0].ID, "Char1", null);
+
+            Assert.AreEqual(imageKey, character.ImageKey);
+        }
+
+        [Test]
+        public async Task AddCharacter_OldCharacterNewImage_OldImageDeleted()
+        {
+            var game = GameUtility.Create(dbContext, 1, 0);
+            var imageKey = game.Characters[0].ImageKey;
+            var imageFile = Substitute.For<IFormFile>();
+
+            await testObj.AddCharacter(game.ID, game.Characters[0].ID, "Char1", imageFile);
+
+            await cdnService.Received(1).DeleteImageAsync(imageKey, ClimbImageRules.CharacterPic);
+        }
+
+        [Test]
+        public async Task AddCharacter_OldCharacterNewImage_NewImageUploaded()
+        {
+            var game = GameUtility.Create(dbContext, 1, 0);
+            var imageFile = Substitute.For<IFormFile>();
+
+            await testObj.AddCharacter(game.ID, game.Characters[0].ID, "Char1", imageFile);
+
+            await cdnService.Received(1).UploadImageAsync(imageFile, ClimbImageRules.CharacterPic);
+        }
+
+        [Test]
+        public async Task AddCharacter_OldCharacterNewImage_ImageKeySaved()
+        {
+            var game = GameUtility.Create(dbContext, 1, 0);
+            var imageFile = Substitute.For<IFormFile>();
+            const string imageKey = "key";
+            cdnService.UploadImageAsync(imageFile, ClimbImageRules.CharacterPic).Returns(imageKey);
+
+            var character = await testObj.AddCharacter(game.ID, game.Characters[0].ID, "Char1", imageFile);
+
+            Assert.AreEqual(imageKey, character.ImageKey);
+        }
+
+        [Test]
+        public async Task AddCharacter_OldCharacterNoImage_ValuesUpdated()
+        {
+            const string name = "NewName";
+            var game = GameUtility.Create(dbContext, 1, 0);
+
+            var character = await testObj.AddCharacter(game.ID, game.Characters[0].ID, name, null);
+
+            Assert.AreEqual(name, character.Name);
+        }
+
+        [Test]
+        public void AddCharacter_HasCharacterIDButNoCharacter_NotFoundException()
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+            var imageFile = Substitute.For<IFormFile>();
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddCharacter(game.ID, 1, "Char1", imageFile));
         }
 
         [Test]

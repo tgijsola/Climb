@@ -22,6 +22,7 @@
             <div>
                 <img src="@cdnService.GetImageUrl(character.ImageKey, ClimbImageRules.CharacterPic)" width="64" height="64"/>
                 <div>@character.Name</div>
+                <a asp-action="CharacterAdd" asp-route-gameid="@Model.Game.ID" asp-route-characterid="@character.ID">edit</a>
             </div>
         }
     </div>
