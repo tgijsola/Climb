@@ -9,6 +9,6 @@ namespace Climb.Services.ModelServices
     {
         Task<Game> Create(CreateRequest request);
         Task<Character> AddCharacter(int gameID, int? characterID, string name, IFormFile imageFile);
-        Task<Stage> AddStage(AddStageRequest request);
+        Task<Stage> AddStage(int gameID, int? stageID, string name);
     }
 }

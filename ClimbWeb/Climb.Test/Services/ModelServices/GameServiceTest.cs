@@ -192,9 +192,8 @@ namespace Climb.Test.Services.ModelServices
         public async Task AddStage_Valid_Stage()
         {
             var game = GameUtility.Create(dbContext, 0, 0);
-            var request = new AddStageRequest(game.ID, "Stage1");
 
-            var stage = await testObj.AddStage(request);
+            var stage = await testObj.AddStage(game.ID, null, "Stage1");
 
             Assert.IsNotNull(stage);
         }
@@ -202,18 +201,34 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public void AddStage_NoGame_NotFoundException()
         {
-            var request = new AddStageRequest(0, "Stage1");
-
-            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddStage(request));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddStage(0, null, "Stage1"));
         }
 
         [Test]
         public void AddStage_NameTaken_ConflictException()
         {
             var game = GameUtility.Create(dbContext, 0, 1);
-            var request = new AddStageRequest(game.ID, game.Stages[0].Name);
 
-            Assert.ThrowsAsync<ConflictException>(() => testObj.AddStage(request));
+            Assert.ThrowsAsync<ConflictException>(() => testObj.AddStage(game.ID, null, game.Stages[0].Name));
+        }
+        
+        [Test]
+        public void AddStage_HasStageIDButNoStage_NotFoundException()
+        {
+            var game = GameUtility.Create(dbContext, 0, 0);
+
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.AddStage(game.ID, 1, "Stage1"));
+        }
+
+        [Test]
+        public async Task AddStage_OldStage_ValuesUpdated()
+        {
+            const string name = "NewName";
+            var game = GameUtility.Create(dbContext, 0, 1);
+
+            var stage = await testObj.AddStage(game.ID, game.Stages[0].ID, name);
+
+            Assert.AreEqual(name, stage.Name);
         }
     }
 }

@@ -1,19 +1,22 @@
 ﻿@model Climb.ViewModels.Games.StageAddViewModel
 
 @{
-    ViewBag.Title = "Games-Home";
+    ViewBag.Title = "Stages-" + Model.ActionName;
     Layout = "_LayoutWithNavbar";
 }
 
-<link rel="stylesheet" href="~/dist/game/game-home.css"/>
+<link rel="stylesheet" href="~/dist/styles/game/game-home.css"/>
 
 <div>
     <h1>@Model.Game.Name</h1>
-    <h3>Add Stage</h3>
+    <h3>@Model.ActionName Stage</h3>
+
+    <a asp-action="Home" asp-route-gameID="@Model.Game.ID">Cancel</a>
 
     <form asp-action="StageAddPost">
         <input name="gameID" value="@Model.Game.ID" type="hidden"/>
-        <input name="name" type="text"/>
-        <button>Add</button>
+        <input name="stageid" value="@Model.Stage?.ID" type="hidden"/>
+        <input name="name" type="text" value="@Model.Stage?.Name"/>
+        <button>@Model.ActionName</button>
     </form>
 </div>

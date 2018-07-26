@@ -89,16 +89,27 @@ namespace Climb.Controllers
         }
 
         [HttpGet("games/stages/add/{gameID:int}")]
-        public async Task<IActionResult> StageAdd(int gameID)
+        public async Task<IActionResult> StageAdd(int gameID, int? stageID)
         {
             var user = await GetViewUserAsync();
+
             var game = await dbContext.Games.FirstOrDefaultAsync(g => g.ID == gameID);
             if(game == null)
             {
                 return NotFound();
             }
 
-            var viewModel = new StageAddViewModel(user, game);
+            Stage stage = null;
+            if(stageID != null)
+            {
+                stage = await dbContext.Stages.FirstOrDefaultAsync(s => s.ID == stageID);
+                if(stage == null)
+                {
+                    return NotFound();
+                }
+            }
+
+            var viewModel = new StageAddViewModel(user, game, stage);
             return View(viewModel);
         }
 
@@ -107,7 +118,7 @@ namespace Climb.Controllers
         {
             try
             {
-                await gameService.AddStage(request);
+                await gameService.AddStage(request.GameID, request.StageID, request.Name);
                 return RedirectToAction("Home", new {request.GameID});
             }
             catch(Exception exception)
