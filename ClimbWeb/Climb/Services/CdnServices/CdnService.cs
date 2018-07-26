@@ -8,12 +8,7 @@ namespace Climb.Services
 {
     public abstract class CdnService : ICdnService
     {
-        private readonly string root;
-
-        protected CdnService(string root)
-        {
-            this.root = root;
-        }
+        protected string root;
 
         public string GetImageUrl(string imageKey, ImageRules rules) => string.IsNullOrWhiteSpace(imageKey) ? rules.MissingUrl : $"{root}/{rules.Folder}/{imageKey}";
 
