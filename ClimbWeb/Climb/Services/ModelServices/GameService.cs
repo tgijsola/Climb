@@ -109,28 +109,45 @@ namespace Climb.Services.ModelServices
             return character;
         }
 
-        public async Task<Stage> AddStage(AddStageRequest request)
+        public async Task<Stage> AddStage(int gameID, int? stageID, string name)
         {
             var game = await dbContext.Games
                 .Include(g => g.Stages).AsNoTracking()
-                .FirstOrDefaultAsync(g => g.ID == request.GameID);
+                .FirstOrDefaultAsync(g => g.ID == gameID);
             if(game == null)
             {
-                throw new NotFoundException(typeof(Game), request.GameID);
+                throw new NotFoundException(typeof(Game), gameID);
             }
 
-            if(game.Stages.Any(c => c.Name == request.Name))
+            Stage stage;
+            if(stageID == null)
             {
-                throw new ConflictException(typeof(Stage), nameof(Stage.Name), request.Name);
+                if(game.Stages.Any(c => c.Name == name))
+                {
+                    throw new ConflictException(typeof(Stage), nameof(Stage.Name), name);
+                }
+
+                stage = new Stage
+                {
+                    Name = name,
+                    GameID = gameID,
+                };
+
+                dbContext.Add(stage);
+            }
+            else
+            {
+                stage = await dbContext.Stages.FirstOrDefaultAsync(s => s.ID == stageID);
+                if(stage == null)
+                {
+                    throw new NotFoundException(typeof(Stage), stageID.Value);
+                }
+
+                dbContext.Update(stage);
+
+                stage.Name = name;
             }
 
-            var stage = new Stage
-            {
-                Name = request.Name,
-                GameID = request.GameID,
-            };
-
-            dbContext.Add(stage);
             await dbContext.SaveChangesAsync();
 
             return stage;
