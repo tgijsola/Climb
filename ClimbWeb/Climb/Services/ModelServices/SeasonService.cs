@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Climb.Core.TieBreakers;
+using Climb.Core.TieBreakers.New;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
 using Microsoft.EntityFrameworkCore;
+using ITieBreaker = Climb.Core.TieBreakers.New.ITieBreaker;
+using ITieBreakerFactory = Climb.Core.TieBreakers.New.ITieBreakerFactory;
 
 namespace Climb.Services.ModelServices
 {
@@ -78,10 +83,12 @@ namespace Climb.Services.ModelServices
         {
             var set = await dbContext.Sets
                 .Include(s => s.Season).ThenInclude(s => s.Participants)
+                .Include(s => s.Season).ThenInclude(s => s.Sets).AsNoTracking()
                 .FirstOrDefaultAsync(s => s.ID == setID);
             dbContext.Update(set);
 
             UpdatePoints(set);
+            BreakTies(set.Season);
             UpdateRanks(set.Season);
 
             await dbContext.SaveChangesAsync();
@@ -104,6 +111,68 @@ namespace Climb.Services.ModelServices
             loser.Points += loserPointDelta;
         }
 
+        private void BreakTies(Season season)
+        {
+            var playedSets = season.Sets.Where(s => s.IsComplete).ToArray();
+            var setWins = new Dictionary<int, List<int>>();
+            foreach(var participant in season.Participants)
+            {
+                setWins.Add(participant.LeagueUserID, new List<int>());
+            }
+
+            foreach(var set in playedSets)
+            {
+                Debug.Assert(set.WinnerID != null, "set.WinnerID != null");
+                Debug.Assert(set.LoserID != null, "set.LoserID != null");
+                setWins[set.WinnerID.Value].Add(set.LoserID.Value);
+            }
+
+            season.Participants.Sort();
+
+            var currentPoints = -1;
+            var tiedParticipants = new Dictionary<IParticipant, ParticipantRecord>();
+            foreach(var seasonLeagueUser in season.Participants)
+            {
+                if(seasonLeagueUser.Points != currentPoints)
+                {
+                    if(tiedParticipants.Count > 1)
+                    {
+                        // figure out wins
+                    }
+
+                    tieBreaker.Break(tiedParticipants);
+                }
+            }
+
+            //int currentPoints = -1;
+            //var tiedParticipants = new List<Participant>();
+            //foreach(var participant in season.Participants)
+            //{
+            //    if(participant.Points != currentPoints)
+            //    {
+            //        if(tiedParticipants.Count > 1)
+            //        {
+            //            foreach(var tiedParticipant in tiedParticipants)
+            //            {
+            //                tiedParticipant.AddWins(setWins[tiedParticipant.UserID]);
+            //            }
+
+            //            tieBreaker.Break(tiedParticipants);
+            //        }
+
+            //        tiedParticipants.Clear();
+            //        currentPoints = participant.Points;
+            //    }
+
+            //    var p = new Participant(
+            //        participant.LeagueUserID,
+            //        participant.LeagueUser.Points,
+            //        participant.Points,
+            //        participant.LeagueUser.JoinDate);
+            //    tiedParticipants.Add(p);
+            //}
+        }
+
         private void UpdateRanks(Season season)
         {
             dbContext.UpdateRange(season.Participants);
@@ -112,14 +181,15 @@ namespace Climb.Services.ModelServices
 
             var rank = 1;
             var lastPoints = -1;
-            for(int i = 0; i < sortedParticipants.Length; i++)
+            for(var i = 0; i < sortedParticipants.Length; i++)
             {
                 var participant = sortedParticipants[i];
                 participant.Standing = rank;
-                if (participant.Points != lastPoints)
+                if(participant.Points != lastPoints)
                 {
                     lastPoints = participant.Points;
                 }
+
                 ++rank;
             }
         }

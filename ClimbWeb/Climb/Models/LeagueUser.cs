@@ -18,6 +18,7 @@ namespace Climb.Models
         public int Rank { get; set; }
         // TODO: Update this value.
         public int SetCount { get; set; }
+        public DateTime JoinDate { get; set; }
 
         [JsonIgnore]
         public League League { get; set; }

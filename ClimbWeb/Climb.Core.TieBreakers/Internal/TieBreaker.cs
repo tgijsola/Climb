@@ -8,7 +8,7 @@ namespace Climb.Core.TieBreakers.Internal
     {
         private readonly List<TieBreakAttempt> attempts = new List<TieBreakAttempt>();
 
-        public void AddAttempt(TieBreakAttempt tieBreakAttempt)
+        public ITieBreaker AddAttempt(TieBreakAttempt tieBreakAttempt)
         {
             if(tieBreakAttempt == null)
             {
@@ -21,6 +21,8 @@ namespace Climb.Core.TieBreakers.Internal
             }
 
             attempts.Add(tieBreakAttempt);
+
+            return this;
         }
 
         public void Break(IReadOnlyList<Participant> participants)
@@ -41,8 +43,8 @@ namespace Climb.Core.TieBreakers.Internal
                         ++place;
                     }
 
-                    var roundScore = (decimal)Math.Pow(place * 2, round);
-                    userScore.Participant.TieBreakerPoints += roundScore;
+                    var roundScore = Math.Pow(place * 2, round);
+                    userScore.Participant.User.TieBreakerPoints += (int)roundScore;
                 }
 
                 --round;
