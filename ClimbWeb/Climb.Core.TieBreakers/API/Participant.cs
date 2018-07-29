@@ -8,6 +8,7 @@ namespace Climb.Core.TieBreakers
         private readonly Dictionary<int, int> beatenOpponents = new Dictionary<int, int>();
 
         public int UserID { get; }
+        public IParticipant User { get; }
         public int LeaguePoints { get; }
         public int SeasonPoints { get; }
         public DateTime JoinDate { get; }
@@ -28,6 +29,7 @@ namespace Climb.Core.TieBreakers
             return seasonPointsCompare != 0 ? seasonPointsCompare : other.TieBreakerPoints.CompareTo(TieBreakerPoints);
         }
 
+        // TODO: Delete
         public void AddWin(int opponentID)
         {
             ++Wins;
@@ -38,6 +40,22 @@ namespace Climb.Core.TieBreakers
             else
             {
                 beatenOpponents[opponentID] = 1;
+            }
+        }
+
+        public void AddWins(IReadOnlyList<int> opponents)
+        {
+            Wins += opponents.Count;
+            foreach(var opponentID in opponents)
+            {
+                if(beatenOpponents.ContainsKey(opponentID))
+                {
+                    beatenOpponents[opponentID]++;
+                }
+                else
+                {
+                    beatenOpponents[opponentID] = 1;
+                }
             }
         }
 

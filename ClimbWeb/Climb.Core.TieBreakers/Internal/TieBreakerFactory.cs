@@ -1,10 +1,16 @@
-﻿namespace Climb.Core.TieBreakers.Internal
+﻿using Climb.Core.TieBreakers.Internal;
+
+namespace Climb.Core.TieBreakers
 {
-    internal class TieBreakerFactory : ITieBreakerFactory
+    public class TieBreakerFactory : ITieBreakerFactory
     {
         public ITieBreaker Create()
         {
-            return new TieBreaker();
+            return new TieBreaker()
+                .AddAttempt(new TotalWinsTieBreak())
+                .AddAttempt(new TiedWinsTieBreak())
+                .AddAttempt(new LeaguePointsTieBreak())
+                .AddAttempt(new MembershipDurationTieBreak());
         }
     }
 }

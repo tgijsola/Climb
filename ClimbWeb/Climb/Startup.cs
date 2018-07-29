@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
+using Climb.Core.TieBreakers;
 using Climb.Data;
 using Climb.Services;
 using Climb.Services.ModelServices;
@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,6 +52,7 @@ namespace Climb
             services.AddTransient<ICdnService, FileStorageCdn>();
             services.AddTransient<IPointService, EloPointService>();
             services.AddTransient<ISeasonPointCalculator, ParticipationSeasonPointCalculator>();
+            services.AddTransient<ITieBreakerFactory, TieBreakerFactory>();
         }
 
         private void ConfigureDB(IServiceCollection services)
