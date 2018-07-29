@@ -1,5 +1,4 @@
-﻿using Climb.Core.TieBreakers.Internal;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace Climb.Core.TieBreakers.Test
 {

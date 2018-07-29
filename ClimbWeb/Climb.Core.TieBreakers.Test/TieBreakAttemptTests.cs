@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace Climb.Core.TieBreakers.Test
@@ -7,40 +6,38 @@ namespace Climb.Core.TieBreakers.Test
     [TestFixture]
     public class TieBreakAttemptTests
     {
-        private class FakeTieBreakAttempt : TieBreakAttempt
+        private class FakeTieBreakRule : TieBreakerRule
         {
-            public readonly List<Participant> participants = new List<Participant>();
+            public readonly List<IParticipant> participants = new List<IParticipant>();
 
-            protected override int GetUserScore(IReadOnlyList<Participant> participants, Participant current)
+            protected override int GetParticipantScore((IParticipant participant, ParticipantRecord record) participant, IReadOnlyDictionary<IParticipant, ParticipantRecord> tiedParticipants)
             {
-                this.participants.Add(current);
+                participants.Add(participant.participant);
                 return 0;
             }
         }
 
-        private FakeTieBreakAttempt testObj;
+        private FakeTieBreakRule testObj;
 
         [SetUp]
         public void SetUp()
         {
-            testObj = new FakeTieBreakAttempt();
+            testObj = new FakeTieBreakRule();
         }
 
         [Test]
         public void Evaluate_AllUsersEvaulated()
         {
-            var participants = new[]
-            {
-                new Participant(0, 0, 0, DateTime.MinValue),
-                new Participant(0, 0, 0, DateTime.MinValue),
-                new Participant(0, 0, 0, DateTime.MinValue),
-            };
+            Dictionary<IParticipant, ParticipantRecord> participants = ParticipantsBuilder.Create()
+                .Add()
+                .Add()
+                .Add();
 
             testObj.Evaluate(participants);
 
             foreach(var participant in participants)
             {
-                testObj.participants.Remove(participant);
+                testObj.participants.Remove(participant.Key);
             }
 
             Assert.AreEqual(0, testObj.participants.Count);

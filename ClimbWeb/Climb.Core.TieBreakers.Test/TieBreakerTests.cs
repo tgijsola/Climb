@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Climb.Core.TieBreakers.Internal;
+using System.Linq;
 using NUnit.Framework;
 
 namespace Climb.Core.TieBreakers.Test
@@ -8,34 +8,34 @@ namespace Climb.Core.TieBreakers.Test
     [TestFixture]
     public class TieBreakerTests
     {
-        private class FakeAttempt : TieBreakAttempt
+        private class FakeRule : TieBreakerRule
         {
             private readonly int[] scores;
             private int index = -1;
 
-            public FakeAttempt(params int[] scores)
+            public FakeRule(params int[] scores)
             {
                 this.scores = scores;
             }
 
-            protected override int GetUserScore(IReadOnlyList<Participant> participants, Participant current)
+            protected override int GetParticipantScore((IParticipant participant, ParticipantRecord record) participant, IReadOnlyDictionary<IParticipant, ParticipantRecord> tiedParticipants)
             {
                 ++index;
                 return scores[index];
             }
         }
 
-        private class Fake2Attempt : FakeAttempt
+        private class Fake2Rule : FakeRule
         {
-            public Fake2Attempt(params int[] scores)
+            public Fake2Rule(params int[] scores)
                 : base(scores)
             {
             }
         }
 
-        private class Fake3Attempt : FakeAttempt
+        private class Fake3Rule : FakeRule
         {
-            public Fake3Attempt(params int[] scores)
+            public Fake3Rule(params int[] scores)
                 : base(scores)
             {
             }
@@ -50,66 +50,64 @@ namespace Climb.Core.TieBreakers.Test
         }
 
         [Test]
-        public void AddAttempt_Null_ArgumentNullException()
+        public void AddRule_Null_ArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => testObj.AddAttempt(null));
+            Assert.Throws<ArgumentNullException>(() => testObj.AddRule(null));
         }
 
         [Test]
-        public void AddAttempt_Duplicate_ArgumentException()
+        public void AddRule_Duplicate_ArgumentException()
         {
-            var attempt = new FakeAttempt();
-            testObj.AddAttempt(attempt);
-            var attempt2 = new FakeAttempt();
+            var rule = new FakeRule();
+            testObj.AddRule(rule);
+            var rule2 = new FakeRule();
 
-            Assert.Throws<ArgumentException>(() => testObj.AddAttempt(attempt2));
+            Assert.Throws<ArgumentException>(() => testObj.AddRule(rule2));
         }
 
         [Test]
-        public void Break_1Attempt_ParticipantTieBreakerScoreUpdated()
+        public void Break_1Rule_ParticipantTieBreakerScoreUpdated()
         {
             // 3rd, 1st, 2nd
-            var scores = new[] {2, 14, 7};
-            testObj.AddAttempt(new FakeAttempt(scores));
+            var scores = new[] { 2, 14, 7 };
+            testObj.AddRule(new FakeRule(scores));
             var participants = CreateParticipants();
 
             testObj.Break(participants);
+            var sortedParticipants = participants.Select(p => p.Key).OrderByDescending(p => p.TieBreakerPoints).ToList();
 
-            participants.Sort();
-            Assert.AreEqual(2, participants[0].UserID);
-            Assert.AreEqual(3, participants[1].UserID);
-            Assert.AreEqual(1, participants[2].UserID);
+            Assert.AreEqual(2, sortedParticipants[0].ID);
+            Assert.AreEqual(3, sortedParticipants[1].ID);
+            Assert.AreEqual(1, sortedParticipants[2].ID);
         }
 
         [Test]
-        public void Break_MultipleAttempts_FirstAttemptWins()
+        public void Break_MultipleRules_FirstRuleWins()
         {
             // 3rd, 1st, 2nd
-            var scores = new[] {2, 14, 7};
-            testObj.AddAttempt(new FakeAttempt(scores));
-            scores = new[] {200, 14, 7};
-            testObj.AddAttempt(new Fake2Attempt(scores));
-            scores = new[] {200, 14, 7};
-            testObj.AddAttempt(new Fake3Attempt(scores));
+            var scores = new[] { 2, 14, 7 };
+            testObj.AddRule(new FakeRule(scores));
+            scores = new[] { 200, 14, 7 };
+            testObj.AddRule(new Fake2Rule(scores));
+            scores = new[] { 200, 14, 7 };
+            testObj.AddRule(new Fake3Rule(scores));
 
             var participants = CreateParticipants();
 
             testObj.Break(participants);
+            var sortedParticipants = participants.Select(p => p.Key).OrderByDescending(p => p.TieBreakerPoints).ToList();
 
-            participants.Sort();
-            Assert.AreEqual(2, participants[0].UserID);
-            Assert.AreEqual(3, participants[1].UserID);
-            Assert.AreEqual(1, participants[2].UserID);
+            Assert.AreEqual(2, sortedParticipants[0].ID);
+            Assert.AreEqual(3, sortedParticipants[1].ID);
+            Assert.AreEqual(1, sortedParticipants[2].ID);
         }
 
-        private static List<Participant> CreateParticipants()
+        private static Dictionary<IParticipant, ParticipantRecord> CreateParticipants()
         {
-            return new List<Participant>
-            {
-                new Participant(1, 0, 0, DateTime.MinValue),
-                new Participant(2, 0, 0, DateTime.MinValue),
-                new Participant(3, 0, 0, DateTime.MinValue),
-            };
+            return ParticipantsBuilder.Create()
+                .Add(1)
+                .Add(2)
+                .Add(3);
         }
     }
 }

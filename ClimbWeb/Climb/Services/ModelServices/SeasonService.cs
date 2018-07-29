@@ -4,13 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Climb.Core.TieBreakers;
-using Climb.Core.TieBreakers.New;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
 using Microsoft.EntityFrameworkCore;
-using ITieBreaker = Climb.Core.TieBreakers.New.ITieBreaker;
-using ITieBreakerFactory = Climb.Core.TieBreakers.New.ITieBreakerFactory;
+using ITieBreaker = Climb.Core.TieBreakers.ITieBreaker;
+using ITieBreakerFactory = Climb.Core.TieBreakers.ITieBreakerFactory;
 
 namespace Climb.Services.ModelServices
 {
@@ -117,7 +116,7 @@ namespace Climb.Services.ModelServices
             var setWins = new Dictionary<int, List<int>>();
             foreach(var participant in season.Participants)
             {
-                setWins.Add(participant.LeagueUserID, new List<int>());
+                setWins.Add(participant.ID, new List<int>());
             }
 
             foreach(var set in playedSets)
@@ -137,40 +136,20 @@ namespace Climb.Services.ModelServices
                 {
                     if(tiedParticipants.Count > 1)
                     {
-                        // figure out wins
+                        foreach(var participantRecord in tiedParticipants)
+                        {
+                            participantRecord.Value.AddWins(setWins[participantRecord.Key.ID]);
+                        }
                     }
 
                     tieBreaker.Break(tiedParticipants);
                 }
+
+                currentPoints = seasonLeagueUser.Points;
+                tiedParticipants.Clear();
+                var record = new ParticipantRecord(seasonLeagueUser.LeagueUser.Points, seasonLeagueUser.LeagueUser.JoinDate);
+                tiedParticipants.Add(seasonLeagueUser, record);
             }
-
-            //int currentPoints = -1;
-            //var tiedParticipants = new List<Participant>();
-            //foreach(var participant in season.Participants)
-            //{
-            //    if(participant.Points != currentPoints)
-            //    {
-            //        if(tiedParticipants.Count > 1)
-            //        {
-            //            foreach(var tiedParticipant in tiedParticipants)
-            //            {
-            //                tiedParticipant.AddWins(setWins[tiedParticipant.UserID]);
-            //            }
-
-            //            tieBreaker.Break(tiedParticipants);
-            //        }
-
-            //        tiedParticipants.Clear();
-            //        currentPoints = participant.Points;
-            //    }
-
-            //    var p = new Participant(
-            //        participant.LeagueUserID,
-            //        participant.LeagueUser.Points,
-            //        participant.Points,
-            //        participant.LeagueUser.JoinDate);
-            //    tiedParticipants.Add(p);
-            //}
         }
 
         private void UpdateRanks(Season season)
