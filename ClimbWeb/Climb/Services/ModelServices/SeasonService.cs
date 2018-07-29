@@ -8,8 +8,6 @@ using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
 using Microsoft.EntityFrameworkCore;
-using ITieBreaker = Climb.Core.TieBreakers.ITieBreaker;
-using ITieBreakerFactory = Climb.Core.TieBreakers.ITieBreakerFactory;
 
 namespace Climb.Services.ModelServices
 {
@@ -82,7 +80,7 @@ namespace Climb.Services.ModelServices
         {
             var set = await dbContext.Sets
                 .Include(s => s.Season).ThenInclude(s => s.Participants)
-                .Include(s => s.Season).ThenInclude(s => s.Sets).AsNoTracking()
+                .Include(s => s.Season).ThenInclude(s => s.Sets)
                 .FirstOrDefaultAsync(s => s.ID == setID);
             dbContext.Update(set);
 
@@ -160,9 +158,8 @@ namespace Climb.Services.ModelServices
 
             var rank = 1;
             var lastPoints = -1;
-            for(var i = 0; i < sortedParticipants.Length; i++)
+            foreach(var participant in sortedParticipants)
             {
-                var participant = sortedParticipants[i];
                 participant.Standing = rank;
                 if(participant.Points != lastPoints)
                 {
