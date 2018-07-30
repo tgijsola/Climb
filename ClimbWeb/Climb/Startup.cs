@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Climb.Core.TieBreakers;
 using Climb.Data;
 using Climb.Services;
 using Climb.Services.ModelServices;
@@ -64,6 +65,7 @@ namespace Climb
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
             services.AddTransient<IPointService, EloPointService>();
             services.AddTransient<ISeasonPointCalculator, ParticipationSeasonPointCalculator>();
+            services.AddTransient<ITieBreakerFactory, TieBreakerFactory>();
         }
 
         private void ConfigureDB(IServiceCollection services)
