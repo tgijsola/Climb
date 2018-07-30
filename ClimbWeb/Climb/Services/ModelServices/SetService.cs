@@ -13,10 +13,12 @@ namespace Climb.Services.ModelServices
     public class SetService : ISetService
     {
         private readonly ApplicationDbContext dbContext;
+        private readonly ISeasonService seasonService;
 
-        public SetService(ApplicationDbContext dbContext)
+        public SetService(ApplicationDbContext dbContext, ISeasonService seasonService)
         {
             this.dbContext = dbContext;
+            this.seasonService = seasonService;
         }
 
         public async Task<SetRequest> RequestSetAsync(int requesterID, int challengedID)
@@ -127,6 +129,11 @@ namespace Climb.Services.ModelServices
             }
 
             await dbContext.SaveChangesAsync();
+
+            if (set.SeasonID != null)
+            {
+                await seasonService.UpdateStandings(setID);
+            }
 
             return set;
 

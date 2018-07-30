@@ -28,15 +28,18 @@
     </div>
     @if(Model.Game.HasStages)
     {
-        <div>
-            <div class="game-header">
-                <h3>Stages</h3>
-                <a asp-action="StageAdd">Add</a>
-            </div>
-            @foreach(var stage in Model.Game.Stages)
-            {
-                <div>@stage.Name</div>
-            }
+    <div>
+        <div class="game-header">
+            <h3>Stages</h3>
+            <a asp-action="StageAdd">Add</a>
         </div>
+        @foreach (var stage in Model.Game.Stages)
+        {
+            <div>
+                <div>@stage.Name</div>
+                <a asp-action="StageAdd" asp-route-gameid="@Model.Game.ID" asp-route-stageid="@stage.ID">edit</a>
+            </div>
+        }
+    </div>
     }
 </div>

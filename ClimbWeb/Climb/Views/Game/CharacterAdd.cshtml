@@ -11,6 +11,8 @@
     <h1>@Model.Game.Name</h1>
     <h3>@Model.ActionName Character</h3>
 
+    <a asp-action="Home" asp-route-gameID="@Model.Game.ID">Cancel</a>
+
     <form asp-action="CharacterAddPost" enctype="multipart/form-data">
         <input name="gameID" value="@Model.Game.ID" type="hidden"/>
         <input name="characterID" value="@Model.Character?.ID" type="hidden"/>

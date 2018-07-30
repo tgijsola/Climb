@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Climb.Core.TieBreakers;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
@@ -13,12 +16,15 @@ namespace Climb.Services.ModelServices
         private readonly ApplicationDbContext dbContext;
         private readonly IScheduleFactory scheduleFactory;
         private readonly ISeasonPointCalculator pointCalculator;
+        private readonly ITieBreaker tieBreaker;
 
-        public SeasonService(ApplicationDbContext dbContext, IScheduleFactory scheduleFactory, ISeasonPointCalculator pointCalculator)
+        public SeasonService(ApplicationDbContext dbContext, IScheduleFactory scheduleFactory, ISeasonPointCalculator pointCalculator, ITieBreakerFactory tieBreakerFactory)
         {
             this.dbContext = dbContext;
             this.scheduleFactory = scheduleFactory;
             this.pointCalculator = pointCalculator;
+
+            tieBreaker = tieBreakerFactory.Create();
         }
 
         public async Task<Season> Create(int leagueID, DateTime start, DateTime end)
@@ -73,11 +79,15 @@ namespace Climb.Services.ModelServices
         public async Task<Season> UpdateStandings(int setID)
         {
             var set = await dbContext.Sets
-                .Include(s => s.Season).ThenInclude(s => s.Participants)
+                .Include(s => s.Season).ThenInclude(s => s.Participants).ThenInclude(slu => slu.LeagueUser)
+                .Include(s => s.Season).ThenInclude(s => s.Sets).ThenInclude(s => s.Player1)
+                .Include(s => s.Season).ThenInclude(s => s.Sets).ThenInclude(s => s.Player2)
                 .FirstOrDefaultAsync(s => s.ID == setID);
             dbContext.Update(set);
 
             UpdatePoints(set);
+            BreakTies(set.Season);
+            UpdateRanks(set.Season);
 
             await dbContext.SaveChangesAsync();
 
@@ -97,6 +107,68 @@ namespace Climb.Services.ModelServices
             set.Player2SeasonPoints = set.WinnerID == set.Player2ID ? winnerPointDelta : loserPointDelta;
             winner.Points += winnerPointDelta;
             loser.Points += loserPointDelta;
+        }
+
+        private void BreakTies(Season season)
+        {
+            var playedSets = season.Sets.Where(s => s.IsComplete).ToArray();
+            var setWins = new Dictionary<int, List<int>>();
+            foreach(var participant in season.Participants)
+            {
+                setWins.Add(participant.ID, new List<int>());
+            }
+
+            foreach(var set in playedSets)
+            {
+                Debug.Assert(set.SeasonWinnerID != null, "set.SeasonWinnerID != null");
+                Debug.Assert(set.SeasonLoserID != null, "set.SeasonLoserID != null");
+                setWins[set.SeasonWinnerID.Value].Add(set.SeasonLoserID.Value);
+            }
+
+            season.Participants.Sort();
+
+            var currentPoints = -1;
+            var tiedParticipants = new Dictionary<IParticipant, ParticipantRecord>();
+            foreach(var seasonLeagueUser in season.Participants)
+            {
+                if(seasonLeagueUser.Points != currentPoints)
+                {
+                    if(tiedParticipants.Count > 1)
+                    {
+                        foreach(var participantRecord in tiedParticipants)
+                        {
+                            participantRecord.Value.AddWins(setWins[participantRecord.Key.ID]);
+                        }
+                    }
+
+                    tieBreaker.Break(tiedParticipants);
+                }
+
+                currentPoints = seasonLeagueUser.Points;
+                tiedParticipants.Clear();
+                var record = new ParticipantRecord(seasonLeagueUser.LeagueUser.Points, seasonLeagueUser.LeagueUser.JoinDate);
+                tiedParticipants.Add(seasonLeagueUser, record);
+            }
+        }
+
+        private void UpdateRanks(Season season)
+        {
+            dbContext.UpdateRange(season.Participants);
+
+            var sortedParticipants = season.Participants.OrderByDescending(slu => slu.Points).ToArray();
+
+            var rank = 1;
+            var lastPoints = -1;
+            foreach(var participant in sortedParticipants)
+            {
+                participant.Standing = rank;
+                if(participant.Points != lastPoints)
+                {
+                    lastPoints = participant.Points;
+                }
+
+                ++rank;
+            }
         }
     }
 }

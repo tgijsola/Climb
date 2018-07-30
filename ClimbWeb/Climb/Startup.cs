@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using Climb.Core.TieBreakers;
 using Climb.Data;
 using Climb.Services;
 using Climb.Services.ModelServices;
@@ -38,6 +40,19 @@ namespace Climb
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddCookieTempDataProvider();
 
+            var cdnType = Configuration["CDN"];
+            switch(cdnType)
+            {
+                case "S3":
+                    services.AddSingleton<ICdnService, S3Cdn>();
+                    break;
+                case "Local":
+                    services.AddSingleton<ICdnService, FileStorageCdn>();
+                    break;
+                default:
+                    throw new NotSupportedException("Need to set a CDN type.");
+            }
+
             services.AddTransient<IApplicationUserService, ApplicationUserService>();
             services.AddTransient<IGameService, GameService>();
             services.AddTransient<ILeagueService, LeagueService>();
@@ -48,9 +63,9 @@ namespace Climb
             services.AddTransient<ITokenHelper, TokenHelper>();
             services.AddTransient<IUrlUtility, UrlUtility>();
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
-            services.AddTransient<ICdnService, FileStorageCdn>();
             services.AddTransient<IPointService, EloPointService>();
             services.AddTransient<ISeasonPointCalculator, ParticipationSeasonPointCalculator>();
+            services.AddTransient<ITieBreakerFactory, TieBreakerFactory>();
         }
 
         private void ConfigureDB(IServiceCollection services)

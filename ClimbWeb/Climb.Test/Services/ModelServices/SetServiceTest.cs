@@ -7,6 +7,7 @@ using Climb.Models;
 using Climb.Requests.Sets;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
@@ -14,17 +15,21 @@ namespace Climb.Test.Services.ModelServices
     // TODO: Tied scores.
     // TODO: Not matching character counts.
     // TODO: Already have an open set request.
+    // TODO: RespondToSetRequestAsync: Request approved and date set.
     [TestFixture]
     public class SetServiceTest
     {
         private SetService testObj;
         private ApplicationDbContext dbContext;
+        private ISeasonService seasonService;
 
         [SetUp]
         public void SetUp()
         {
             dbContext = DbContextUtility.CreateMockDb();
-            testObj = new SetService(dbContext);
+            seasonService = Substitute.For<ISeasonService>();
+
+            testObj = new SetService(dbContext, seasonService);
         }
 
         [Test]
@@ -81,6 +86,33 @@ namespace Climb.Test.Services.ModelServices
 
             Assert.AreEqual(1, set.Player1Score);
             Assert.AreEqual(2, set.Player2Score);
+        }
+
+        [Test]
+        public async Task Update_IsSeasonSet_UpdatesSeasonPoints()
+        {
+            var set = SetUtility.Create(dbContext);
+
+            var matchForms = CreateMatchForms(3);
+            await testObj.Update(set.ID, matchForms);
+
+#pragma warning disable 4014
+            seasonService.Received(1).UpdateStandings(set.ID);
+#pragma warning restore 4014
+        }
+
+        [Test]
+        public async Task Update_IsNotSeasonSet_DoesNotUpdateSeasonPoints()
+        {
+            var set = SetUtility.Create(dbContext);
+            set.SeasonID = null;
+
+            var matchForms = CreateMatchForms(3);
+            await testObj.Update(set.ID, matchForms);
+
+#pragma warning disable 4014
+            seasonService.DidNotReceive().UpdateStandings(set.ID);
+#pragma warning restore 4014
         }
 
         [Test]
@@ -142,7 +174,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task RespondToSetRequest_Approved_CreateSet()
         {
-            SetRequest setRequest = CreateSetRequest(true);
+            var setRequest = CreateSetRequest(true);
 
             setRequest = await testObj.RespondToSetRequestAsync(setRequest.ID, true);
 
@@ -152,7 +184,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task RespondToSetRequest_Declined_NoSet()
         {
-            SetRequest setRequest = CreateSetRequest(true);
+            var setRequest = CreateSetRequest(true);
 
             setRequest = await testObj.RespondToSetRequestAsync(setRequest.ID, false);
 
@@ -163,7 +195,7 @@ namespace Climb.Test.Services.ModelServices
         [TestCase(false)]
         public async Task RespondToSetRequest_Responded_IsClosed(bool accepted)
         {
-            SetRequest setRequest = CreateSetRequest(true);
+            var setRequest = CreateSetRequest(true);
             Assert.IsTrue(setRequest.IsOpen);
 
             setRequest = await testObj.RespondToSetRequestAsync(setRequest.ID, accepted);
@@ -175,12 +207,10 @@ namespace Climb.Test.Services.ModelServices
         [TestCase(false)]
         public void RespondToSetRequest_NotOpen_BadRequestException(bool accepted)
         {
-            SetRequest setRequest = CreateSetRequest(false);
+            var setRequest = CreateSetRequest(false);
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.RespondToSetRequestAsync(setRequest.ID, accepted));
         }
-
-        // TODO: RespondToSetRequestAsync: Request approved and date set.
 
         private static List<MatchForm> CreateMatchFormsWithScores(int count, int p1Score, int p2Score)
         {
@@ -211,7 +241,7 @@ namespace Climb.Test.Services.ModelServices
 
             return matchForms;
         }
-        
+
         private SetRequest CreateSetRequest(bool isOpen)
         {
             var league = LeagueUtility.CreateLeague(dbContext);
