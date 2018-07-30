@@ -28,6 +28,8 @@ namespace Climb.Test.Utilities
                 s.Player2ID = player2.LeagueUserID;
                 s.SeasonPlayer1 = player1;
                 s.SeasonPlayer2 = player2;
+                s.Player1 = player1.LeagueUser;
+                s.Player2 = player2.LeagueUser;
             });
 
             return set;
