@@ -125,9 +125,8 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task UpdateStandings_Ties_NoTiedStandings()
         {
-            tieBreaker.WhenForAnyArgs(tb => tb.Break(null)).Do(info =>
+            MockTieBreak(arg =>
             {
-                var arg = info.Arg<Dictionary<IParticipant, ParticipantRecord>>();
                 var points = 1;
                 foreach(var entry in arg)
                 {
@@ -147,7 +146,7 @@ namespace Climb.Test.Services.ModelServices
             await testObj.UpdateStandings(set.ID);
 
             season.Participants.Sort();
-            for(int i = 0; i < season.Participants.Count; i++)
+            for(var i = 0; i < season.Participants.Count; i++)
             {
                 Assert.AreEqual(i + 1, season.Participants[i].Standing);
             }
@@ -156,13 +155,9 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task UpdateStandings_TieBrokenWithWin_TieBreakScoresReset()
         {
-            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
-            SeasonLeagueUser player1 = season.Participants[0];
-            player1.Standing = 1;
-            player1.TieBreakerPoints = 100;
-            SeasonLeagueUser player2 = season.Participants[1];
-            player2.Standing = 2;
-            player2.TieBreakerPoints = 10;
+            var season = CreateSeason((1, 5, 100), (2, 5, 10));
+            var player1 = season.Participants[0];
+            var player2 = season.Participants[1];
 
             var set = SetUtility.Create(dbContext, player1, player2, season.LeagueID);
 
@@ -170,6 +165,41 @@ namespace Climb.Test.Services.ModelServices
 
             Assert.AreEqual(0, player1.TieBreakerPoints);
             Assert.AreEqual(0, player2.TieBreakerPoints);
+        }
+
+        [Test]
+        public async Task UpdateStandings_3WayTieBrokenWithWin_2TiedUsersHaveCorrectTieBreakScores()
+        {
+            var season = CreateSeason((1, 5, 1000), (2, 5, 100), (3, 5, 10), (4, 2, 0));
+            var player1 = season.Participants[0];
+            var player2 = season.Participants[1];
+            var player3 = season.Participants[2];
+            var player4 = season.Participants[3];
+
+
+            var set = SetUtility.Create(dbContext, player2, player4, season.LeagueID);
+            set.Player1Score = 1;
+            set.Player2Score = 0;
+
+            await testObj.UpdateStandings(set.ID);
+
+            Assert.Greater(player1.TieBreakerPoints, 0);
+            Assert.Greater(player3.TieBreakerPoints, 0);
+
+            Assert.AreEqual(0, player2.TieBreakerPoints);
+        }
+
+        private Season CreateSeason(params (int standing, int points, int tieBreak)[] participants)
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, participants.Length).season;
+            for(var i = 0; i < participants.Length; i++)
+            {
+                season.Participants[i].Standing = participants[i].standing;
+                season.Participants[i].Points = participants[i].points;
+                season.Participants[i].TieBreakerPoints = participants[i].tieBreak;
+            }
+
+            return season;
         }
 
         private Set CreateSet(int p1Score, int p2Score)
@@ -184,6 +214,15 @@ namespace Climb.Test.Services.ModelServices
             set.Player2Score = p2Score;
 
             return set;
+        }
+
+        private void MockTieBreak(Action<Dictionary<IParticipant, ParticipantRecord>> onBreak)
+        {
+            tieBreaker.WhenForAnyArgs(tb => tb.Break(null)).Do(info =>
+            {
+                var arg = info.Arg<Dictionary<IParticipant, ParticipantRecord>>();
+                onBreak(arg);
+            });
         }
     }
 }
