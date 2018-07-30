@@ -115,6 +115,7 @@ namespace Climb.Services.ModelServices
             var setWins = new Dictionary<int, List<int>>();
             foreach(var participant in season.Participants)
             {
+                participant.TieBreakerPoints = 0;
                 setWins.Add(participant.ID, new List<int>());
             }
 

@@ -14,6 +14,7 @@ using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
 {
+    // TODO Has score and still has a tie = same score.
     [TestFixture]
     public class SeasonServiceTest
     {
@@ -150,6 +151,25 @@ namespace Climb.Test.Services.ModelServices
             {
                 Assert.AreEqual(i + 1, season.Participants[i].Standing);
             }
+        }
+
+        [Test]
+        public async Task UpdateStandings_TieBrokenWithWin_TieBreakScoresReset()
+        {
+            var season = SeasonUtility.CreateSeason(dbContext, 2).season;
+            SeasonLeagueUser player1 = season.Participants[0];
+            player1.Standing = 1;
+            player1.TieBreakerPoints = 100;
+            SeasonLeagueUser player2 = season.Participants[1];
+            player2.Standing = 2;
+            player2.TieBreakerPoints = 10;
+
+            var set = SetUtility.Create(dbContext, player1, player2, season.LeagueID);
+
+            await testObj.UpdateStandings(set.ID);
+
+            Assert.AreEqual(0, player1.TieBreakerPoints);
+            Assert.AreEqual(0, player2.TieBreakerPoints);
         }
 
         private Set CreateSet(int p1Score, int p2Score)
