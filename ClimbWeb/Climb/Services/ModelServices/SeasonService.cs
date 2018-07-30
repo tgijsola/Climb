@@ -79,8 +79,9 @@ namespace Climb.Services.ModelServices
         public async Task<Season> UpdateStandings(int setID)
         {
             var set = await dbContext.Sets
-                .Include(s => s.Season).ThenInclude(s => s.Participants)
-                .Include(s => s.Season).ThenInclude(s => s.Sets)
+                .Include(s => s.Season).ThenInclude(s => s.Participants).ThenInclude(slu => slu.LeagueUser)
+                .Include(s => s.Season).ThenInclude(s => s.Sets).ThenInclude(s => s.Player1)
+                .Include(s => s.Season).ThenInclude(s => s.Sets).ThenInclude(s => s.Player2)
                 .FirstOrDefaultAsync(s => s.ID == setID);
             dbContext.Update(set);
 
@@ -119,9 +120,9 @@ namespace Climb.Services.ModelServices
 
             foreach(var set in playedSets)
             {
-                Debug.Assert(set.WinnerID != null, "set.WinnerID != null");
-                Debug.Assert(set.LoserID != null, "set.LoserID != null");
-                setWins[set.WinnerID.Value].Add(set.LoserID.Value);
+                Debug.Assert(set.SeasonWinnerID != null, "set.SeasonWinnerID != null");
+                Debug.Assert(set.SeasonLoserID != null, "set.SeasonLoserID != null");
+                setWins[set.SeasonWinnerID.Value].Add(set.SeasonLoserID.Value);
             }
 
             season.Participants.Sort();
