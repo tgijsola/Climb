@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Climb.Core.TieBreakers;
@@ -11,7 +12,6 @@ using Climb.Test.Utilities;
 using NSubstitute;
 using NUnit.Framework;
 
-// TODO: Tie breakers
 namespace Climb.Test.Services.ModelServices
 {
     [TestFixture]
@@ -21,6 +21,7 @@ namespace Climb.Test.Services.ModelServices
         private ApplicationDbContext dbContext;
         private IScheduleFactory scheduler;
         private ISeasonPointCalculator pointCalculator;
+        private ITieBreaker tieBreaker;
 
         private static DateTime StartDate => DateTime.Now.AddDays(1);
         private static DateTime EndDate => DateTime.Now.AddDays(2);
@@ -32,6 +33,9 @@ namespace Climb.Test.Services.ModelServices
             scheduler = Substitute.For<IScheduleFactory>();
             pointCalculator = Substitute.For<ISeasonPointCalculator>();
             var tieBreakerFactory = Substitute.For<ITieBreakerFactory>();
+            tieBreaker = Substitute.For<TieBreaker>();
+
+            tieBreakerFactory.Create().Returns(tieBreaker);
 
             testObj = new SeasonService(dbContext, scheduler, pointCalculator, tieBreakerFactory);
         }
@@ -115,6 +119,37 @@ namespace Climb.Test.Services.ModelServices
 
             Assert.AreEqual(1, set.SeasonPlayer2.Standing);
             Assert.AreEqual(2, set.SeasonPlayer1.Standing);
+        }
+
+        [Test]
+        public async Task UpdateStandings_Ties_NoTiedStandings()
+        {
+            tieBreaker.WhenForAnyArgs(tb => tb.Break(null)).Do(info =>
+            {
+                var arg = info.Arg<Dictionary<IParticipant, ParticipantRecord>>();
+                var points = 1;
+                foreach(var entry in arg)
+                {
+                    entry.Key.TieBreakerPoints = points;
+                    ++points;
+                }
+            });
+
+            var season = SeasonUtility.CreateSeason(dbContext, 4).season;
+            foreach(var seasonLeagueUser in season.Participants)
+            {
+                seasonLeagueUser.Standing = 1;
+            }
+
+            var set = SetUtility.Create(dbContext, season.Participants[0], season.Participants[1], season.LeagueID);
+
+            await testObj.UpdateStandings(set.ID);
+
+            season.Participants.Sort();
+            for(int i = 0; i < season.Participants.Count; i++)
+            {
+                Assert.AreEqual(i + 1, season.Participants[i].Standing);
+            }
         }
 
         private Set CreateSet(int p1Score, int p2Score)
