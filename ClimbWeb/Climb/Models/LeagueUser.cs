@@ -13,6 +13,7 @@ namespace Climb.Models
         public int LeagueID { get; set; }
         [Required]
         public string UserID { get; set; }
+        public string DisplayName { get; set; }
         public bool HasLeft { get; set; }
         public int Points { get; set; }
         public int Rank { get; set; }

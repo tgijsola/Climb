@@ -101,14 +101,21 @@ namespace Climb.Services.ModelServices
 
         public async Task UpdateSettings(string userID, string username, IFormFile profilePic)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userID);
+            var user = await dbContext.Users
+                .Include(u => u.LeagueUsers)
+                .FirstOrDefaultAsync(u => u.Id == userID);
             if(user == null)
             {
                 throw new NotFoundException(typeof(ApplicationUser), userID);
             }
             dbContext.Update(user);
+            dbContext.UpdateRange(user.LeagueUsers);
 
             user.UserName = username;
+            foreach(var leagueUser in user.LeagueUsers)
+            {
+                leagueUser.DisplayName = username;
+            }
 
             if(profilePic != null)
             {
