@@ -239,6 +239,7 @@ namespace Climb.Data
                 {
                     LeagueID = leagueIDs[oldLeagueUser.LeagueID],
                     UserID = applicationUserIDs[oldLeagueUser.User.ApplicationUser.Id],
+                    DisplayName = oldLeagueUser.DisplayName,
                     HasLeft = oldLeagueUser.HasLeft,
                     Rank = oldLeagueUser.Rank,
                     Points = oldLeagueUser.Points,
