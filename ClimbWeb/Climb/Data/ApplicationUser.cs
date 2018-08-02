@@ -10,6 +10,7 @@ namespace Climb.Data
     {
         public string ProfilePicKey { get; set; }
 
+        public List<OrganizationUser> OrganizationUsers { get; set; }
         public List<LeagueUser> LeagueUsers { get; set; }
 
         public string GetProfilePicUrl(ICdnService cdnService)
