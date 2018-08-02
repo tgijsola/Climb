@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Climb.Data;
 
 namespace Climb.Models
 {
@@ -10,7 +9,6 @@ namespace Climb.Models
         public string Name { get; set; }
         public DateTime DateCreated { get; set; }
 
-        public List<ApplicationUser> Owners { get; set; }
         public List<League> Leagues { get; set; }
         public List<OrganizationUser> Members { get; set; }
     }

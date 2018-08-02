@@ -30,9 +30,9 @@
                 <td>
                     <a asp-action="Home" asp-route-leagueID="@organization.ID">@organization.Name</a>
                 </td>
-                <td>@organization.Owners.Count</td>
-
+                <td>@organization.Members.Count(ou => ou.IsOwner)</td>
                 <td>@organization.DateCreated.ToShortDateString()</td>
+                <td>@organization.Leagues.Count</td>
                 <td>@organization.Members.Count</td>
             </tr>
         }

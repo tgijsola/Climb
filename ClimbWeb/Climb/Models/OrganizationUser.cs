@@ -10,6 +10,7 @@ namespace Climb.Models
         public string UserID { get; set; }
         public bool HasLeft { get; set; }
         public DateTime JoinDate { get; set; }
+        public bool IsOwner { get; set; }
 
         public Organization Organization { get; set; }
         public ApplicationUser User { get; set; }

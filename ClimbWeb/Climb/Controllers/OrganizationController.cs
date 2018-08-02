@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Models;
@@ -24,7 +23,6 @@ namespace Climb.Controllers
         {
             var user = await GetViewUserAsync();
             var organizations = await dbContext.Organizations
-                .Include(l => l.Owners).AsNoTracking()
                 .Include(l => l.Members).AsNoTracking()
                 .Include(l => l.Leagues).AsNoTracking()
                 .ToArrayAsync();
@@ -57,21 +55,17 @@ namespace Climb.Controllers
             {
                 Name = name,
                 DateCreated = DateTime.Now,
-                Owners = new List<ApplicationUser>(),
             };
+            dbContext.Organizations.Add(organization);
 
             var owner = new OrganizationUser
             {
-                Organization = organization,
-                User = user,
+                OrganizationID = organization.ID,
+                UserID = user.Id,
+                IsOwner = true,
             };
+            dbContext.OrganizationUsers.Add(owner);
 
-            dbContext.Add(organization);
-            dbContext.Add(owner);
-            await dbContext.SaveChangesAsync();
-
-            dbContext.Update(organization);
-            organization.Owners.Add(user);
             await dbContext.SaveChangesAsync();
 
             return RedirectToAction("Home", new {organizationID = organization.ID});
