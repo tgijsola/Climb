@@ -140,13 +140,14 @@ namespace Climb.Services.ModelServices
                         {
                             participantRecord.Value.AddWins(setWins[participantRecord.Key.ID]);
                         }
+                    
+                        tieBreaker.Break(tiedParticipants);
                     }
-
-                    tieBreaker.Break(tiedParticipants);
+                
+                    currentPoints = seasonLeagueUser.Points;
+                    tiedParticipants.Clear();
                 }
 
-                currentPoints = seasonLeagueUser.Points;
-                tiedParticipants.Clear();
                 var record = new ParticipantRecord(seasonLeagueUser.LeagueUser.Points, seasonLeagueUser.LeagueUser.JoinDate);
                 tiedParticipants.Add(seasonLeagueUser, record);
             }
@@ -156,7 +157,10 @@ namespace Climb.Services.ModelServices
         {
             dbContext.UpdateRange(season.Participants);
 
-            var sortedParticipants = season.Participants.OrderByDescending(slu => slu.Points).ToArray();
+            var sortedParticipants = season.Participants
+                .OrderByDescending(slu => slu.Points)
+                .ThenByDescending(slu => slu.TieBreakerPoints)
+                .ToArray();
 
             var rank = 1;
             var lastPoints = -1;

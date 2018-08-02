@@ -10,6 +10,7 @@ using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using NSubstitute;
+using NSubstitute.Exceptions;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
@@ -34,7 +35,7 @@ namespace Climb.Test.Services.ModelServices
             scheduler = Substitute.For<IScheduleFactory>();
             pointCalculator = Substitute.For<ISeasonPointCalculator>();
             var tieBreakerFactory = Substitute.For<ITieBreakerFactory>();
-            tieBreaker = Substitute.For<TieBreaker>();
+            tieBreaker = Substitute.For<ITieBreaker>();
 
             tieBreakerFactory.Create().Returns(tieBreaker);
 
@@ -176,10 +177,20 @@ namespace Climb.Test.Services.ModelServices
             var player3 = season.Participants[2];
             var player4 = season.Participants[3];
 
+            MockTieBreak(arg =>
+            {
+                arg.First(p => p.Key.ID == player1.ID).Key.TieBreakerPoints = 100;
+                arg.First(p => p.Key.ID == player3.ID).Key.TieBreakerPoints = 10;
+            });
+
+            pointCalculator.CalculatePointDeltas(player2, player4).Returns((2, 1));
 
             var set = SetUtility.Create(dbContext, player2, player4, season.LeagueID);
-            set.Player1Score = 1;
-            set.Player2Score = 0;
+            DbContextUtility.UpdateAndSave(dbContext, set, () =>
+            {
+                set.Player1Score = 1;
+                set.Player2Score = 0;
+            });
 
             await testObj.UpdateStandings(set.ID);
 
@@ -188,6 +199,9 @@ namespace Climb.Test.Services.ModelServices
 
             Assert.AreEqual(0, player2.TieBreakerPoints);
         }
+
+        // TODO: First place tie
+        // TODO: Last place tie
 
         private Season CreateSeason(params (int standing, int points, int tieBreak)[] participants)
         {
