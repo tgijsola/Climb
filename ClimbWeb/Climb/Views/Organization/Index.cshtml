@@ -28,7 +28,7 @@
         {
             <tr>
                 <td>
-                    <a asp-action="Home" asp-route-leagueID="@organization.ID">@organization.Name</a>
+                    <a asp-action="Home" asp-route-organizationID="@organization.ID">@organization.Name</a>
                 </td>
                 <td>@organization.Members.Count(ou => ou.IsOwner)</td>
                 <td>@organization.DateCreated.ToShortDateString()</td>
