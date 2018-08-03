@@ -45,6 +45,7 @@ namespace Climb.Controllers
             return View(viewModel);
         }
 
+        [Authorize]
         [HttpPost("organizations/update")]
         public async Task<IActionResult> UpdatePost(int? id, string name)
         {
