@@ -7,25 +7,18 @@ namespace Climb.ViewModels.Organizations
 {
     public class HomeViewModel : BaseViewModel
     {
-        public League League { get; }
+        public Organization Organization { get; }
         public bool IsMember { get; }
-        public IReadOnlyList<LeagueUser> Members { get; }
-        public bool CanStartSeason { get;  }
+        public IReadOnlyList<OrganizationUser> Members { get; }
 
-        public HomeViewModel(ApplicationUser user, League league)
+        public HomeViewModel(ApplicationUser user, Organization organization)
             : base(user)
         {
-            League = league;
+            Organization = organization;
 
-            league.Members.Sort();
-            Members = league.Members;
-            IsMember = league.Members.Any(lu => lu.UserID == user?.Id);
-
-#if DEBUG
-            CanStartSeason = true;
-#else
-            CanStartSeason = league.AdminID == user.Id;
-#endif
+            organization.Members.Sort();
+            Members = organization.Members;
+            IsMember = organization.Members.Any(ou => ou.UserID == user?.Id);
         }
     }
 }

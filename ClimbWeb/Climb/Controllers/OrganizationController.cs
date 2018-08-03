@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Models;
-using Climb.ViewModels;
 using Climb.ViewModels.Organizations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,8 +40,7 @@ namespace Climb.Controllers
                 .Include(l => l.Members).AsNoTracking()
                 .FirstOrDefaultAsync(l => l.ID == organizationID);
 
-            //var viewModel = new HomeViewModel(user, league);
-            var viewModel = new BaseViewModel(user);
+            var viewModel = new HomeViewModel(user, organization);
 
             return View(viewModel);
         }
