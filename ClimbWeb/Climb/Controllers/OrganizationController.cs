@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Models;
+using Climb.Services.ModelServices;
 using Climb.ViewModels.Organizations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,9 +14,12 @@ namespace Climb.Controllers
 {
     public class OrganizationController : BaseController<OrganizationController>
     {
-        public OrganizationController(ILogger<OrganizationController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext)
+        private IOrganizationService organizationService;
+
+        public OrganizationController(ILogger<OrganizationController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext, IOrganizationService organizationService)
             : base(logger, userManager, dbContext)
         {
+            this.organizationService = organizationService;
         }
 
         [HttpGet("organizations")]
@@ -24,7 +28,7 @@ namespace Climb.Controllers
             var user = await GetViewUserAsync();
             var organizations = await dbContext.Organizations
                 .Include(l => l.Members).AsNoTracking()
-                .Include(l => l.Leagues).AsNoTracking()
+                .Include(l => l.Leagues).ThenInclude(l => l.Members).AsNoTracking()
                 .ToArrayAsync();
 
             var viewModel = new IndexViewModel(user, organizations);
@@ -36,7 +40,7 @@ namespace Climb.Controllers
         {
             var user = await GetViewUserAsync();
             var organization = await dbContext.Organizations
-                .Include(l => l.Leagues).AsNoTracking()
+                .Include(l => l.Leagues).ThenInclude(l => l.Members).AsNoTracking()
                 .Include(l => l.Members).AsNoTracking()
                 .FirstOrDefaultAsync(l => l.ID == organizationID);
 
@@ -45,6 +49,7 @@ namespace Climb.Controllers
             return View(viewModel);
         }
 
+        // TODO: Move to service.
         [Authorize]
         [HttpPost("organizations/update")]
         public async Task<IActionResult> UpdatePost(int? id, string name)
@@ -69,6 +74,20 @@ namespace Climb.Controllers
             await dbContext.SaveChangesAsync();
 
             return RedirectToAction("Home", new {organizationID = organization.ID});
+        }
+
+        [HttpPost("Organizations/AddLeague")]
+        public async Task<IActionResult> AddLeaguePost(int organizationID, int leagueID)
+        {
+            try
+            {
+                await organizationService.AddLeague(organizationID, leagueID);
+                return RedirectToAction("Home", new {organizationID});
+            }
+            catch(Exception exception)
+            {
+                return GetExceptionResult(exception, new {organizationID, leagueID});
+            }
         }
     }
 }
