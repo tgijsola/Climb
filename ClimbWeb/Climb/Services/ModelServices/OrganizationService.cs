@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Climb.Data;
 using Climb.Exceptions;
 using Climb.Models;
@@ -15,9 +16,10 @@ namespace Climb.Services.ModelServices
             this.dbContext = dbContext;
         }
 
-        public async Task<Organization> AddLeague(int organizationID, int leagueID)
+        public async Task<Organization> AddLeague(int organizationID, int leagueID, string userID)
         {
             var organization = await dbContext.Organizations
+                .Include(o => o.Members)
                 .Include(o => o.Leagues)
                 .FirstOrDefaultAsync(o => o.ID == organizationID);
             if(organization == null)
@@ -29,6 +31,11 @@ namespace Climb.Services.ModelServices
             if(league == null)
             {
                 throw new NotFoundException(typeof(League), leagueID);
+            }
+
+            if(!organization.Members.Any(ou => ou.IsOwner && ou.UserID == userID))
+            {
+                throw new NotAuthorizedException(userID, "add league to organization");
             }
 
             if(league.OrganizationID != null)

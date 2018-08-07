@@ -44,6 +44,7 @@ namespace Climb.Test.Controllers
         [TestCase(typeof(NotFoundException), HttpStatusCode.NotFound)]
         [TestCase(typeof(BadRequestException), HttpStatusCode.BadRequest)]
         [TestCase(typeof(ConflictException), HttpStatusCode.Conflict)]
+        [TestCase(typeof(NotAuthorizedException), HttpStatusCode.Forbidden)]
         [TestCase(typeof(Exception), HttpStatusCode.InternalServerError)]
         public void GetExceptionResult_NotFound_NotFound(Type exceptionType, HttpStatusCode statusCode)
         {

@@ -81,7 +81,9 @@ namespace Climb.Controllers
         {
             try
             {
-                await organizationService.AddLeague(organizationID, leagueID);
+                var user = await GetViewUserAsync();
+
+                await organizationService.AddLeague(organizationID, leagueID, user.Id);
                 return RedirectToAction("Home", new {organizationID});
             }
             catch(Exception exception)
