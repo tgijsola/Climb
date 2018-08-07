@@ -19,6 +19,8 @@
       <Content Remove="Views\Game\Index.cshtml" />
       <Content Remove="Views\Game\StageAdd.cshtml" />
       <Content Remove="Views\League\Index.cshtml" />
+      <Content Remove="Views\Organization\Home.cshtml" />
+      <Content Remove="Views\Organization\Index.cshtml" />
       <Content Remove="Views\Season\Home.cshtml" />
       <Content Remove="Views\Site\Home.cshtml" />
       <Content Remove="Views\League\Home.cshtml" />
@@ -61,6 +63,8 @@
     <None Include="Views\Game\CharacterAdd.cshtml" />
     <None Include="Views\Game\Index.cshtml" />
     <None Include="Views\League\Index.cshtml" />
+    <None Include="Views\Organization\Home.cshtml" />
+    <None Include="Views\Organization\Index.cshtml" />
     <None Include="Views\Season\Home.cshtml" />
     <None Include="Views\Site\Support.cshtml" />
     <None Include="Views\Site\Home.cshtml" />
