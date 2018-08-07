@@ -10,7 +10,6 @@ using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Test.Utilities;
 using NSubstitute;
-using NSubstitute.Exceptions;
 using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
@@ -137,19 +136,31 @@ namespace Climb.Test.Services.ModelServices
             });
 
             var season = SeasonUtility.CreateSeason(dbContext, 4).season;
-            foreach(var seasonLeagueUser in season.Participants)
-            {
-                seasonLeagueUser.Standing = 1;
-            }
 
-            var set = SetUtility.Create(dbContext, season.Participants[0], season.Participants[1], season.LeagueID);
+            var player1 = season.Participants[0];
+            var player2 = season.Participants[1];
+
+            // both will end with 3 points
+            dbContext.UpdateRange(season.Participants);
+            player1.Points = 2;
+            player2.Points = 1;
+            dbContext.SaveChanges();
+
+            pointCalculator.CalculatePointDeltas(player1, player2).Returns((1, 2));
+
+            var set = SetUtility.Create(dbContext, player1, player2, season.LeagueID);
+            DbContextUtility.UpdateAndSave(dbContext, set, () =>
+            {
+                set.Player1Score = 0;
+                set.Player2Score = 1;
+            });
 
             await testObj.UpdateStandings(set.ID);
 
             season.Participants.Sort();
             for(var i = 0; i < season.Participants.Count; i++)
             {
-                Assert.AreEqual(i + 1, season.Participants[i].Standing);
+                Assert.AreEqual(4 - i, season.Participants[i].Standing);
             }
         }
 
