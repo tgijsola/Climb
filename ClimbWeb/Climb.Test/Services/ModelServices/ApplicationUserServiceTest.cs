@@ -169,6 +169,18 @@ namespace Climb.Test.Services.ModelServices
 #pragma warning restore 4014
         }
 
+        [Test]
+        public async Task UpdateSettings_HasLeagueUsers_PropogateDisplayName()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var leagueUser = LeagueUtility.AddUsersToLeague(league, 1, dbContext)[0];
+            const string newDisplayName = "bob";
+
+            await testObj.UpdateSettings(leagueUser.UserID, newDisplayName, null);
+
+            Assert.AreEqual(newDisplayName, leagueUser.DisplayName);
+        }
+
         private IFormFile PrepareCdnService()
         {
             var file = Substitute.For<IFormFile>();

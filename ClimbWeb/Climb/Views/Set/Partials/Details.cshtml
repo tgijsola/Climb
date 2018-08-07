@@ -1,27 +1,39 @@
 ﻿@model Climb.ViewModels.Sets.DetailsViewModel
 
 <div class="detail-card">
-    @if (Model.UserIsPlaying)
+    @if(Model.UserIsPlaying)
     {
         <div class="flex align-center-i justify-center">
-            <img src="@Model.OpponentProfilePic" width="64" height="64" />
+            <img src="@Model.OpponentProfilePic" width="64" height="64"/>
             <div class="flex wrap">
-                <p class="padding-left-10">@Model.Set.Player1.User.UserName</p> 
-                <p class="padding-left-10"><em>vs</em></p>
-                <p class="padding-left-10">@Model.Set.Player2.User.UserName</p>
+                <p class="padding-left-10">
+                    <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player1" />
+                </p>
+                <p class="padding-left-10">
+                    <em>vs</em>
+                </p>
+                <p class="padding-left-10">
+                    <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player2" />
+                </p>
             </div>
         </div>
     }
     else
     {
         <div class="flex align-center-i justify-center">
-            <img src="@Model.P1ProfilePic" width="64" height="64" />
+            <img src="@Model.P1ProfilePic" width="64" height="64"/>
             <div class="flex wrap">
-                <p class="padding-left-10">@Model.Set.Player1.User.UserName</p>
-                <p class="padding-left-10"><em>vs</em></p>
-                <p class="padding-left-10">@Model.Set.Player2.User.UserName</p>
+                <p class="padding-left-10">
+                    <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player1"/>
+                </p>
+                <p class="padding-left-10">
+                    <em>vs</em>
+                </p>
+                <p class="padding-left-10">
+                    <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player2"/>
+                </p>
             </div>
-            <img src="@Model.P2ProfilePic" width="64" height="64" />
+            <img src="@Model.P2ProfilePic" width="64" height="64"/>
         </div>
     }
     <a class="btn btn-fight margin-left-10" asp-controller="Set" asp-action="Fight" asp-route-setID="@Model.Set.ID">Fight</a>
