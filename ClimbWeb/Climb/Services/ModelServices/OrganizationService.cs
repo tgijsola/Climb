@@ -33,7 +33,8 @@ namespace Climb.Services.ModelServices
                 throw new NotFoundException(typeof(League), leagueID);
             }
 
-            if(!organization.Members.Any(ou => ou.IsOwner && ou.UserID == userID))
+            if(!organization.Members.Any(ou => ou.IsOwner && ou.UserID == userID)
+                || league.AdminID != userID)
             {
                 throw new NotAuthorizedException(userID, "add league to organization");
             }

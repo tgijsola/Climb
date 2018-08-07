@@ -8,7 +8,6 @@ using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
 {
-    // not admin
     [TestFixture]
     public class OrganizationServiceTest
     {
@@ -26,16 +25,10 @@ namespace Climb.Test.Services.ModelServices
             userID = DbContextUtility.AddNew<ApplicationUser>(dbContext).Id;
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-
-        }
-
         [Test]
         public void AddLeague_NoOrganization_NotFoundException()
         {
-            var league = LeagueUtility.CreateLeague(dbContext);
+            var league = CreateLeagueWithAdmin();
 
             Assert.ThrowsAsync<NotFoundException>(() => testObj.AddLeague(0, league.ID, userID));
         }
@@ -43,8 +36,7 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public void AddLeague_NoLeague_NotFoundException()
         {
-            var organization = DbContextUtility.AddNew<Organization>(dbContext);
-            MakeUserAnOwner(organization, userID);
+            var organization = CreateOrgWithOwner();
 
             Assert.ThrowsAsync<NotFoundException>(() => testObj.AddLeague(organization.ID, 0, userID));
         }
@@ -52,9 +44,8 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task AddLeague_NewLeague_LeagueAdded()
         {
-            var league = LeagueUtility.CreateLeague(dbContext);
-            var organization = DbContextUtility.AddNew<Organization>(dbContext);
-            MakeUserAnOwner(organization, userID);
+            var league = CreateLeagueWithAdmin();
+            var organization = CreateOrgWithOwner();
 
             await testObj.AddLeague(organization.ID, league.ID, userID);
 
@@ -64,9 +55,8 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task AddLeague_OldLeague_LeagueNotAdded()
         {
-            var league = LeagueUtility.CreateLeague(dbContext);
-            var organization = DbContextUtility.AddNew<Organization>(dbContext);
-            MakeUserAnOwner(organization, userID);
+            var league = CreateLeagueWithAdmin();
+            var organization = CreateOrgWithOwner();
 
             await testObj.AddLeague(organization.ID, league.ID, userID);
             await testObj.AddLeague(organization.ID, league.ID, userID);
@@ -77,11 +67,9 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public async Task AddLeague_LeagueInAnotherOrg_LeagueNotAdded()
         {
-            var league = LeagueUtility.CreateLeague(dbContext);
-            var organization1 = DbContextUtility.AddNew<Organization>(dbContext);
-            MakeUserAnOwner(organization1, userID);
-            var organization2 = DbContextUtility.AddNew<Organization>(dbContext);
-            MakeUserAnOwner(organization2, userID);
+            var league = CreateLeagueWithAdmin();
+            var organization1 = CreateOrgWithOwner();
+            var organization2 = CreateOrgWithOwner();
 
             await testObj.AddLeague(organization1.ID, league.ID, userID);
             await testObj.AddLeague(organization2.ID, league.ID, userID);
@@ -92,21 +80,38 @@ namespace Climb.Test.Services.ModelServices
         [Test]
         public void AddLeague_NotOwner_NotAuthorizedException()
         {
-            var league = LeagueUtility.CreateLeague(dbContext);
+            var league = CreateLeagueWithAdmin();
             var organization = DbContextUtility.AddNew<Organization>(dbContext);
 
-            Assert.ThrowsAsync<NotAuthorizedException>(() => testObj.AddLeague(organization.ID, league.ID, ""));
+            Assert.ThrowsAsync<NotAuthorizedException>(() => testObj.AddLeague(organization.ID, league.ID, userID));
+        }
+
+        [Test]
+        public void AddLeague_NotAdmin_NotAuthorizedException()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var organization = CreateOrgWithOwner();
+
+            Assert.ThrowsAsync<NotAuthorizedException>(() => testObj.AddLeague(organization.ID, league.ID, userID));
         }
 
         #region Helpers
-        private void MakeUserAnOwner(Organization organization, string userID)
+        private League CreateLeagueWithAdmin()
         {
+            return LeagueUtility.CreateLeague(dbContext, userID);
+        }
+
+        private Organization CreateOrgWithOwner()
+        {
+            var organization = DbContextUtility.AddNew<Organization>(dbContext);
             DbContextUtility.AddNew<OrganizationUser>(dbContext, ou =>
             {
                 ou.UserID = userID;
                 ou.OrganizationID = organization.ID;
                 ou.IsOwner = true;
             });
+
+            return organization;
         }
         #endregion
     }
