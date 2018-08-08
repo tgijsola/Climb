@@ -14,7 +14,6 @@ using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
 {
-    // TODO Has score and still has a tie = same score.
     [TestFixture]
     public class SeasonServiceTest
     {
@@ -122,8 +121,11 @@ namespace Climb.Test.Services.ModelServices
             Assert.AreEqual(2, set.SeasonPlayer1.Standing);
         }
 
-        [Test]
-        public async Task UpdateStandings_Ties_NoTiedStandings()
+        [TestCase(0, 0, 0, 0)]
+        [TestCase(0, 0, 1, 1)]
+        [TestCase(1, 1, 0, 0)]
+        [TestCase(1, 0, 0, 1)]
+        public async Task UpdateStandings_Ties_NoTiedStandings(params int[] seasonPoints)
         {
             MockTieBreak(arg =>
             {
@@ -136,24 +138,14 @@ namespace Climb.Test.Services.ModelServices
             });
 
             var season = SeasonUtility.CreateSeason(dbContext, 4).season;
-
-            var player1 = season.Participants[0];
-            var player2 = season.Participants[1];
-
-            // both will end with 3 points
             dbContext.UpdateRange(season.Participants);
-            player1.Points = 2;
-            player2.Points = 1;
+            for(int i = 0; i < seasonPoints.Length; i++)
+            {
+                season.Participants[i].Points = seasonPoints[i];
+            }
             dbContext.SaveChanges();
 
-            pointCalculator.CalculatePointDeltas(player1, player2).Returns((1, 2));
-
-            var set = SetUtility.Create(dbContext, player1, player2, season.LeagueID);
-            DbContextUtility.UpdateAndSave(dbContext, set, () =>
-            {
-                set.Player1Score = 0;
-                set.Player2Score = 1;
-            });
+            var set = SetUtility.Create(dbContext, season.Participants[0], season.Participants[1], season.LeagueID);
 
             await testObj.UpdateStandings(set.ID);
 
@@ -210,9 +202,6 @@ namespace Climb.Test.Services.ModelServices
 
             Assert.AreEqual(0, player2.TieBreakerPoints);
         }
-
-        // TODO: First place tie
-        // TODO: Last place tie
 
         private Season CreateSeason(params (int standing, int points, int tieBreak)[] participants)
         {

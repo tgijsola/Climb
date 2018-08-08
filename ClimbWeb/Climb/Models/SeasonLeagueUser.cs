@@ -35,7 +35,7 @@ namespace Climb.Models
 
         public int CompareTo(SeasonLeagueUser other)
         {
-            return Points.CompareTo(other.Points);
+            return Points != other.Points ? Points.CompareTo(other.Points) : TieBreakerPoints.CompareTo(other.TieBreakerPoints);
         }
     }
 }
