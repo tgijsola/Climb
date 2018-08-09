@@ -396,6 +396,8 @@ namespace Climb.Migrations
 
                     b.Property<int>("LeagueID");
 
+                    b.Property<string>("Message");
+
                     b.Property<int>("RequesterID");
 
                     b.Property<int?>("SetID");
