@@ -65,11 +65,11 @@ namespace Climb.API
         
         [HttpPost("api/v1/sets/challenge")]
         [SwaggerResponse(HttpStatusCode.Created, typeof(SetRequest))]
-        public async Task<IActionResult> ChallengeUser(int requesterID, int challengedID)
+        public async Task<IActionResult> ChallengeUser(int requesterID, int challengedID, string message)
         {
             try
             {
-                var request = await setService.RequestSetAsync(requesterID, challengedID);
+                var request = await setService.RequestSetAsync(requesterID, challengedID, message);
                 return CodeResultAndLog(HttpStatusCode.Created, request, $"Member {requesterID} challenged {challengedID}.");
             }
             catch(Exception exception)

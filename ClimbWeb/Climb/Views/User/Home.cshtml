@@ -30,7 +30,7 @@
                                 </div>
                                 <div class="card-body">
                                     <h5 class="card-title">@setRequest.Requester.User.UserName</h5>
-                                    <p class="card-text">Let's fight!</p>
+                                    <p class="card-text">@setRequest.Message</p>
                                     <button class="request-decline btn btn-secondary" data-requestId="@setRequest.ID">Decline</button>
                                     <button class="request-accept btn btn-danger" data-requestId="@setRequest.ID">Accept</button>
                                 </div>
@@ -57,7 +57,9 @@
                             </div>
                             <div class="card-body">
                                 <h5 class="card-title">@Model.HomeUser.UserName</h5>
-                                <p class="card-text">I wanna fight you!</p>
+                                <div class="input-group">
+                                    <input id="challenge-message-@leagueUser.Challenged.ID" type="text" value="Let's fight!" />
+                                </div>
                                 <button class="request-button btn btn-danger" data-requester="@leagueUser.Requester.ID" data-challenged="@leagueUser.Challenged.ID">Challenge!</button>
                             </div>
                         </div>
