@@ -2,12 +2,14 @@
 
 <link rel="stylesheet" href="~/dist/styles/league/leagueuser.css"/>
 
-<div class="detail-card">
-    <img src="@Model.ProfilePic" width="64" height="64" />
-    <a asp-controller="User" asp-action="Home" asp-route-userId="@Model.LeagueUser.UserID" class="username">@Model.LeagueUser.User.UserName</a>
-    @*<div class="username">WWWWWWWWWWWW</div>*@
-    <div class="rank">@Model.LeagueUser.Rank</div>
-    @*<div class="rank"><p>890</p></div>*@
-    <div class="points">(@Model.LeagueUser.Points)</div>
-    @*<div class="points">(1234)</div>*@
+<div class="leagueuser-container mb-2">
+    <p>@Model.LeagueUser.League.Name</p>
+    <div class="leagueuser-details">
+        <img src="https://pbs.twimg.com/profile_images/697220635198689285/T34coLzR_400x400.png" width="64" height="64" />
+        <div>
+            <p>@Model.LeagueUser.Rank</p>
+            <p>@($"({Model.LeagueUser.Points})")</p>
+        </div>
+        <img src="https://cdn4.iconfinder.com/data/icons/defaulticon/icons/png/256x256/arrow-alt-up.png" width="32" height="32"/>
+    </div>
 </div>
