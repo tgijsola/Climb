@@ -11,7 +11,7 @@ namespace Climb.ViewModels.Sets
         public string P2ProfilePic { get; }
         public bool UserIsPlaying { get; }
         public string OpponentProfilePic { get; }
-        public string SetType { get; set; }
+        public string SetType { get; }
 
         private DetailsViewModel(Set set, string p1ProfilePic, string p2ProfilePic, bool userIsPlaying, string opponentProfilePic)
         {
