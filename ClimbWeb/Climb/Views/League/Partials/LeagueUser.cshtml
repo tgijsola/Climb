@@ -3,9 +3,9 @@
 <link rel="stylesheet" href="~/dist/styles/league/leagueuser.css"/>
 
 <div class="leagueuser-container mb-2">
-    <p>@Model.LeagueUser.League.Name</p>
+    <a href="@Model.TitleLink">@Model.Title</a>
     <div class="leagueuser-details">
-        <img src="https://pbs.twimg.com/profile_images/697220635198689285/T34coLzR_400x400.png" width="64" height="64" />
+        <img src="@Model.Picture" width="64" height="64" />
         <div>
             <p>@Model.LeagueUser.Rank</p>
             <p>@($"({Model.LeagueUser.Points})")</p>

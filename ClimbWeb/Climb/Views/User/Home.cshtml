@@ -105,7 +105,7 @@
             <div>
                 @foreach(var leagueUser in Model.HomeUser.LeagueUsers)
                 {
-                    <partial name="../League/Partials/LeagueUser" model="@LeagueUserViewModel.Create(leagueUser, cdnService)"/>
+                    <partial name="../League/Partials/LeagueUser" model="@LeagueUserViewModel.Create(leagueUser, cdnService, false, Url)"/>
                 }
             </div>
         </div>
