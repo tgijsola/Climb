@@ -1,8 +1,10 @@
 ﻿import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { ClimbClient } from "../gen/climbClient";
+import { SetDetails } from "./SetDetails";
 import { MatchSummary } from "./MatchSummary";
 import { MatchEdit } from "./MatchEdit";
+import { SetCount } from "./SetCount";
 
 interface ISetSubmitState {
     set: ClimbClient.SetDto | null;
@@ -69,40 +71,8 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
 
         return (
             <div>
-                <div id="set-submit-header">
-                    <div id="set-submit-player-info">
-                        <div className="set-submit-player">
-                            <div className="set-submit-player-top">
-                                <img src="https://cdn2.iconfinder.com/data/icons/professions/512/user_boy_avatar-64.png"/>
-                                <div className="set-submit-player-meta">
-                                    <div className="set-submit-player-rank">#4</div>
-                                    <div className="set-submit-player-trend">↓</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="set-submit-score-container">
-                            <div className="set-submit-score right">{set.player1Score}</div>
-                            <div id="set-submit-score-divide">-</div>
-                            <div className="set-submit-score left">{set.player2Score}</div>
-                        </div>
-
-                        <div className="set-submit-player">
-                            <div className="set-submit-player-top">
-                                <div className="set-submit-player-meta">
-                                    <div className="set-submit-player-rank">#4</div>
-                                    <div className="set-submit-player-trend">↓</div>
-                                </div>
-                                <img src="https://cdn2.iconfinder.com/data/icons/professions/512/user_boy_avatar-64.png"/>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="set-submit-player-names">
-                        <div className="set-submit-player-name left">{player1.username}</div>
-                        <div className="set-submit-player-name right">{player2.username}</div>
-                    </div>
-                </div>
+                <SetDetails set={set} player1={player1} player2={player2}/>
+                <SetCount set={set}/>
 
                 <div>{matches}</div>
                 <div className="match-summary-buttons">

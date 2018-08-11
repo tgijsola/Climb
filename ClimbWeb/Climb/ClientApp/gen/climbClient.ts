@@ -2380,7 +2380,9 @@ export interface IMatchForm {
 export class SetDto implements ISetDto {
     id!: number;
     leagueID!: number;
+    leagueName?: string | undefined;
     seasonID?: number | undefined;
+    seasonIndex?: number | undefined;
     gameID!: number;
     player1ID!: number;
     player2ID!: number;
@@ -2408,7 +2410,9 @@ export class SetDto implements ISetDto {
         if (data) {
             this.id = data["id"];
             this.leagueID = data["leagueID"];
+            this.leagueName = data["leagueName"];
             this.seasonID = data["seasonID"];
+            this.seasonIndex = data["seasonIndex"];
             this.gameID = data["gameID"];
             this.player1ID = data["player1ID"];
             this.player2ID = data["player2ID"];
@@ -2437,7 +2441,9 @@ export class SetDto implements ISetDto {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["leagueID"] = this.leagueID;
+        data["leagueName"] = this.leagueName;
         data["seasonID"] = this.seasonID;
+        data["seasonIndex"] = this.seasonIndex;
         data["gameID"] = this.gameID;
         data["player1ID"] = this.player1ID;
         data["player2ID"] = this.player2ID;
@@ -2459,7 +2465,9 @@ export class SetDto implements ISetDto {
 export interface ISetDto {
     id: number;
     leagueID: number;
+    leagueName?: string | undefined;
     seasonID?: number | undefined;
+    seasonIndex?: number | undefined;
     gameID: number;
     player1ID: number;
     player2ID: number;

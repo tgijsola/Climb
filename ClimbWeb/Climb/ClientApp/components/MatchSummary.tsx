@@ -26,12 +26,14 @@ export class MatchSummary extends React.Component<IMatchSummaryProps> {
         const stageView = this.renderStage(match, game);
 
         return (
-            <div className="match-summary-container" onClick={() => this.props.onSelect(match)}>
-                <div className="match-summary-index">Match {match.index + 1}</div>
-                <div className="match-summary-info">
-                    <div>{p1Characters}</div>
-                    <div>{match.player1Score} - {match.player2Score}</div>
-                    <div>{p2Characters}</div>
+            <div className="card" onClick={() => this.props.onSelect(match)}>
+                <div className="card-body">
+                    <h6 className="card-title">Match {match.index + 1}</h6>
+                    <div className="d-flex justify-content-between card-text">
+                        <div>{p1Characters}</div>
+                        <div>{match.player1Score} - {match.player2Score}</div>
+                        <div>{p2Characters}</div>
+                    </div>
                 </div>
                 {stageView}
             </div>
