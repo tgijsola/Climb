@@ -1,19 +1,38 @@
 ﻿@model Climb.ViewModels.Sets.DetailsViewModel
 
-<div class="detail-card">
+<div class="set-container mb-2 pb-2">
+    <small class="set-details">@Model.Set.League.Name - @Model.SetType - @Model.Set.DueDate.ToShortDateString()</small>
+    <div class="set-pictures m-1">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRma0tgdrMHZiNnA0b-20CyuuvuWVaImCkm0cHEjihf6bYThDNVTA" width="64" height="64"/>
+        <p class="set-vs">vs</p>
+        <img src="https://ssbworld.com/images/character-profiles/square/Wii-Fit-Trainer-F-Profile-Square.png" width="64" height="64"/>
+    </div>
+    <div class="set-names px-2">
+        <small>
+            <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player1"/>
+        </small>
+        <small>
+            <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player2"/>
+        </small>
+    </div>
+    <a class="btn btn-danger btn-sm w-50 m-auto" asp-controller="Set" asp-action="Fight" asp-route-setID="@Model.Set.ID">Fight</a>
+</div>
+
+<!--OLD-->
+<div class="detail-card" hidden>
     @if(Model.UserIsPlaying)
     {
         <div class="flex align-center-i justify-center">
             <img src="@Model.OpponentProfilePic" width="64" height="64"/>
             <div class="flex wrap">
                 <p class="padding-left-10">
-                    <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player1" />
+                    <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player1"/>
                 </p>
                 <p class="padding-left-10">
                     <em>vs</em>
                 </p>
                 <p class="padding-left-10">
-                    <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player2" />
+                    <partial name="~/Views/User/Partials/LeagueUserLink.cshtml" model="@Model.Set.Player2"/>
                 </p>
             </div>
         </div>
