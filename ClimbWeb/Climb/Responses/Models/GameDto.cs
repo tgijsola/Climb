@@ -10,11 +10,15 @@ namespace Climb.Responses.Models
         public string Name { get; }
         public CharacterDto[] Characters { get; }
         public StageDto[] Stages { get; }
+        public int CharactersPerMatch { get; }
+        public bool HasStages { get; }
 
-        private GameDto(int id, string name, CharacterDto[] characters, StageDto[] stages)
+        private GameDto(Game game, CharacterDto[] characters, StageDto[] stages)
         {
-            ID = id;
-            Name = name;
+            ID = game.ID;
+            Name = game.Name;
+            CharactersPerMatch = game.CharactersPerMatch;
+            HasStages = game.HasStages;
             Characters = characters;
             Stages = stages;
         }
@@ -24,7 +28,7 @@ namespace Climb.Responses.Models
             var characters = game.Characters.Select(c => CharacterDto.Create(c, cdnService)).ToArray();
             var stages = game.Stages.Select(s => new StageDto(s.ID, s.Name)).ToArray();
 
-            return new GameDto(game.ID, game.Name, characters, stages);
+            return new GameDto(game, characters, stages);
         }
     }
 }

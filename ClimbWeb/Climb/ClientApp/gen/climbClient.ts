@@ -1725,6 +1725,8 @@ export class GameDto implements IGameDto {
     name?: string | undefined;
     characters?: CharacterDto[] | undefined;
     stages?: StageDto[] | undefined;
+    charactersPerMatch!: number;
+    hasStages!: boolean;
 
     constructor(data?: IGameDto) {
         if (data) {
@@ -1749,6 +1751,8 @@ export class GameDto implements IGameDto {
                 for (let item of data["stages"])
                     this.stages.push(StageDto.fromJS(item));
             }
+            this.charactersPerMatch = data["charactersPerMatch"];
+            this.hasStages = data["hasStages"];
         }
     }
 
@@ -1773,6 +1777,8 @@ export class GameDto implements IGameDto {
             for (let item of this.stages)
                 data["stages"].push(item.toJSON());
         }
+        data["charactersPerMatch"] = this.charactersPerMatch;
+        data["hasStages"] = this.hasStages;
         return data; 
     }
 }
@@ -1782,6 +1788,8 @@ export interface IGameDto {
     name?: string | undefined;
     characters?: CharacterDto[] | undefined;
     stages?: StageDto[] | undefined;
+    charactersPerMatch: number;
+    hasStages: boolean;
 }
 
 export class CharacterDto implements ICharacterDto {
