@@ -70,14 +70,17 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         const canSubmit = set.player1Score !== set.player2Score;
 
         return (
-            <div>
+            <div className="pb-4">
                 <SetDetails set={set} player1={player1} player2={player2}/>
                 <SetCount set={set}/>
 
-                <div className="card-deck">{matches}</div>
-                <div className="match-summary-buttons">
-                    <button disabled={!canSubmit} onClick={this.onSubmit}>Submit</button>
-                    <button onClick={this.onAddMatch}>Add Match</button>
+                <div>
+                    <div className="card-deck">{matches}</div>
+                    <button id="add-button" className="btn btn-primary" onClick={this.onAddMatch}>Add Match</button>
+                </div>
+
+                <div className="d-flex justify-content-end">
+                    <button id="submit-button" className="btn btn-danger mt-4" disabled={!canSubmit} onClick={this.onSubmit}>Submit</button>
                 </div>
             </div>
         );
