@@ -3,7 +3,7 @@
 import { ClimbClient } from "../gen/climbClient";
 
 interface IMatchEditProps {
-    game: ClimbClient.Game;
+    game: ClimbClient.GameDto;
     match: ClimbClient.MatchDto;
     onEdit: (match: ClimbClient.MatchDto) => void;
     onCancel: () => void;

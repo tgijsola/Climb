@@ -9,7 +9,7 @@ import { SetCount } from "./SetCount";
 interface ISetSubmitState {
     set: ClimbClient.SetDto | null;
     selectedMatch: ClimbClient.MatchDto | null;
-    game: ClimbClient.Game | null;
+    game: ClimbClient.GameDto | null;
     player1: ClimbClient.LeagueUserDto | null;
     player2: ClimbClient.LeagueUserDto | null;
 }
@@ -74,7 +74,7 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
                 <SetDetails set={set} player1={player1} player2={player2}/>
                 <SetCount set={set}/>
 
-                <div>{matches}</div>
+                <div className="card-deck">{matches}</div>
                 <div className="match-summary-buttons">
                     <button disabled={!canSubmit} onClick={this.onSubmit}>Submit</button>
                     <button onClick={this.onAddMatch}>Add Match</button>
