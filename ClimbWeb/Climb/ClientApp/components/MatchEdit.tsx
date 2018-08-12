@@ -5,6 +5,8 @@ import { ClimbClient } from "../gen/climbClient";
 interface IMatchEditProps {
     game: ClimbClient.GameDto;
     match: ClimbClient.MatchDto;
+    player1Name: string;
+    player2Name: string;
     onEdit: (match: ClimbClient.MatchDto) => void;
     onCancel: () => void;
     onDelete: () => void;
@@ -48,20 +50,20 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                 </div>
 
                 <h3>Match {match.index + 1}</h3>
-                {this.renderPlayerInputs(1, characters, match.player1Characters, game.charactersPerMatch)}
+                {this.renderPlayerInputs(1, this.props.player1Name, characters, match.player1Characters, game.charactersPerMatch)}
                 <hr/>
-                {this.renderPlayerInputs(2, characters, match.player2Characters, game.charactersPerMatch)}
+                {this.renderPlayerInputs(2, this.props.player2Name, characters, match.player2Characters, game.charactersPerMatch)}
                 {stageInput}
 
                 <div className="d-flex justify-content-between">
-                    <button className="btn btn-secondary btn-md" onClick={this.props.onCancel}>Cancel</button>
+                    <button className="btn btn-secondary" onClick={this.props.onCancel}>Cancel</button>
                     <button className="btn btn-primary" disabled={!canOk} onClick={() => this.props.onEdit(this.state.match)}>Ok</button>
                 </div>
             </div>
         );
     }
 
-    private renderPlayerInputs(playerNumber: number, characters: any, characterValues: number[], characterCount: number) {
+    private renderPlayerInputs(playerNumber: number, playerName: string, characters: JSX.Element[], characterValues: number[], characterCount: number) {
         const match = this.state.match;
         const score = playerNumber === 1 ? match.player1Score : match.player2Score;
         
@@ -78,7 +80,7 @@ export class MatchEdit extends React.Component<IMatchEditProps, IMatchEditState>
                 <div className="form-group row">
                     <label className="col-form-label col-4 text-right">Player {playerNumber}</label>
                     <div className="col-8">
-                        <input type="text" readOnly className="form-control" value="Steve" />
+                        <input type="text" readOnly className="form-control" value={playerName} />
                     </div>
                 </div>
 
