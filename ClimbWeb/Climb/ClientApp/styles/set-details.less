@@ -1,27 +1,47 @@
-﻿// Move all common detail styles to site.less
+﻿@import "vars.less";
+// Move all common detail styles to site.less
 
 .set-container {
-    min-width: 300px;
-    max-width: 400px;
     display: flex;
     flex-direction: column;
-    background-color: whitesmoke;
+    background-color: @color-light;
+    border-bottom: 1px solid @color-dark;
+}
+
+.set-container:first-of-type  {
+    border-top: 1px solid @color-darker;
+}
+
+.set-container:last-of-type {
+    border-bottom: none;
 }
 
 .set-details {
-    border-bottom: solid 1px black;
-}
-
-.set-pictures {
-    display: flex;
-    justify-content: space-around;
+    color: @color-darker;
+    background-color: @color-med;
+    padding: 5px 0;
 }
 
 .set-vs {
-    align-self: flex-end;
+    color: @color-darker;
+    font-size: 1.5rem;
+    flex-grow: 1;
 }
 
 .set-names {
     display: flex;
     justify-content: space-between;
+}
+
+.btn-fight {
+    color: #ffb;
+    background-color: @color-accent;
+}
+
+.btn-fight:hover {
+    color: white;
+}
+
+.btn-fight:active {
+    color: black;
 }
