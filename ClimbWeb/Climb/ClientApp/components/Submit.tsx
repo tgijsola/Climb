@@ -56,6 +56,8 @@ export class Submit extends React.Component<RouteComponentProps<any>, ISetSubmit
         if (this.state.selectedMatch != null) {
             return <MatchEdit match={this.state.selectedMatch}
                               game={game}
+                              player1Name={player1.username}
+                              player2Name={player2.username}
                               onEdit={this.onMatchEdited}
                               onCancel={this.onMatchCancelled}
                               onDelete={this.onMatchDelete}/>;
