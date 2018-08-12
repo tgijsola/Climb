@@ -1,23 +1,44 @@
 ﻿using Climb.Models;
 using Climb.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Climb.ViewModels.Leagues
 {
     public class LeagueUserViewModel
     {
         public LeagueUser LeagueUser { get; }
-        public string ProfilePic { get; }
+        public string Title { get; }
+        public string TitleLink { get; }
+        public string Picture { get; }
 
-        private LeagueUserViewModel(LeagueUser leagueUser, string profilePic)
+        private LeagueUserViewModel(LeagueUser leagueUser, string title, string titleLink, string picture)
         {
             LeagueUser = leagueUser;
-            ProfilePic = profilePic;
+            Picture = picture;
+            TitleLink = titleLink;
+            Title = title;
         }
 
-        public static LeagueUserViewModel Create(LeagueUser leagueUser, ICdnService cdnService)
+        public static LeagueUserViewModel Create(LeagueUser leagueUser, ICdnService cdnService, bool showUser, IUrlHelper urlHelper)
         {
-            var profilePic = leagueUser.User.GetProfilePicUrl(cdnService);
-            return new LeagueUserViewModel(leagueUser, profilePic);
+            string title;
+            string titleLink;
+            string picture;
+
+            if(showUser)
+            {
+                title = leagueUser.DisplayName;
+                titleLink = urlHelper.Action("Home", "User", new {leagueUser.UserID});
+                picture = leagueUser.User.GetProfilePicUrl(cdnService);
+            }
+            else
+            {
+                title = leagueUser.League.Name;
+                titleLink = urlHelper.Action("Home", "League", new {leagueUser.LeagueID});
+                picture = "https://pbs.twimg.com/profile_images/697220635198689285/T34coLzR_400x400.png";
+            }
+
+            return new LeagueUserViewModel(leagueUser, title, titleLink, picture);
         }
     }
 }
