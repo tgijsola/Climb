@@ -99,7 +99,7 @@ namespace Climb.Services.ModelServices
             return imageUrl;
         }
 
-        public async Task UpdateSettings(string userID, string username, IFormFile profilePic)
+        public async Task UpdateSettings(string userID, string username, string name, IFormFile profilePic)
         {
             var user = await dbContext.Users
                 .Include(u => u.LeagueUsers)
@@ -112,6 +112,7 @@ namespace Climb.Services.ModelServices
             dbContext.UpdateRange(user.LeagueUsers);
 
             user.UserName = username;
+            user.Name = name;
             foreach(var leagueUser in user.LeagueUsers)
             {
                 leagueUser.DisplayName = username;
