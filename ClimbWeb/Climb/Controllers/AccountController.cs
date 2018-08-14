@@ -97,7 +97,7 @@ namespace Climb.Controllers
             var user = await GetViewUserAsync();
 
             // TODO: Handle errors.
-            await applicationUserService.UpdateSettings(user.Id, request.Username, request.ProfilePic);
+            await applicationUserService.UpdateSettings(user.Id, request.Username, request.Name, request.ProfilePic);
 
             return RedirectToAction("Settings");
         }

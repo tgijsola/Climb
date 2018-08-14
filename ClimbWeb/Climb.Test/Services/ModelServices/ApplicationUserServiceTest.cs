@@ -125,15 +125,17 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public async Task UpdateSettings_NewUsername_UpdateUsername()
+        public async Task UpdateSettings_NewValues_ValuesUpdated()
         {
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
             const string username = "bob";
+            const string name = "ted";
             var file = Substitute.For<IFormFile>();
 
-            await testObj.UpdateSettings(user.Id, username, file);
+            await testObj.UpdateSettings(user.Id, username, name, file);
 
             Assert.AreEqual(username, user.UserName);
+            Assert.AreEqual(name, user.Name);
         }
 
         [Test]
@@ -141,7 +143,7 @@ namespace Climb.Test.Services.ModelServices
         {
             var file = Substitute.For<IFormFile>();
 
-            Assert.ThrowsAsync<NotFoundException>(() => testObj.UpdateSettings("", "bob", file));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.UpdateSettings("", "bob", "", file));
         }
 
         [Test]
@@ -150,7 +152,7 @@ namespace Climb.Test.Services.ModelServices
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
             var file = Substitute.For<IFormFile>();
 
-            await testObj.UpdateSettings(user.Id, "bob", file);
+            await testObj.UpdateSettings(user.Id, "bob", "", file);
 
 #pragma warning disable 4014
             cdnService.Received(1).UploadImageAsync(file, ClimbImageRules.ProfilePic);
@@ -162,7 +164,7 @@ namespace Climb.Test.Services.ModelServices
         {
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
 
-            await testObj.UpdateSettings(user.Id, "bob", null);
+            await testObj.UpdateSettings(user.Id, "bob", "", null);
 
 #pragma warning disable 4014
             cdnService.DidNotReceiveWithAnyArgs().UploadImageAsync(null, null);
@@ -176,7 +178,7 @@ namespace Climb.Test.Services.ModelServices
             var leagueUser = LeagueUtility.AddUsersToLeague(league, 1, dbContext)[0];
             const string newDisplayName = "bob";
 
-            await testObj.UpdateSettings(leagueUser.UserID, newDisplayName, null);
+            await testObj.UpdateSettings(leagueUser.UserID, newDisplayName, "", null);
 
             Assert.AreEqual(newDisplayName, leagueUser.DisplayName);
         }
