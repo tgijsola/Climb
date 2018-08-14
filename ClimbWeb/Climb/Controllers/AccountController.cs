@@ -70,7 +70,7 @@ namespace Climb.Controllers
             }
             catch(Exception exception)
             {
-                return new BadRequestResult();
+                return GetExceptionResult(exception, request);
             }
         }
 
