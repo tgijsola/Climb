@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Climb.Test.Services.ModelServices
 {
@@ -25,6 +26,7 @@ namespace Climb.Test.Services.ModelServices
         private ApplicationDbContext dbContext;
         private ICdnService cdnService;
         private FakeUserManager userManager;
+        private ISignInManager signInManager;
 
         [SetUp]
         public void SetUp()
@@ -38,23 +40,16 @@ namespace Climb.Test.Services.ModelServices
             var emailSender = Substitute.For<IEmailSender>();
             var tokenHelper = Substitute.For<ITokenHelper>();
             var urlUtility = Substitute.For<IUrlUtility>();
-            var signInManager = new FakeSignInManager();
+            signInManager = Substitute.For<ISignInManager>();
             userManager = Substitute.For<FakeUserManager>();
 
             testObj = new ApplicationUserService(dbContext, cdnService, signInManager, emailSender, configuration, tokenHelper, urlUtility, userManager);
         }
 
         [Test]
-        public void LogIn_NoUser_NotFoundException()
+        public void LogIn_WrongPassword_BadRequestException()
         {
-            var request = new LoginRequest();
-
-            Assert.ThrowsAsync<BadRequestException>(() => testObj.LogIn(request));
-        }
-
-        [Test]
-        public void LogIn_WrongPassword_NotFoundException()
-        {
+            signInManager.PasswordSignInAsync("", "", false, false).ReturnsForAnyArgs(SignInResult.Failed);
             const string email = "user@test.com";
             DbContextUtility.AddNew<ApplicationUser>(dbContext, u => u.Email = email);
             var request = new LoginRequest {Email = email};
@@ -70,6 +65,19 @@ namespace Climb.Test.Services.ModelServices
             var urlHelper = Substitute.For<IUrlHelper>();
 
             Assert.ThrowsAsync<BadRequestException>(() => testObj.Register(request, urlHelper, ""));
+        }
+
+        [Test]
+        public async Task Register_Valid_SetValues()
+        {
+            userManager.CreateAsync(null, null).ReturnsForAnyArgs(IdentityResult.Success);
+            const string name = "bob";
+            var request = new RegisterRequest {Name = name};
+            var urlHelper = Substitute.For<IUrlHelper>();
+
+            var user = await testObj.Register(request, urlHelper, "");
+
+            Assert.AreEqual(name, user.Name);
         }
 
         [Test]
