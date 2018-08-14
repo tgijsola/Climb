@@ -19,13 +19,13 @@ namespace Climb.Test.Controllers
     {
         private AccountApi testObj;
         private FakeUserManager userManager;
-        private FakeSignInManager signInManager;
+        private ISignInManager signInManager;
 
         [SetUp]
         public void SetUp()
         {
             userManager = Substitute.For<FakeUserManager>();
-            signInManager = Substitute.For<FakeSignInManager>();
+            signInManager = Substitute.For<ISignInManager>();
             var logger = Substitute.For<ILogger<AccountApi>>();
             var tokenHelper = Substitute.For<ITokenHelper>();
             var applicationUserService = Substitute.For<IApplicationUserService>();

@@ -17,14 +17,14 @@ namespace Climb.Services.ModelServices
     {
         private readonly ApplicationDbContext dbContext;
         private readonly ICdnService cdnService;
-        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly ISignInManager signInManager;
         private readonly IEmailSender emailSender;
         private readonly IConfiguration configuration;
         private readonly ITokenHelper tokenHelper;
         private readonly IUrlUtility urlUtility;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public ApplicationUserService(ApplicationDbContext dbContext, ICdnService cdnService, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, UserManager<ApplicationUser> userManager)
+        public ApplicationUserService(ApplicationDbContext dbContext, ICdnService cdnService, ISignInManager signInManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, UserManager<ApplicationUser> userManager)
         {
             this.dbContext = dbContext;
             this.cdnService = cdnService;
@@ -42,6 +42,7 @@ namespace Climb.Services.ModelServices
             {
                 UserName = request.Username,
                 Email = request.Email,
+                Name = request.Name,
             };
             var result = await userManager.CreateAsync(user, request.Password);
             if(result.Succeeded)
