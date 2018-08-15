@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -17,6 +17,7 @@ namespace Climb.Controllers
 {
     public class AccountController : BaseController<AccountController>
     {
+        public const string EmailKey = "Email";
         private const string LoginFail = "LoginFail";
         private readonly IApplicationUserService applicationUserService;
         private readonly ISignInManager signInManager;
@@ -118,6 +119,11 @@ namespace Climb.Controllers
                 return RedirectToAction("Home", "User", new {userID = user.Id});
             }
 
+            if(TempData.ContainsKey(EmailKey))
+            {
+                ViewData[EmailKey] = TempData[EmailKey];
+            }
+
             var viewModel = new BaseViewModel(null);
             return View(viewModel);
         }
@@ -138,6 +144,8 @@ namespace Climb.Controllers
 
                 await emailSender.SendEmailAsync(email, "Password Reset", builder.ToString());
             }
+
+            TempData[EmailKey] = email;
 
             return RedirectToAction("ForgotPassword");
         }
