@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -33,11 +33,13 @@ namespace Climb.Controllers
             this.emailSender = emailSender;
         }
 
+        [HttpGet("account/register")]
         public IActionResult Register()
         {
             return View();
         }
 
+        [HttpGet("account/login")]
         public IActionResult LogIn()
         {
             if(TempData.ContainsKey(LoginFail))
