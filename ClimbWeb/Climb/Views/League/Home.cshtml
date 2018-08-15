@@ -33,7 +33,7 @@
     <h3>Members</h3>
     @foreach(var member in Model.Members)
     {
-        <partial name="./Partials/LeagueUser" model="@LeagueUserViewModel.Create(member, cdnService)"/>
+        <partial name="./Partials/LeagueUser" model="@LeagueUserViewModel.Create(member, cdnService, true, Url)"/>
     }
     
     <h3>Seasons</h3>

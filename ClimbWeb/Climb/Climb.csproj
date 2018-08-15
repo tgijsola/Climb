@@ -11,23 +11,6 @@
     <StartupObject />
   </PropertyGroup>
 
-    <ItemGroup>
-      <Content Remove="Views\Account\LogIn.cshtml" />
-      <Content Remove="Views\Account\Register.cshtml" />
-      <Content Remove="Views\Account\Settings.cshtml" />
-      <Content Remove="Views\Game\CharacterAdd.cshtml" />
-      <Content Remove="Views\Game\Index.cshtml" />
-      <Content Remove="Views\Game\StageAdd.cshtml" />
-      <Content Remove="Views\League\Index.cshtml" />
-      <Content Remove="Views\Season\Home.cshtml" />
-      <Content Remove="Views\Site\Home.cshtml" />
-      <Content Remove="Views\League\Home.cshtml" />
-      <Content Remove="Views\Game\Home.cshtml" />
-      <Content Remove="Views\Site\Support.cshtml" />
-      <Content Remove="Views\User\Home.cshtml" />
-      <Content Remove="Views\User\Partials\LeagueUser.cshtml" />
-    </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.20" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -42,11 +25,11 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" PrivateAssets="All" />
-        <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.1" />
+        <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
+        <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.1" />
         <PackageReference Include="morelinq" Version="2.10.0" />
-        <PackageReference Include="NSwag.AspNetCore" Version="11.17.18" />
+        <PackageReference Include="NSwag.AspNetCore" Version="11.18.3" />
         <PackageReference Include="Sendgrid" Version="9.9.0" />
     </ItemGroup>
 
@@ -62,6 +45,8 @@
     <None Include="Views\Game\CharacterAdd.cshtml" />
     <None Include="Views\Game\Index.cshtml" />
     <None Include="Views\League\Index.cshtml" />
+    <None Include="Views\Organization\Home.cshtml" />
+    <None Include="Views\Organization\Index.cshtml" />
     <None Include="Views\Season\Home.cshtml" />
     <None Include="Views\Site\Support.cshtml" />
     <None Include="Views\Site\Home.cshtml" />
@@ -75,6 +60,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Update="Views\Account\ResetPassword.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Account\ForgotPassword.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Season\Partials\SeasonParticipant.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
@@ -87,10 +78,14 @@
     <Content Update="Views\Shared\_LayoutWithNavbar.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\User\Partials\LeagueUserLink.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\images\logo\" />
+    <Folder Include="wwwroot\temp\cdn\character-pics\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -119,6 +114,6 @@
     <TypeScriptOutFile />
   </PropertyGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties package_1json__JSONSchema="http://json.schemastore.org/project" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="http://json.schemastore.org/bowerrc" package_1json__JSONSchema="http://json.schemastore.org/project" /></VisualStudio></ProjectExtensions>
 
 </Project>

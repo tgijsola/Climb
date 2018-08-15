@@ -11,6 +11,8 @@ namespace Climb.ViewModels
         public IReadOnlyList<League> UserActiveLeagues { get; }
         public IReadOnlyList<Season> UserActiveSeasons { get; }
 
+        public bool IsLoggedIn => User != null;
+
         public BaseViewModel(ApplicationUser user)
         {
             User = user;

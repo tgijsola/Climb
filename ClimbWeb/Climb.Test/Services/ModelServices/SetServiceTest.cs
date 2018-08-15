@@ -121,7 +121,7 @@ namespace Climb.Test.Services.ModelServices
             var league = LeagueUtility.CreateLeague(dbContext);
             var challenged = LeagueUtility.AddUsersToLeague(league, 1, dbContext)[0];
 
-            Assert.ThrowsAsync<NotFoundException>(() => testObj.RequestSetAsync(0, challenged.ID));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.RequestSetAsync(0, challenged.ID, null));
         }
 
         [Test]
@@ -130,13 +130,7 @@ namespace Climb.Test.Services.ModelServices
             var league = LeagueUtility.CreateLeague(dbContext);
             var requester = LeagueUtility.AddUsersToLeague(league, 1, dbContext)[0];
 
-            Assert.ThrowsAsync<NotFoundException>(() => testObj.RequestSetAsync(requester.ID, 0));
-        }
-
-        [Test]
-        public void RespondToSetRequestAsync_NoRequest_NotFoundException()
-        {
-            Assert.ThrowsAsync<NotFoundException>(() => testObj.RespondToSetRequestAsync(0, false));
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.RequestSetAsync(requester.ID, 0, null));
         }
 
         [Test]
@@ -147,7 +141,7 @@ namespace Climb.Test.Services.ModelServices
             var requester = league.Members[0];
             var challenged = league.Members[1];
 
-            var request = await testObj.RequestSetAsync(requester.ID, challenged.ID);
+            var request = await testObj.RequestSetAsync(requester.ID, challenged.ID, null);
 
             Assert.AreEqual(DateTime.Today.ToShortDateString(), request.DateCreated.ToShortDateString());
         }
@@ -160,9 +154,15 @@ namespace Climb.Test.Services.ModelServices
             var requester = league.Members[0];
             var challenged = league.Members[1];
 
-            var request = await testObj.RequestSetAsync(requester.ID, challenged.ID);
+            var request = await testObj.RequestSetAsync(requester.ID, challenged.ID, null);
 
             Assert.AreEqual(league.ID, request.LeagueID);
+        }
+
+        [Test]
+        public void RespondToSetRequestAsync_NoRequest_NotFoundException()
+        {
+            Assert.ThrowsAsync<NotFoundException>(() => testObj.RespondToSetRequestAsync(0, false));
         }
 
         [Test]

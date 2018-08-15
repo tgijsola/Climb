@@ -92,18 +92,37 @@ namespace Climb.Test.Services.ModelServices
         {
             var league = LeagueUtility.CreateLeague(dbContext);
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
-
-            var oldLeagueUser = new LeagueUser(league.ID, user.Id)
-            {
-                HasLeft = true
-            };
-            dbContext.LeagueUsers.Add(oldLeagueUser);
-            dbContext.SaveChanges();
+            LeagueUser oldLeagueUser = CreateOldLeagueUser(league, user);
 
             var leagueUser = await testObj.Join(league.ID, user.Id);
 
             Assert.IsFalse(leagueUser.HasLeft);
             Assert.AreEqual(oldLeagueUser.ID, leagueUser.ID);
+        }
+
+        [Test]
+        public async Task Join_NewUser_UpdateDisplayName()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext, u => u.UserName = "bob");
+
+            var leagueUser = await testObj.Join(league.ID, user.Id);
+
+            Assert.AreEqual(user.UserName, leagueUser.DisplayName);
+        }
+
+        [Test]
+        public async Task Join_OldUser_UpdateDisplayName()
+        {
+            var league = LeagueUtility.CreateLeague(dbContext);
+            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext, u => u.UserName = "bob");
+            CreateOldLeagueUser(league, user);
+            user.UserName = "bob";
+            dbContext.Update(user);
+            dbContext.SaveChanges();
+
+            var leagueUser = await testObj.Join(league.ID, user.Id);
+            Assert.AreEqual(user.UserName, leagueUser.DisplayName);
         }
 
         [Test]
@@ -222,6 +241,7 @@ namespace Climb.Test.Services.ModelServices
             Assert.AreEqual(-deltaPoints, snapshot.DeltaPoints, "Delta Points");
         }
 
+        #region Helpers
         private Season CreateSeason(int memberCount)
         {
             var league = CreateLeague(memberCount);
@@ -246,7 +266,7 @@ namespace Climb.Test.Services.ModelServices
         private void CreateSets(League league, Season season)
         {
             var firstMember = league.Members[0];
-            for(var i = 1; i < league.Members.Count; i++)
+            for (var i = 1; i < league.Members.Count; i++)
             {
                 var nextMember = league.Members[i].ID;
                 var set = SetUtility.Create(dbContext, firstMember.ID, nextMember, league.ID, season);
@@ -255,5 +275,14 @@ namespace Climb.Test.Services.ModelServices
                 set.Player2Score = 1;
             }
         }
+
+        private LeagueUser CreateOldLeagueUser(League league, ApplicationUser user)
+        {
+            var oldLeagueUser = new LeagueUser(league.ID, user.Id) { HasLeft = true };
+            dbContext.LeagueUsers.Add(oldLeagueUser);
+            dbContext.SaveChanges();
+            return oldLeagueUser;
+        } 
+        #endregion
     }
 }

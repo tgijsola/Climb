@@ -21,7 +21,7 @@ namespace Climb.Services.ModelServices
             this.seasonService = seasonService;
         }
 
-        public async Task<SetRequest> RequestSetAsync(int requesterID, int challengedID)
+        public async Task<SetRequest> RequestSetAsync(int requesterID, int challengedID, string message)
         {
             if (!await dbContext.LeagueUsers.AnyAsync(lu => lu.ID == requesterID))
             {
@@ -42,6 +42,7 @@ namespace Climb.Services.ModelServices
                 RequesterID = requesterID,
                 ChallengedID = challengedID,
                 DateCreated = DateTime.Now,
+                Message = message,
             };
             dbContext.Add(setRequest);
             await dbContext.SaveChangesAsync();

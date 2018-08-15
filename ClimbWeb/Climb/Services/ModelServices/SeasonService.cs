@@ -115,6 +115,7 @@ namespace Climb.Services.ModelServices
             var setWins = new Dictionary<int, List<int>>();
             foreach(var participant in season.Participants)
             {
+                participant.TieBreakerPoints = 0;
                 setWins.Add(participant.ID, new List<int>());
             }
 
@@ -128,26 +129,32 @@ namespace Climb.Services.ModelServices
             season.Participants.Sort();
 
             var currentPoints = -1;
-            var tiedParticipants = new Dictionary<IParticipant, ParticipantRecord>();
+            var tiedParticipants = new Dictionary<int, Dictionary<IParticipant, ParticipantRecord>>();
             foreach(var seasonLeagueUser in season.Participants)
             {
                 if(seasonLeagueUser.Points != currentPoints)
                 {
-                    if(tiedParticipants.Count > 1)
-                    {
-                        foreach(var participantRecord in tiedParticipants)
-                        {
-                            participantRecord.Value.AddWins(setWins[participantRecord.Key.ID]);
-                        }
-                    }
-
-                    tieBreaker.Break(tiedParticipants);
+                    currentPoints = seasonLeagueUser.Points;
+                    tiedParticipants.Add(currentPoints, new Dictionary<IParticipant, ParticipantRecord>());
                 }
 
-                currentPoints = seasonLeagueUser.Points;
-                tiedParticipants.Clear();
                 var record = new ParticipantRecord(seasonLeagueUser.LeagueUser.Points, seasonLeagueUser.LeagueUser.JoinDate);
-                tiedParticipants.Add(seasonLeagueUser, record);
+                tiedParticipants[currentPoints].Add(seasonLeagueUser, record);
+            }
+
+            foreach(var tiedParticipantGroup in tiedParticipants)
+            {
+                if(tiedParticipantGroup.Value.Count <= 1)
+                {
+                    continue;
+                }
+
+                foreach(var participantRecord in tiedParticipantGroup.Value)
+                {
+                    participantRecord.Value.AddWins(setWins[participantRecord.Key.ID]);
+                }
+
+                tieBreaker.Break(tiedParticipantGroup.Value);
             }
         }
 
@@ -155,7 +162,10 @@ namespace Climb.Services.ModelServices
         {
             dbContext.UpdateRange(season.Participants);
 
-            var sortedParticipants = season.Participants.OrderByDescending(slu => slu.Points).ToArray();
+            var sortedParticipants = season.Participants
+                .OrderByDescending(slu => slu.Points)
+                .ThenByDescending(slu => slu.TieBreakerPoints)
+                .ToArray();
 
             var rank = 1;
             var lastPoints = -1;

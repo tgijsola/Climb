@@ -21,7 +21,7 @@ namespace Climb.Data
 {
     public static class DataMigrator
     {
-        private static readonly Dictionary<string, string> applicationUserIDs = new Dictionary<string, string>();
+        private static readonly Dictionary<string, (string id, string name)> applicationUserIDs = new Dictionary<string, (string id, string name)>();
         private static readonly Dictionary<int, int> gameIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> characterIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> leagueIDs = new Dictionary<int, int>();
@@ -95,7 +95,7 @@ namespace Climb.Data
 
             for(var i = 0; i < users.Length; i++)
             {
-                applicationUserIDs[v1Users[i].ApplicationUser.Id] = users[i].Id;
+                applicationUserIDs[v1Users[i].ApplicationUser.Id] = (users[i].Id, users[i].UserName);
             }
         }
 
@@ -235,10 +235,13 @@ namespace Climb.Data
             for(var i = 0; i < oldLeagueUsers.Length; i++)
             {
                 var oldLeagueUser = oldLeagueUsers[i];
+                var (oldUserID, oldUsername) = applicationUserIDs[oldLeagueUser.User.ApplicationUser.Id];
+
                 leagueUsers[i] = new LeagueUser
                 {
                     LeagueID = leagueIDs[oldLeagueUser.LeagueID],
-                    UserID = applicationUserIDs[oldLeagueUser.User.ApplicationUser.Id],
+                    UserID = oldUserID,
+                    DisplayName = oldUsername,
                     HasLeft = oldLeagueUser.HasLeft,
                     Rank = oldLeagueUser.Rank,
                     Points = oldLeagueUser.Points,

@@ -54,7 +54,10 @@ namespace Climb.Services.ModelServices
                 throw new NotFoundException(typeof(League), leagueID);
             }
 
-            if(!await dbContext.Users.AnyAsync(u => u.Id == userID))
+            var user = await dbContext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userID);
+            if(user == null)
             {
                 throw new NotFoundException(typeof(ApplicationUser), userID);
             }
@@ -71,6 +74,8 @@ namespace Climb.Services.ModelServices
                 leagueUser = new LeagueUser(leagueID, userID) {JoinDate = DateTime.UtcNow};
                 dbContext.Add(leagueUser);
             }
+
+            leagueUser.DisplayName = user.UserName;
 
             await dbContext.SaveChangesAsync();
 

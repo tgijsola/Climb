@@ -6,7 +6,6 @@ using Climb.Requests.Games;
 using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.ViewModels.Games;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,7 +17,7 @@ namespace Climb.Controllers
         private readonly IGameService gameService;
         private readonly ICdnService cdnService;
 
-        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger, UserManager<ApplicationUser> userManager, ICdnService cdnService)
+        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger, IUserManager userManager, ICdnService cdnService)
             : base(logger, userManager, dbContext)
         {
             this.gameService = gameService;

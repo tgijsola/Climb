@@ -10,6 +10,7 @@ namespace Climb.Models
     {
         public int ID { get; set; }
         public int GameID { get; set; }
+        public int? OrganizationID { get; set; }
         [Required]
         public string Name { get; set; } = "";
         public int SetsTillRank { get; set; } = 4;
@@ -25,6 +26,7 @@ namespace Climb.Models
         [JsonIgnore]
         public List<Set> Sets { get; set; }
         public ApplicationUser Admin { get; set; }
+        public Organization Organization { get; set; }
 
         public League()
         {
