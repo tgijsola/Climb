@@ -22,9 +22,9 @@ namespace Climb.Services.ModelServices
         private readonly IConfiguration configuration;
         private readonly ITokenHelper tokenHelper;
         private readonly IUrlUtility urlUtility;
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly IUserManager userManager;
 
-        public ApplicationUserService(ApplicationDbContext dbContext, ICdnService cdnService, ISignInManager signInManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, UserManager<ApplicationUser> userManager)
+        public ApplicationUserService(ApplicationDbContext dbContext, ICdnService cdnService, ISignInManager signInManager, IEmailSender emailSender, IConfiguration configuration, ITokenHelper tokenHelper, IUrlUtility urlUtility, IUserManager userManager)
         {
             this.dbContext = dbContext;
             this.cdnService = cdnService;

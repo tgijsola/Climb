@@ -66,6 +66,7 @@ namespace Climb
             services.AddTransient<ISeasonPointCalculator, ParticipationSeasonPointCalculator>();
             services.AddTransient<ITieBreakerFactory, TieBreakerFactory>();
             services.AddTransient<ISignInManager, SignInManager>();
+            services.AddTransient<IUserManager, UserManager>();
 
             services.AddSingleton<IEmailSender, SendGridService>();
         }
