@@ -60,6 +60,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Update="Views\Account\ResetPassword.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Account\ForgotPassword.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Season\Partials\SeasonParticipant.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

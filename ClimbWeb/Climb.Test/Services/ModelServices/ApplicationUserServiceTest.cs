@@ -4,7 +4,6 @@ using Climb.Exceptions;
 using Climb.Requests.Account;
 using Climb.Services;
 using Climb.Services.ModelServices;
-using Climb.Test.Fakes;
 using Climb.Test.Utilities;
 using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +24,7 @@ namespace Climb.Test.Services.ModelServices
         private ApplicationUserService testObj;
         private ApplicationDbContext dbContext;
         private ICdnService cdnService;
-        private FakeUserManager userManager;
+        private IUserManager userManager;
         private ISignInManager signInManager;
 
         [SetUp]
@@ -41,7 +40,7 @@ namespace Climb.Test.Services.ModelServices
             var tokenHelper = Substitute.For<ITokenHelper>();
             var urlUtility = Substitute.For<IUrlUtility>();
             signInManager = Substitute.For<ISignInManager>();
-            userManager = Substitute.For<FakeUserManager>();
+            userManager = Substitute.For<IUserManager>();
 
             testObj = new ApplicationUserService(dbContext, cdnService, signInManager, emailSender, configuration, tokenHelper, urlUtility, userManager);
         }
