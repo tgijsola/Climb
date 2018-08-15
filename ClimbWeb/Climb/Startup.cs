@@ -59,14 +59,16 @@ namespace Climb
             services.AddTransient<ISeasonService, SeasonService>();
             services.AddTransient<ISetService, SetService>();
             services.AddTransient<IOrganizationService, OrganizationService>();
-
-            services.AddSingleton<IEmailSender, SendGridService>();
             services.AddTransient<ITokenHelper, TokenHelper>();
             services.AddTransient<IUrlUtility, UrlUtility>();
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
             services.AddTransient<IPointService, EloPointService>();
             services.AddTransient<ISeasonPointCalculator, ParticipationSeasonPointCalculator>();
             services.AddTransient<ITieBreakerFactory, TieBreakerFactory>();
+            services.AddTransient<ISignInManager, SignInManager>();
+            services.AddTransient<IUserManager, UserManager>();
+
+            services.AddSingleton<IEmailSender, SendGridService>();
         }
 
         private void ConfigureDB(IServiceCollection services)
