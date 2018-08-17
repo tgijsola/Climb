@@ -7,39 +7,48 @@
     Layout = "_LayoutWithNavbar";
 }
 
-<link rel="stylesheet" href="~/dist/game/game-home.css"/>
-
 <div>
-    <h1>@Model.Game.Name</h1>
+    <div class="d-flex justify-content-center">
+        <h1>@Model.Game.Name</h1>
+        <a class="align-self-center ml-2" asp-action="Update">edit</a>
+    </div>
 
-    <div>
+    <div class="container">
         <div class="game-header">
             <h3>Characters</h3>
-            <a asp-action="CharacterAdd">Add</a>
+            <a class="btn btn-danger mb-4" asp-action="CharacterAdd">Add</a>
         </div>
-        @foreach(var character in Model.Game.Characters)
-        {
-            <div>
-                <img src="@cdnService.GetImageUrl(character.ImageKey, ClimbImageRules.CharacterPic)" width="64" height="64"/>
-                <div>@character.Name</div>
-                <a asp-action="CharacterAdd" asp-route-gameid="@Model.Game.ID" asp-route-characterid="@character.ID">edit</a>
-            </div>
-        }
+        <div class="card-group">
+            @foreach(var character in Model.Game.Characters)
+            {
+                <div class="col-sm-3 pb-4">
+                    <div class="card">
+                            <h6 class="card-header">@character.Name</h6>
+                        <div class="card-body">
+                            <img src="@cdnService.GetImageUrl(character.ImageKey, ClimbImageRules.CharacterPic)" width="64" height="64" />
+                        </div>
+                        <div class="card-footer">
+                            <a asp-action="CharacterAdd" asp-route-gameid="@Model.Game.ID" asp-route-characterid="@character.ID">edit</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
     @if(Model.Game.HasStages)
     {
-    <div>
-        <div class="game-header">
-            <h3>Stages</h3>
-            <a asp-action="StageAdd">Add</a>
-        </div>
-        @foreach (var stage in Model.Game.Stages)
-        {
-            <div>
-                <div>@stage.Name</div>
-                <a asp-action="StageAdd" asp-route-gameid="@Model.Game.ID" asp-route-stageid="@stage.ID">edit</a>
+        <div>
+            <div class="game-header">
+                <h3>Stages</h3>
+                <a asp-action="StageAdd">Add</a>
             </div>
-        }
-    </div>
+            @foreach(var stage in Model.Game.Stages)
+            {
+                <div>
+                    <div>@stage.Name</div>
+                    <a asp-action="StageAdd" asp-route-gameid="@Model.Game.ID" asp-route-stageid="@stage.ID">edit</a>
+                </div>
+            }
+        </div>
     }
 </div>
