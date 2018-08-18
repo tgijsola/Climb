@@ -41,6 +41,7 @@ namespace Climb.Controllers
         {
             var user = await GetViewUserAsync();
             var league = await dbContext.Leagues
+                .Include(l => l.Game).AsNoTracking()
                 .Include(l => l.Seasons).AsNoTracking()
                 .Include(l => l.Members).ThenInclude(lu => lu.User).AsNoTracking()
                 .FirstOrDefaultAsync(l => l.ID == leagueID);
