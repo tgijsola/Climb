@@ -57,6 +57,9 @@
 
   <PropertyGroup>
     <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
+    <Authors>Steve Yeager</Authors>
+    <Company>Little Byte</Company>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
