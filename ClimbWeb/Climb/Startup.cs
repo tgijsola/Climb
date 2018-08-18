@@ -68,7 +68,14 @@ namespace Climb
             services.AddTransient<ISignInManager, SignInManager>();
             services.AddTransient<IUserManager, UserManager>();
 
-            services.AddSingleton<IEmailSender, SendGridService>();
+            if(string.IsNullOrWhiteSpace(Configuration["Email:Key"]))
+            {
+                services.AddTransient<IEmailSender, NullEmailService>();
+            }
+            else
+            {
+                services.AddTransient<IEmailSender, SendGridService>();
+            }
         }
 
         private void ConfigureDB(IServiceCollection services)
