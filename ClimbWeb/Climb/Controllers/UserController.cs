@@ -30,7 +30,7 @@ namespace Climb.Controllers
             }
 
             var user = await dbContext.Users
-                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).AsNoTracking()
+                .Include(u => u.LeagueUsers).ThenInclude(lu => lu.League).ThenInclude(l => l.Game).AsNoTracking().AsNoTracking()
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P1Sets).ThenInclude(s => s.Matches).ThenInclude(m => m.MatchCharacters).AsNoTracking()
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P1Sets).ThenInclude(s => s.Player1).ThenInclude(lu => lu.User).AsNoTracking()
                 .Include(u => u.LeagueUsers).ThenInclude(lu => lu.P1Sets).ThenInclude(s => s.Player2).ThenInclude(lu => lu.User).AsNoTracking()

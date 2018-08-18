@@ -106,6 +106,8 @@ namespace Climb.Migrations
 
                     b.Property<bool>("HasStages");
 
+                    b.Property<string>("LogoImageKey");
+
                     b.Property<int>("MaxMatchPoints");
 
                     b.Property<string>("Name")
