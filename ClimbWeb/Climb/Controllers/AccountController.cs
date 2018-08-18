@@ -34,13 +34,20 @@ namespace Climb.Controllers
         }
 
         [HttpGet("account/register")]
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
-            return View();
+            var user = await GetViewUserAsync();
+            if(user != null)
+            {
+                return RedirectToAction("Home", "User", new {userID = user.Id});
+            }
+
+            var viewModel = new BaseViewModel(null);
+            return View(viewModel);
         }
 
         [HttpGet("account/login")]
-        public IActionResult LogIn()
+        public async Task<IActionResult> LogIn()
         {
             if(TempData.ContainsKey(LoginFail))
             {
@@ -48,7 +55,14 @@ namespace Climb.Controllers
                 ViewData[LoginFail] = true;
             }
 
-            return View();
+            var user = await GetViewUserAsync();
+            if(user != null)
+            {
+                return RedirectToAction("Home", "User", new {userID = user.Id});
+            }
+
+            var viewModel = new BaseViewModel(null);
+            return View(viewModel);
         }
 
         [HttpPost("account/login")]
