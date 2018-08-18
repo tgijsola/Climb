@@ -42,13 +42,19 @@ namespace Climb.Controllers
                 return RedirectToAction("Home", "User", new {userID = user.Id});
             }
 
-            var viewModel = new BaseViewModel(null);
+            var viewModel = new RegisterViewModel(null, new RegisterRequest());
             return View(viewModel);
         }
 
         [HttpPost("account/register")]
         public async Task<IActionResult> RegisterPost(RegisterRequest request)
         {
+            if(!ModelState.IsValid)
+            {
+                var viewModel = new RegisterViewModel(null, request);
+                return View("Register", viewModel);
+            }
+
             try
             {
                 await applicationUserService.Register(request, Url, Request.Scheme);

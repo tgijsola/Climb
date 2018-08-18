@@ -1,4 +1,4 @@
-﻿@model Climb.ViewModels.BaseViewModel
+﻿@model Climb.ViewModels.Account.RegisterViewModel
 
 @{
     ViewBag.Title = "Account-Register";
@@ -10,23 +10,28 @@
 
     <form class="form-signin" asp-action="RegisterPost" method="post">
         <div class="form-group">
-            <input type="email" id="inputEmail" name="Email" class="form-control" placeholder="Email address" required autofocus>
+            <input asp-for="Request.Email" class="form-control" placeholder="Email Address" autofocus>
+            <span asp-validation-for="Request.Email" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <input type="text" id="inputUsername" name="Username" class="form-control" placeholder="Username" required autofocus>
+            <input asp-for="Request.Name" class="form-control" placeholder="Name" autofocus>
+            <span asp-validation-for="Request.Name" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <input type="text" id="inputName" name="Name" class="form-control" placeholder="John Smith" required autofocus>
+            <input asp-for="Request.Username" class="form-control" placeholder="Username" autofocus>
+            <span asp-validation-for="Request.Username" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <input type="password" id="inputPassword" name="Password" class="form-control" placeholder="Password" required>
+            <input asp-for="Request.Password" class="form-control" placeholder="Password" autofocus>
+            <span asp-validation-for="Request.Password" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <input type="password" id="inputConfirm" name="ConfirmPassword" class="form-control" placeholder="Confirm Password" required />
+            <input asp-for="Request.ConfirmPassword" class="form-control" placeholder="Confirm Password" autofocus>
+            <span asp-validation-for="Request.ConfirmPassword" class="text-danger"></span>
         </div>
 
         <div class="form-check mb-3">
