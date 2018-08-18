@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
 using Climb.Data;
+using Climb.Models;
 using Climb.Requests.Games;
+using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.ViewModels.Games;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,11 +16,13 @@ namespace Climb.Controllers
     public class GameController : BaseController<GameController>
     {
         private readonly IGameService gameService;
+        private readonly ICdnService cdnService;
 
-        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger, UserManager<ApplicationUser> userManager)
+        public GameController(IGameService gameService, ApplicationDbContext dbContext, ILogger<GameController> logger, IUserManager userManager, ICdnService cdnService)
             : base(logger, userManager, dbContext)
         {
             this.gameService = gameService;
+            this.cdnService = cdnService;
         }
 
         [HttpGet("games")]
@@ -42,21 +45,32 @@ namespace Climb.Controllers
                 return NotFound();
             }
 
-            var viewModel = new HomeViewModel(user, game);
+            var viewModel = HomeViewModel.Create(user, game, cdnService);
             return View(viewModel);
         }
 
         [HttpGet("games/characters/add/{gameID:int}")]
-        public async Task<IActionResult> CharacterAdd(int gameID)
+        public async Task<IActionResult> CharacterAdd(int gameID, int? characterID)
         {
             var user = await GetViewUserAsync();
+
             var game = await dbContext.Games.FirstOrDefaultAsync(g => g.ID == gameID);
             if(game == null)
             {
                 return NotFound();
             }
 
-            var viewModel = new CharacterAddViewModel(user, game);
+            Character character = null;
+            if(characterID != null)
+            {
+                character = await dbContext.Characters.FirstOrDefaultAsync(c => c.ID == characterID);
+                if(character == null)
+                {
+                    return NotFound();
+                }
+            }
+
+            var viewModel = CharacterAddViewModel.Create(user, game, character, cdnService);
             return View(viewModel);
         }
 
@@ -65,8 +79,8 @@ namespace Climb.Controllers
         {
             try
             {
-                var character = await gameService.AddCharacter(request);
-                return CodeResultAndLog(HttpStatusCode.Created, character, $"New character {character.Name} created.");
+                await gameService.AddCharacter(request.GameID, request.CharacterID, request.Name, request.Image);
+                return RedirectToAction("Home", new {request.GameID});
             }
             catch(Exception exception)
             {
@@ -75,16 +89,27 @@ namespace Climb.Controllers
         }
 
         [HttpGet("games/stages/add/{gameID:int}")]
-        public async Task<IActionResult> StageAdd(int gameID)
+        public async Task<IActionResult> StageAdd(int gameID, int? stageID)
         {
             var user = await GetViewUserAsync();
+
             var game = await dbContext.Games.FirstOrDefaultAsync(g => g.ID == gameID);
             if(game == null)
             {
                 return NotFound();
             }
 
-            var viewModel = new StageAddViewModel(user, game);
+            Stage stage = null;
+            if(stageID != null)
+            {
+                stage = await dbContext.Stages.FirstOrDefaultAsync(s => s.ID == stageID);
+                if(stage == null)
+                {
+                    return NotFound();
+                }
+            }
+
+            var viewModel = new StageAddViewModel(user, game, stage);
             return View(viewModel);
         }
 
@@ -93,8 +118,8 @@ namespace Climb.Controllers
         {
             try
             {
-                var stage = await gameService.AddStage(request);
-                return CodeResultAndLog(HttpStatusCode.Created, stage, $"New stage {stage.Name} created.");
+                await gameService.AddStage(request.GameID, request.StageID, request.Name);
+                return RedirectToAction("Home", new {request.GameID});
             }
             catch(Exception exception)
             {
@@ -102,12 +127,38 @@ namespace Climb.Controllers
             }
         }
 
-        [HttpPost("games/create")]
-        public async Task<IActionResult> Create(CreateRequest request)
+        [Authorize]
+        [HttpGet("games/create")]
+        public async Task<IActionResult> Create()
+        {
+            var user = await GetViewUserAsync();
+
+            var viewModel = new UpdateViewModel(user, null, cdnService);
+            return View("Update", viewModel);
+        }
+
+        [Authorize]
+        [HttpGet("games/update/{gameID:int}")]
+        public async Task<IActionResult> Update(int gameID)
+        {
+            var user = await GetViewUserAsync();
+
+            var game = await dbContext.Games.FirstOrDefaultAsync(g => g.ID == gameID);
+            if(game == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new UpdateViewModel(user, game, cdnService);
+            return View(viewModel);
+        }
+
+        [HttpPost("games/update")]
+        public async Task<IActionResult> UpdatePost(UpdateRequest request)
         {
             try
             {
-                var game = await gameService.Create(request);
+                var game = await gameService.Update(request);
                 logger.LogInformation($"Game {game.ID} created");
 
                 return RedirectToAction("Home", new

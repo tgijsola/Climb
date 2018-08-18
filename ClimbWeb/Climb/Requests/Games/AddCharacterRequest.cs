@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace Climb.Requests.Games
 {
@@ -6,17 +7,10 @@ namespace Climb.Requests.Games
     {
         [Required]
         public int GameID { get; set; }
+        public int? CharacterID { get; set; }
         [Required]
         public string Name { get; set; }
-
-        public AddCharacterRequest()
-        {
-        }
-
-        public AddCharacterRequest(int gameID, string name)
-        {
-            GameID = gameID;
-            Name = name;
-        }
+        [Required]
+        public IFormFile Image { get; set; }
     }
 }

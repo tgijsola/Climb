@@ -15,8 +15,13 @@ namespace Climb.Data
         public DbSet<SeasonLeagueUser> SeasonLeagueUsers { get; set; }
         public DbSet<Set> Sets { get; set; }
         public DbSet<Match> Matches { get; set; }
+        public DbSet<Character> Characters { get; set; }
+        public DbSet<Stage> Stages { get; set; }
         public DbSet<MatchCharacter> MatchCharacters { get; set; }
         public DbSet<RankSnapshot> RankSnapshots { get; set; }
+        public DbSet<SetRequest> SetRequests { get; set; }
+        public DbSet<Organization> Organizations { get; set; }
+        public DbSet<OrganizationUser> OrganizationUsers { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -32,24 +37,10 @@ namespace Climb.Data
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
-            CreateLeagueUser(builder.Entity<LeagueUser>());
-            CreateSeasonLeagueUser(builder.Entity<SeasonLeagueUser>());
-            CreateMatchCharacter(builder.Entity<MatchCharacter>());
-        }
-
-        private static void CreateLeagueUser(EntityTypeBuilder<LeagueUser> entity)
-        {
-            entity.HasQueryFilter(lu => lu.HasLeft == false);
-        }
-
-        private static void CreateSeasonLeagueUser(EntityTypeBuilder<SeasonLeagueUser> entity)
-        {
-            entity.HasKey(lus => new {lus.LeagueUserID, lus.SeasonID});
-        }
-
-        private static void CreateMatchCharacter(EntityTypeBuilder<MatchCharacter> entity)
-        {
-            entity.HasKey(m => new {m.MatchID, m.CharacterID, m.LeagueUserID});
+            builder.Entity<OrganizationUser>().HasQueryFilter(ou => ou.HasLeft == false);
+            builder.Entity<LeagueUser>().HasQueryFilter(lu => lu.HasLeft == false);
+            builder.Entity<MatchCharacter>().HasKey(m => new {m.MatchID, m.CharacterID, m.LeagueUserID});
+            builder.Entity<SetRequest>().HasQueryFilter(lu => lu.IsOpen);
         }
     }
 }

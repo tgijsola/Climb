@@ -3,16 +3,13 @@
     "strict": true,
     "noImplicitAny": true,
     "jsx": "react",
-    "module": "commonjs",
+    "module": "es6",
     "target": "es6",
     "sourceMap": true,
     "outDir": "./dist/",
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-  "include": [
-    "./src/app/**/*"
-  ],
   "exclude": [
     "node_modules"
   ]

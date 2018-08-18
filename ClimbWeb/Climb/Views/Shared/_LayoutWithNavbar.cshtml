@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Climb</title>
 
-    <partial name="./_Files"/>
+    <partial name="./_Files" />
 </head>
 <body class="text-center">
-<partial name="./Navbar" />
-@RenderBody()
-
-@RenderSection("scripts", required: false)
+    <div class="w-100">
+        <partial name="./Navbar" />
+        @RenderBody()
+    </div>
+    <partial name="./Footer" />
+    @RenderSection("scripts", required: false)
 </body>
+
 </html>

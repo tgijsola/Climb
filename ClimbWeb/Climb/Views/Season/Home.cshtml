@@ -1,11 +1,11 @@
 ﻿@using Climb.Services
 @using Climb.ViewModels.Seasons
+@using Climb.ViewModels.Sets
 @model HomeViewModel
 @inject ICdnService cdnService
 
 @{
     ViewBag.Title = "Leagues-Home";
-    Layout = "_LayoutWithNavbar";
 }
 
 <div>
@@ -33,13 +33,9 @@
     @if (Model.Season.Sets.Count > 0)
     {
         <h3>Sets</h3>
-        foreach(var set in Model.Season.Sets)
+        foreach(var set in Model.AvailableSets)
         {
-            <div>
-                <div>Set @set.ID</div>
-                <div>@set.Player1.User.UserName v @set.Player2.User.UserName</div>
-                <a class="btn btn-sm btn-primary">Fight</a>
-            </div>
+            <partial name="../Set/Partials/Details" model="@DetailsViewModel.Create(Model.User, set, cdnService)"/>
         }
     }
 

@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Climb.Data;
-using Climb.Services.ModelServices;
+using Climb.Services;
 using Climb.ViewModels;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -10,15 +9,12 @@ namespace Climb.Controllers
 {
     public class SetController : BaseController<SetController>
     {
-        private readonly ISetService setService;
-
-        public SetController(ApplicationDbContext dbContext, ISetService setService, ILogger<SetController> logger, UserManager<ApplicationUser> userManager)
+        public SetController(ApplicationDbContext dbContext, ILogger<SetController> logger, IUserManager userManager)
             : base(logger, userManager, dbContext)
         {
-            this.setService = setService;
         }
 
-        [HttpGet("sets/fight")]
+        [HttpGet("sets/fight/{setID:int}")]
         public async Task<IActionResult> Fight()
         {
             var user = await GetViewUserAsync();

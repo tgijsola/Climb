@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Climb.Models;
 
 namespace Climb.Services
@@ -18,7 +17,15 @@ namespace Climb.Services
                 {
                     var player2 = participants[j];
                     var dueDate = DateTime.Now;
-                    var set = new Set(season.LeagueID, season.ID, player1.LeagueUserID, player2.LeagueUserID, dueDate);
+                    var set = new Set{
+                        LeagueID = season.LeagueID,
+                        SeasonID = season.ID,
+                        DueDate = dueDate,
+                        Player1ID = player1.LeagueUserID,
+                        Player2ID = player2.LeagueUserID,
+                        SeasonPlayer1ID = player1.ID,
+                        SeasonPlayer2ID = player2.ID,
+                    };
                     sets.Add(set);
                 }
             }

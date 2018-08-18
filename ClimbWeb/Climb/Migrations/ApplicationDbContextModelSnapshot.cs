@@ -15,7 +15,7 @@ namespace Climb.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.0-rtm-30799")
+                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -37,6 +37,8 @@ namespace Climb.Migrations
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
+
+                    b.Property<string>("Name");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256);
@@ -80,6 +82,8 @@ namespace Climb.Migrations
 
                     b.Property<int>("GameID");
 
+                    b.Property<string>("ImageKey");
+
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -87,7 +91,7 @@ namespace Climb.Migrations
 
                     b.HasIndex("GameID");
 
-                    b.ToTable("Character");
+                    b.ToTable("Characters");
                 });
 
             modelBuilder.Entity("Climb.Models.Game", b =>
@@ -101,6 +105,8 @@ namespace Climb.Migrations
                     b.Property<DateTime>("DateAdded");
 
                     b.Property<bool>("HasStages");
+
+                    b.Property<string>("LogoImageKey");
 
                     b.Property<int>("MaxMatchPoints");
 
@@ -127,6 +133,8 @@ namespace Climb.Migrations
                     b.Property<string>("Name")
                         .IsRequired();
 
+                    b.Property<int?>("OrganizationID");
+
                     b.Property<int>("SetsTillRank");
 
                     b.HasKey("ID");
@@ -134,6 +142,8 @@ namespace Climb.Migrations
                     b.HasIndex("AdminID");
 
                     b.HasIndex("GameID");
+
+                    b.HasIndex("OrganizationID");
 
                     b.ToTable("Leagues");
                 });
@@ -144,7 +154,11 @@ namespace Climb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("DisplayName");
+
                     b.Property<bool>("HasLeft");
+
+                    b.Property<DateTime>("JoinDate");
 
                     b.Property<int>("LeagueID");
 
@@ -208,6 +222,46 @@ namespace Climb.Migrations
                     b.ToTable("MatchCharacters");
                 });
 
+            modelBuilder.Entity("Climb.Models.Organization", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateCreated");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Organizations");
+                });
+
+            modelBuilder.Entity("Climb.Models.OrganizationUser", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("HasLeft");
+
+                    b.Property<bool>("IsOwner");
+
+                    b.Property<DateTime>("JoinDate");
+
+                    b.Property<int>("OrganizationID");
+
+                    b.Property<string>("UserID");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("OrganizationID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("OrganizationUsers");
+                });
+
             modelBuilder.Entity("Climb.Models.RankSnapshot", b =>
                 {
                     b.Property<int>("ID")
@@ -258,15 +312,23 @@ namespace Climb.Migrations
 
             modelBuilder.Entity("Climb.Models.SeasonLeagueUser", b =>
                 {
-                    b.Property<int>("LeagueUserID");
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("SeasonID");
+                    b.Property<int>("LeagueUserID");
 
                     b.Property<int>("Points");
 
+                    b.Property<int>("SeasonID");
+
                     b.Property<int>("Standing");
 
-                    b.HasKey("LeagueUserID", "SeasonID");
+                    b.Property<int>("TieBreakerPoints");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("LeagueUserID");
 
                     b.HasIndex("SeasonID");
 
@@ -291,11 +353,19 @@ namespace Climb.Migrations
 
                     b.Property<int?>("Player1Score");
 
+                    b.Property<int>("Player1SeasonPoints");
+
                     b.Property<int>("Player2ID");
 
                     b.Property<int?>("Player2Score");
 
+                    b.Property<int>("Player2SeasonPoints");
+
                     b.Property<int?>("SeasonID");
+
+                    b.Property<int?>("SeasonPlayer1ID");
+
+                    b.Property<int?>("SeasonPlayer2ID");
 
                     b.Property<DateTime?>("UpdatedDate");
 
@@ -309,7 +379,44 @@ namespace Climb.Migrations
 
                     b.HasIndex("SeasonID");
 
+                    b.HasIndex("SeasonPlayer1ID");
+
+                    b.HasIndex("SeasonPlayer2ID");
+
                     b.ToTable("Sets");
+                });
+
+            modelBuilder.Entity("Climb.Models.SetRequest", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ChallengedID");
+
+                    b.Property<DateTime>("DateCreated");
+
+                    b.Property<bool>("IsOpen");
+
+                    b.Property<int>("LeagueID");
+
+                    b.Property<string>("Message");
+
+                    b.Property<int>("RequesterID");
+
+                    b.Property<int?>("SetID");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ChallengedID");
+
+                    b.HasIndex("LeagueID");
+
+                    b.HasIndex("RequesterID");
+
+                    b.HasIndex("SetID");
+
+                    b.ToTable("SetRequests");
                 });
 
             modelBuilder.Entity("Climb.Models.Stage", b =>
@@ -327,7 +434,7 @@ namespace Climb.Migrations
 
                     b.HasIndex("GameID");
 
-                    b.ToTable("Stage");
+                    b.ToTable("Stages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -459,6 +566,11 @@ namespace Climb.Migrations
                         .WithMany("Leagues")
                         .HasForeignKey("GameID")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.Organization", "Organization")
+                        .WithMany("Leagues")
+                        .HasForeignKey("OrganizationID")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Climb.Models.LeagueUser", b =>
@@ -502,6 +614,19 @@ namespace Climb.Migrations
                     b.HasOne("Climb.Models.Match", "Match")
                         .WithMany("MatchCharacters")
                         .HasForeignKey("MatchID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Climb.Models.OrganizationUser", b =>
+                {
+                    b.HasOne("Climb.Models.Organization", "Organization")
+                        .WithMany("Members")
+                        .HasForeignKey("OrganizationID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Data.ApplicationUser", "User")
+                        .WithMany("Organizations")
+                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
@@ -554,6 +679,39 @@ namespace Climb.Migrations
                     b.HasOne("Climb.Models.Season", "Season")
                         .WithMany("Sets")
                         .HasForeignKey("SeasonID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.SeasonLeagueUser", "SeasonPlayer1")
+                        .WithMany("P1Sets")
+                        .HasForeignKey("SeasonPlayer1ID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.SeasonLeagueUser", "SeasonPlayer2")
+                        .WithMany("P2Sets")
+                        .HasForeignKey("SeasonPlayer2ID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Climb.Models.SetRequest", b =>
+                {
+                    b.HasOne("Climb.Models.LeagueUser", "Challenged")
+                        .WithMany()
+                        .HasForeignKey("ChallengedID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.League", "League")
+                        .WithMany()
+                        .HasForeignKey("LeagueID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.LeagueUser", "Requester")
+                        .WithMany()
+                        .HasForeignKey("RequesterID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Climb.Models.Set", "Set")
+                        .WithMany()
+                        .HasForeignKey("SetID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

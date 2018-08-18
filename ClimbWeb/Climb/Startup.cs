@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Reflection;
+using Climb.Core.TieBreakers;
 using Climb.Data;
 using Climb.Services;
 using Climb.Services.ModelServices;
 using Climb.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,38 +24,65 @@ namespace Climb
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
             ConfigureDB(services);
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+                {
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireNonAlphanumeric  = false;
+                    options.Password.RequireUppercase  = false;
+                    options.Password.RequireLowercase  = false;
+                })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
             services.AddAuthentication();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddCookieTempDataProvider();
+
+            var cdnType = Configuration["CDN"];
+            switch(cdnType)
+            {
+                case "S3":
+                    services.AddSingleton<ICdnService, S3Cdn>();
+                    break;
+                case "Local":
+                    services.AddSingleton<ICdnService, FileStorageCdn>();
+                    break;
+                default:
+                    throw new NotSupportedException("Need to set a CDN type.");
+            }
 
             services.AddTransient<IApplicationUserService, ApplicationUserService>();
             services.AddTransient<IGameService, GameService>();
             services.AddTransient<ILeagueService, LeagueService>();
             services.AddTransient<ISeasonService, SeasonService>();
             services.AddTransient<ISetService, SetService>();
-
-            services.AddSingleton<IEmailSender, EmailSender>();
+            services.AddTransient<IOrganizationService, OrganizationService>();
             services.AddTransient<ITokenHelper, TokenHelper>();
             services.AddTransient<IUrlUtility, UrlUtility>();
             services.AddTransient<IScheduleFactory, RoundRobinScheduler>();
-            services.AddTransient<ICdnService, FileStorageCdn>();
             services.AddTransient<IPointService, EloPointService>();
+            services.AddTransient<ISeasonPointCalculator, ParticipationSeasonPointCalculator>();
+            services.AddTransient<ITieBreakerFactory, TieBreakerFactory>();
+            services.AddTransient<ISignInManager, SignInManager>();
+            services.AddTransient<IUserManager, UserManager>();
+
+            if(string.IsNullOrWhiteSpace(Configuration["Email:Key"]))
+            {
+                services.AddTransient<IEmailSender, NullEmailService>();
+            }
+            else
+            {
+                services.AddTransient<IEmailSender, SendGridService>();
+            }
         }
 
         private void ConfigureDB(IServiceCollection services)
@@ -80,35 +106,28 @@ namespace Climb
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
 
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true,
-                    EnvironmentVariables = new Dictionary<string, string>{{"mode", "development"}},
-                });
+                //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                //{
+                //    HotModuleReplacement = false,
+                //    ReactHotModuleReplacement = false,
+                //    EnvironmentVariables = new Dictionary<string, string> {{"mode", "development"}},
+                //});
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseStatusCodePagesWithReExecute("/Site/Error", "?statusCode={0}");
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
 
             app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly,
                 settings => settings.GeneratorSettings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase);
 
             app.UseAuthentication();
 
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvcWithDefaultRoute();
         }
     }
 }

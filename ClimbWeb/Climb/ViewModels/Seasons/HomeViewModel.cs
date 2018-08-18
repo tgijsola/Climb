@@ -11,8 +11,8 @@ namespace Climb.ViewModels.Seasons
         public int SeasonNumber { get; }
         public bool IsParticipant { get; }
         public bool CanStartSeason { get; }
-
-        public IReadOnlyList<SeasonLeagueUser> Participants => Season.Participants;
+        public IEnumerable<SeasonLeagueUser> Participants { get; }
+        public IEnumerable<Set> AvailableSets { get; }
 
         private HomeViewModel(ApplicationUser user, Season season, bool isParticipant)
             : base(user)
@@ -21,7 +21,8 @@ namespace Climb.ViewModels.Seasons
             IsParticipant = isParticipant;
             SeasonNumber = season.Index + 1;
 
-            Season.Participants.Sort();
+            Participants = Season.Participants.OrderBy(p => p.Standing);
+            AvailableSets = Season.Sets.Where(s => !s.IsComplete);
 
             if(season.IsActive)
             {

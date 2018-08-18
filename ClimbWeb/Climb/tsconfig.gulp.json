@@ -2,11 +2,12 @@
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
+    "module": "es6",
+    "target": "es6",
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-  "include": [
-    "./src/scripts/**/*"
-  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,4 +1,5 @@
-﻿const gulp = require("gulp");
+﻿/// <binding ProjectOpened='watch-less' />
+const gulp = require("gulp");
 const ts = require("gulp-typescript");
 const less = require("gulp-less");
 const path = require("path");
@@ -10,6 +11,13 @@ gulp.task("ts", function () {
         .pipe(gulp.dest('wwwroot/dist/scripts'));
 });
 
+var tsClimbProject = ts.createProject('tsconfig.gulp.json');
+gulp.task("ts-climb", function () {
+    return gulp.src('ClientApp/gen/climbClient.ts')
+        .pipe(tsClimbProject())
+        .pipe(gulp.dest('wwwroot/dist/gen'));
+});
+
 gulp.task("less", () => {
     return gulp.src("ClientApp/styles/**/*.less")
         .pipe(less({
@@ -18,4 +26,8 @@ gulp.task("less", () => {
         .pipe(gulp.dest("wwwroot/dist/styles"));
 });
 
-gulp.task("default", gulp.parallel("less", "ts"));
+gulp.task("watch-less", () => {
+    gulp.watch("./ClientApp/styles/**/*.less", gulp.series("less"));
+});
+
+gulp.task("default", gulp.parallel("less", "ts", "ts-climb"));
