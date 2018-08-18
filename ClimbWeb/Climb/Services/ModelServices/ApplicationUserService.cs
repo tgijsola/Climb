@@ -6,7 +6,6 @@ using Climb.Extensions;
 using Climb.Requests.Account;
 using Climb.Utilities;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -61,7 +60,7 @@ namespace Climb.Services.ModelServices
         public async Task<string> LogIn(LoginRequest request)
         {
             var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            
+
             var result = await signInManager.PasswordSignInAsync(user?.UserName, request.Password, request.RememberMe, false);
             if(result.Succeeded)
             {
@@ -87,13 +86,8 @@ namespace Climb.Services.ModelServices
             }
 
             dbContext.Update(user);
-            if(!string.IsNullOrWhiteSpace(user.ProfilePicKey))
-            {
-                await cdnService.DeleteImageAsync(user.ProfilePicKey, ClimbImageRules.ProfilePic);
-                user.ProfilePicKey = "";
-            }
-
-            var imageKey = await cdnService.UploadImageAsync(image, ClimbImageRules.ProfilePic);
+            
+            var imageKey = await cdnService.ReplaceImageAsync(user.ProfilePicKey, image, ClimbImageRules.ProfilePic);
             var imageUrl = cdnService.GetImageUrl(imageKey, ClimbImageRules.ProfilePic);
             user.ProfilePicKey = imageKey;
             await dbContext.SaveChangesAsync();
@@ -109,6 +103,7 @@ namespace Climb.Services.ModelServices
             {
                 throw new NotFoundException(typeof(ApplicationUser), userID);
             }
+
             dbContext.Update(user);
             dbContext.UpdateRange(user.LeagueUsers);
 

@@ -118,20 +118,6 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
-        public async Task UploadImage_UserHasImage_DeleteOldImage()
-        {
-            const string firstKey = ImageKey + "_First";
-            var user = DbContextUtility.AddNew<ApplicationUser>(dbContext, u => u.ProfilePicKey = firstKey);
-            var file = PrepareCdnService();
-
-            await testObj.UploadProfilePic(user.Id, file);
-
-#pragma warning disable 4014
-            cdnService.Received(1).DeleteImageAsync(firstKey, ClimbImageRules.ProfilePic);
-#pragma warning restore 4014
-        }
-
-        [Test]
         public async Task UpdateSettings_NewValues_ValuesUpdated()
         {
             var user = DbContextUtility.AddNew<ApplicationUser>(dbContext);
@@ -162,7 +148,7 @@ namespace Climb.Test.Services.ModelServices
             await testObj.UpdateSettings(user.Id, "bob", "", file);
 
 #pragma warning disable 4014
-            cdnService.Received(1).UploadImageAsync(file, ClimbImageRules.ProfilePic);
+            cdnService.Received(1).ReplaceImageAsync(Arg.Any<string>(), file, ClimbImageRules.ProfilePic);
 #pragma warning restore 4014
         }
 
@@ -193,7 +179,7 @@ namespace Climb.Test.Services.ModelServices
         private IFormFile PrepareCdnService()
         {
             var file = Substitute.For<IFormFile>();
-            cdnService.UploadImageAsync(file, ClimbImageRules.ProfilePic).Returns(ImageKey);
+            cdnService.ReplaceImageAsync(Arg.Any<string>(), file, ClimbImageRules.ProfilePic).Returns(ImageKey);
             cdnService.GetImageUrl(ImageKey, ClimbImageRules.ProfilePic).Returns(ImageUrl);
             return file;
         }
