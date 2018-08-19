@@ -17,7 +17,6 @@ namespace Climb.Models
         public bool HasLeft { get; set; }
         public int Points { get; set; }
         public int Rank { get; set; }
-        // TODO: Update this value.
         public int SetCount { get; set; }
         public DateTime JoinDate { get; set; }
 
