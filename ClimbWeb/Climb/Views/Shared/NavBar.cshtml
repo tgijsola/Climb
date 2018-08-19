@@ -77,7 +77,7 @@
     {
         <div class="ml-2">
             <a asp-controller="User" asp-action="Home" asp-route-userID="">
-                <img src="@cdnService.GetImageUrl(Model.User.ProfilePicKey, ClimbImageRules.ProfilePic)" width="30" height="30"/>
+                <img src="@Model.GetProfilePic(cdnService)" width="30" height="30"/>
             </a>
         </div>
     }
