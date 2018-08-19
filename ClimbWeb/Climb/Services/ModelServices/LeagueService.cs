@@ -179,7 +179,7 @@ namespace Climb.Services.ModelServices
                 RankSnapshot lastSnapshot = null;
                 if(member.RankSnapshots?.Count > 0)
                 {
-                    lastSnapshot = member.RankSnapshots.MaxBy(rs => rs.CreatedDate);
+                    lastSnapshot = member.RankSnapshots.MaxBy(rs => rs.CreatedDate).Take(1).First();
                 }
 
                 var rankDelta = member.Rank - (lastSnapshot?.Rank ?? 0);

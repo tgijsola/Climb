@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Climb.Models;
-using Microsoft.AspNetCore.Identity;
 using Climb.Services;
-using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace Climb.Data
 {
@@ -18,16 +18,14 @@ namespace Climb.Data
         {
             const int defaultPicturesCount = 24;
 
-            if (string.IsNullOrWhiteSpace(ProfilePicKey))
+            if(string.IsNullOrWhiteSpace(ProfilePicKey))
             {
-                var idHash = Id.GetHashCode();
-                var defaultID = Math.Abs(idHash % defaultPicturesCount);
+                var idHash = Id.Select(c => (int)c).Sum();
+                var defaultID = idHash % defaultPicturesCount;
                 return $"/images/profile-default/profile-default-{defaultID}.jpg";
             }
-            else
-            {
-                return cdnService.GetImageUrl(ProfilePicKey, ClimbImageRules.ProfilePic);
-            }
+
+            return cdnService.GetImageUrl(ProfilePicKey, ClimbImageRules.ProfilePic);
         }
     }
 }

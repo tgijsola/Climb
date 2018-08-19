@@ -4,32 +4,33 @@
     ViewBag.Title = "Account-Settings";
 }
 
-<div class="container">
-    <h3 class="py-4">@Model.User.UserName Settings</h3>
+<div class="container mt-4">
+    <h1 class="mb-4">@Model.User.UserName Settings</h1>
     <form asp-action="UpdateSettings" method="post" enctype="multipart/form-data">
+        <!--ID-->
         <div class="form-group row">
-            <label class="col-sm-4 col-form-label" for="inputName">Name</label>
-            <div class="col-sm-8">
-                <input type="text" id="inputName" name="Name" class="form-control" value="@Model.User.Name" autofocus>
+            <label class="col-5 col-form-label text-left">ID</label>
+            <input type="text" name="Name" class="form-control col-7" value="@Model.User.Id" readonly="readonly"/>
+        </div>
+        <!--Name-->
+        <div class="form-group row">
+            <label class="col-5 col-form-label text-left">Name</label>
+            <input type="text" name="Name" class="form-control col-7" value="@Model.User.Name" autofocus />
+        </div>
+        <!--Username-->
+        <div class="form-group row">
+            <label class="col-5 col-form-label text-left">Username</label>
+            <input type="text" name="Username" class="form-control col-7" value="@Model.User.UserName" autofocus required />
+        </div>
+        <!--Profile Picture-->
+        <div class="form-group row">
+            <label class="col-5 col-form-label text-left">Profile Picture</label>
+            <div class="col-7">
+                <img src="@Model.ProfilePic" width="100" height="100" />
+                <input class="form-control-file" type="file" name="ProfilePic" accept="image/*" />
             </div>
         </div>
-        <div class="form-group row">
-            <label class="col-sm-4 col-form-label" for="inputUsername">Username</label>
-            <div class="col-sm-8">
-                <input type="text" id="inputUsername" name="Username" class="form-control" value="@Model.User.UserName" required autofocus>
-            </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-4">
-                <img src="@Model.ProfilePic" />
-            </div>
-            <div class="col-sm-8">
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="inputProfilePic" name="ProfilePic" accept="image/*" autofocus>
-                    <label class="custom-file-label" for="inputProfilePic">Choose Image</label>
-                </div>
-            </div>
-        </div>
+
         <button class="btn btn-lg btn-primary btn-block" type="submit">Save Changes</button>
     </form>
 </div>
