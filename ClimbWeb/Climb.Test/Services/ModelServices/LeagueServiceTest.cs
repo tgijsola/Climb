@@ -11,6 +11,9 @@ using NUnit.Framework;
 
 namespace Climb.Test.Services.ModelServices
 {
+    // TODO: Sets for all players
+    // TODO: Sets for some players
+    // TODO: Sets for no players
     [TestFixture]
     public class LeagueServiceTest
     {
@@ -151,6 +154,7 @@ namespace Climb.Test.Services.ModelServices
         public async Task UpdateStandings_UniquePoints_NoTies()
         {
             var league = CreateLeague(10);
+            league.SetsTillRank = 0;
             for(var i = 0; i < league.Members.Count; i++)
             {
                 league.Members[i].Points = i;
@@ -170,6 +174,7 @@ namespace Climb.Test.Services.ModelServices
         public async Task UpdateStandings_SharedPoints_CorrectlySkipPlace()
         {
             var league = CreateLeague(3);
+            league.SetsTillRank = 0;
             league.Members[0].Points = 2;
             league.Members[1].Points = 2;
             league.Members[2].Points = 1;
@@ -183,9 +188,34 @@ namespace Climb.Test.Services.ModelServices
             Assert.AreEqual(3, members[2].Rank);
         }
 
-        // TODO: Sets for all players
-        // TODO: Sets for some players
-        // TODO: Sets for no players
+        [Test]
+        public async Task UpdateStandings_NewcomerHasRank_RankSetTo0()
+        {
+            var league = CreateLeague(1);
+            league.Members[0].Points = 2;
+            league.Members[0].Rank = 2;
+
+            await testObj.UpdateStandings(league.ID);
+
+            Assert.AreEqual(0, league.Members[0].Rank);
+        }
+
+        [Test]
+        public async Task UpdateStandings_Newcomer_PointsUpdated()
+        {
+            var league = CreateLeague(2);
+            var player1 = league.Members[0];
+            var originalPoints = player1.Points;
+
+            var set = SetUtility.Create(dbContext, player1.ID, league.Members[1].ID, league.ID);
+            DbContextUtility.UpdateAndSave(dbContext, set, () => { set.IsComplete = true; });
+            
+            pointService.CalculatePointDeltas(0, 0, false).ReturnsForAnyArgs((1, -1));
+
+            await testObj.UpdateStandings(league.ID);
+
+            Assert.AreNotEqual(originalPoints, player1.Points);
+        }
 
         [Test]
         public void TakeSnapshots_NoLeague_NotFound()
