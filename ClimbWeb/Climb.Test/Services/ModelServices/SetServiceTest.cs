@@ -141,6 +141,17 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
+        public async Task Update_IsCompleteIsTrue()
+        {
+            var set = SetUtility.Create(dbContext);
+
+            var matchForms = CreateMatchForms(3);
+            await testObj.Update(set.ID, matchForms);
+
+            Assert.IsTrue(set.IsComplete);
+        }
+
+        [Test]
         public void RequestSet_NoRequester_NotFoundException()
         {
             var league = LeagueUtility.CreateLeague(dbContext);

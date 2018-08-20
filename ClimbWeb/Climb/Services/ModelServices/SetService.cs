@@ -112,6 +112,7 @@ namespace Climb.Services.ModelServices
 
             dbContext.Sets.Update(set);
 
+            set.IsComplete = true;
             set.Player1Score = set.Player2Score = 0;
 
             for(var i = 0; i < matchForms.Count; i++)
