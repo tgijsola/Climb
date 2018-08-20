@@ -142,14 +142,19 @@ namespace Climb.Services.ModelServices
 
             void UpdateRanks()
             {
-                var activeMembers = league.Members.Where(lu => !league.IsMemberNew(lu))
-                    .OrderByDescending(lu => lu.Points).ToList();
+                var activeMembers = league.Members.OrderByDescending(lu => lu.Points).ToList();
 
                 var rank = 0;
                 var lastPoints = -1;
                 for(var i = 0; i < activeMembers.Count; i++)
                 {
                     var member = activeMembers[i];
+                    if(league.IsMemberNew(member))
+                    {
+                        member.Rank = 0;
+                        continue;
+                    }
+
                     if(member.Points != lastPoints)
                     {
                         lastPoints = member.Points;
@@ -194,9 +199,15 @@ namespace Climb.Services.ModelServices
                     CreatedDate = createdDate
                 };
                 rankSnapshots[i] = rankSnapshot;
+
+                if(member.IsNewcomer && !league.IsMemberNew(member))
+                {
+                    member.IsNewcomer = false;
+                    dbContext.Update(member);
+                }
             }
 
-            await dbContext.RankSnapshots.AddRangeAsync(rankSnapshots);
+            dbContext.RankSnapshots.AddRange(rankSnapshots);
             await dbContext.SaveChangesAsync();
 
             return rankSnapshots;
