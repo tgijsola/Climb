@@ -63,6 +63,7 @@ namespace Climb.Controllers
                 foreach(var league in leagues)
                 {
                     await leagueService.UpdateStandings(league.ID);
+                    await leagueService.TakeSnapshots(league.ID);
                 }
 
                 return Ok();
