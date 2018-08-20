@@ -199,9 +199,15 @@ namespace Climb.Services.ModelServices
                     CreatedDate = createdDate
                 };
                 rankSnapshots[i] = rankSnapshot;
+
+                if(member.IsNewcomer && !league.IsMemberNew(member))
+                {
+                    member.IsNewcomer = false;
+                    dbContext.Update(member);
+                }
             }
 
-            await dbContext.RankSnapshots.AddRangeAsync(rankSnapshots);
+            dbContext.RankSnapshots.AddRange(rankSnapshots);
             await dbContext.SaveChangesAsync();
 
             return rankSnapshots;

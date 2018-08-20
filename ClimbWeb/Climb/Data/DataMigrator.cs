@@ -21,6 +21,7 @@ namespace Climb.Data
 {
     public static class DataMigrator
     {
+        private const int SetsTillNotNewcomer = 4;
         private static readonly Dictionary<string, (string id, string name)> applicationUserIDs = new Dictionary<string, (string id, string name)>();
         private static readonly Dictionary<int, int> gameIDs = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> characterIDs = new Dictionary<int, int>();
@@ -184,7 +185,7 @@ namespace Climb.Data
                     AdminID = oldLeague.Admin.ApplicationUser.Id,
                     Name = oldLeague.Name,
                     DateCreated = DateTime.Today,
-                    SetsTillRank = 4,
+                    SetsTillRank = SetsTillNotNewcomer,
                 };
             }
 
@@ -245,6 +246,7 @@ namespace Climb.Data
                     Rank = oldLeagueUser.Rank,
                     Points = oldLeagueUser.Points,
                     SetCount = oldLeagueUser.SetsPlayed,
+                    IsNewcomer = oldLeagueUser.SetsPlayed < SetsTillNotNewcomer, 
                 };
             }
 

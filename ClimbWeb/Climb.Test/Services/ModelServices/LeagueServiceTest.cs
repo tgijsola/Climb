@@ -218,6 +218,19 @@ namespace Climb.Test.Services.ModelServices
         }
 
         [Test]
+        public async Task TakeSnapshots_NewcomerHasEnoughSets_NewcomerStatusRemoved()
+        {
+            var league = CreateLeague(1);
+            league.SetsTillRank = 2;
+            var player = league.Members[0];
+            player.SetCount = 2;
+
+            await testObj.TakeSnapshots(league.ID);
+
+            Assert.IsFalse(player.IsNewcomer);
+        }
+
+        [Test]
         public void TakeSnapshots_NoLeague_NotFound()
         {
             Assert.ThrowsAsync<NotFoundException>(() => testObj.TakeSnapshots(0));

@@ -19,8 +19,8 @@ namespace Climb.ViewModels.Leagues
             League = league;
 
             league.Members.Sort();
-            Members = league.Members.Where(lu => !league.IsMemberNew(lu)).ToList();
-            Newcomers = league.Members.Where(league.IsMemberNew).ToList();
+            Members = league.Members.Where(lu => !lu.IsNewcomer).ToList();
+            Newcomers = league.Members.Where(lu => lu.IsNewcomer).ToList();
             IsMember = league.Members.Any(lu => lu.UserID == user?.Id);
 
 #if DEBUG
