@@ -579,6 +579,11 @@
         "ImageKey": "t7_eddy.png"
     },
     {
+        "Name": "Eliza",
+        "GameID": 4,
+        "ImageKey": "t7_eliza.png"
+    },
+    {
         "Name": "Feng",
         "GameID": 4,
         "ImageKey": "t7_feng.png"
@@ -692,6 +697,11 @@
         "Name": "Panda",
         "GameID": 4,
         "ImageKey": "t7_panda.png"
+    },
+    {
+        "Name": "Paul",
+        "GameID": 4,
+        "ImageKey": "t7_paul.png"
     },
     {
         "Name": "Shaheen",
